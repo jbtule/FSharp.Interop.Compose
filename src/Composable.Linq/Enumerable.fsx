@@ -1,4 +1,4 @@
-// Generated with ComposableExtensions (0.6.1) https://github.com/jbtule/ComposableExtensions
+// Generated with ComposableExtensions (0.6.2) https://github.com/jbtule/ComposableExtensions
 
 module Composable.Linq.Enumerable
 let inline aggregate source (func:'TSource->'TSource->'TSource) = System.Linq.Enumerable.Aggregate(source, System.Func<'TSource, 'TSource, 'TSource>(func))

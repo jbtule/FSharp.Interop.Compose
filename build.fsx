@@ -29,7 +29,7 @@ open Tools
 let buildDir = "./build/"
 let srcDir = "./src/"
 let publishDir = "./publish/"
-let version = "0.6.1"
+let version = "0.6.2"
 let projectName = "ComposableExtensions"
 let projectUrl = "https://github.com/jbtule/ComposableExtensions"
 let title = "FSharp Composable Extension Methods"

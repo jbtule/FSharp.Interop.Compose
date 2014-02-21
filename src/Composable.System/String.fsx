@@ -1,4 +1,4 @@
-// Generated with ComposableExtensions (0.6.1) https://github.com/jbtule/ComposableExtensions
+// Generated with ComposableExtensions (0.6.2) https://github.com/jbtule/ComposableExtensions
 
 module Composable.System.String
 let inline isNullOrEmpty value = System.String.IsNullOrEmpty(value)
