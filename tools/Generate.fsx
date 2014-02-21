@@ -121,7 +121,7 @@ module IdentifyMethods =
 
     let isExtensionMethod (x:MethodDefinition) = hasExtensionMember x
     
-    let matchesSigniture (name:string) (argTypes:string seq) (m:MethodDefinition) =
+    let matchesSignature (name:string) (argTypes:string seq) (m:MethodDefinition) =
         let nameMatch =  m.Name = name
         let paramTypes = (m.Parameters |> Seq.map (fun p -> p.ParameterType.FullName))
         nameMatch && System.Linq.Enumerable.SequenceEqual(paramTypes, argTypes)

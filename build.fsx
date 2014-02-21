@@ -58,10 +58,10 @@ Target "Generate" (fun _ ->
    generateWrapper coreAsm "System.Linq" "Enumerable" Reorder.extensionMethodReorder [IdentifyMethods.isExtensionMethod]
    generateWrapper coreAsm "System.Linq" "ParallelEnumerable" Reorder.extensionMethodReorder [IdentifyMethods.isExtensionMethod]
    
-   let stringMethodFilters = [IdentifyMethods.matchesSigniture "Join" ["System.String";"System.Collections.Generic.IEnumerable`1<System.String>"]]
+   let stringMethodFilters = [IdentifyMethods.matchesSignature "Join" ["System.String";"System.Collections.Generic.IEnumerable`1<System.String>"]]
    generateWrapper mscorlibAsm "System" "String" Reorder.noChange stringMethodFilters
     
-   let fileMethodFilters = [IdentifyMethods.matchesSigniture "WriteAllLines" ["System.String";"System.Collections.Generic.IEnumerable`1<System.String>"]]
+   let fileMethodFilters = [IdentifyMethods.matchesSignature "WriteAllLines" ["System.String";"System.Collections.Generic.IEnumerable`1<System.String>"]]
    generateWrapper mscorlibAsm "System.IO" "File" Reorder.noChange  fileMethodFilters
    
    CreateFSharpAssemblyInfo (Path.Combine(srcDir, "AssemblyInfo.fsx"))
