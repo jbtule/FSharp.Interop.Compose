@@ -126,6 +126,9 @@ module IdentifyMethods =
         let paramTypes = (m.Parameters |> Seq.map (fun p -> p.ParameterType.FullName))
         nameMatch && System.Linq.Enumerable.SequenceEqual(paramTypes, argTypes)
 
+    let matchesName (name:string) (m:MethodDefinition) =
+        m.Name = name
+    
 module Generate =
 
     let writeWrappers (header:string) (srcDir:string) (asm:string) (namesp:string) (typeName:string) (orderedParameters:MethodDefinition->seq<ParameterDefinition>) (methodSelectors:(MethodDefinition->bool) list) =
