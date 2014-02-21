@@ -14,6 +14,10 @@ if not exist tools\packages\Mono.Cecil\lib\net40\Mono.Cecil.dll (
     "tools\nuget\nuget.exe" "install" "Mono.Cecil" "-OutputDirectory" "tools\packages" "-ExcludeVersion"
 )
 
+if not exist tools\packages\FsUnit.xUnit\lib\net40\FsUnit.xUnit.dll (
+    "tools\nuget\nuget.exe" "install" "FsUnit.xUnit" "-OutputDirectory" "tools\packages" "-ExcludeVersion"
+)
+
 SET TARGET="Default"
 
 IF NOT [%1]==[] (set TARGET="%1")

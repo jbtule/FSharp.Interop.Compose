@@ -8,4 +8,7 @@ fi
 if [ ! -f tools/packages/Mono.Cecil/lib/net40/Mono.Cecil.dll ]; then
   mono --runtime=v4.0 tools/NuGet/NuGet.exe install Mono.Cecil -OutputDirectory tools/packages -ExcludeVersion
 fi
+if [ ! -f tools/packages/FsUnit.xUnit/lib/net40/FsUnit.Xunit.dll ]; then
+  mono --runtime=v4.0 tools/NuGet/NuGet.exe install FsUnit.xUnit -OutputDirectory tools/packages -ExcludeVersion
+fi
 mono --runtime=v4.0 tools/packages/FAKE/tools/FAKE.exe build.fsx $@
