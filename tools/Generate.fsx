@@ -64,7 +64,12 @@ module Reformat =
         else
             sprintf "Composable.%s" x
     
-    let methodWrapper (specifyAllTypes:bool) (x:MethodDefinition) =
+    let methodWrapper (x:MethodDefinition) =
+        let paramCnt = x.Parameters |> Seq.length
+        let specifyAllTypes = 
+            (x.DeclaringType.Methods
+                 |> Seq.filter (fun m-> m.Name = x.Name && (m.Parameters |> Seq.length) = paramCnt)
+                 |> Seq.length) > 1
         let fsharpName = camelCase x.Name
         let parameterFix = parameterFixer specifyAllTypes
         let fsharpParams = (x.Parameters |> Seq.map parameterFix |> String.concat " ")
@@ -123,7 +128,7 @@ module IdentifyMethods =
 
 module Generate =
 
-    let writeWrappers (header:string) (srcDir:string) (asm:string) (namesp:string) (typeName:string) (specifyAllTypes:bool) (orderedParameters:MethodDefinition->seq<ParameterDefinition>) (methodSelectors:(MethodDefinition->bool) list) =
+    let writeWrappers (header:string) (srcDir:string) (asm:string) (namesp:string) (typeName:string) (orderedParameters:MethodDefinition->seq<ParameterDefinition>) (methodSelectors:(MethodDefinition->bool) list) =
         let asmDef = AssemblyDefinition.ReadAssembly((Assembly.Load(asm)).Location)
         let methods = asmDef.MainModule.Types
                         |> Seq.filter (fun t -> t.IsPublic)
@@ -170,4 +175,4 @@ module Generate =
                 for m in mlist |> Seq.sortBy (fun x->x.Name) do
                     if not isMain then
                         writer.Write(String.replicate 4 " ")
-                    writer.WriteLine(Reformat.methodWrapper specifyAllTypes m)
+                    writer.WriteLine(Reformat.methodWrapper m)

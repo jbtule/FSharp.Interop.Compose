@@ -55,14 +55,14 @@ Target "Generate" (fun _ ->
    let mscorlibAsm = "mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
 
    let methodFilters = [IdentifyMethods.isExtensionMethod]
-   Generate.writeWrappers header srcDir coreAsm "System.Linq" "Enumerable" false Reorder.extensionMethodReorder methodFilters
-   Generate.writeWrappers header srcDir coreAsm "System.Linq" "ParallelEnumerable" false Reorder.extensionMethodReorder methodFilters
+   Generate.writeWrappers header srcDir coreAsm "System.Linq" "Enumerable" Reorder.extensionMethodReorder methodFilters
+   Generate.writeWrappers header srcDir coreAsm "System.Linq" "ParallelEnumerable" Reorder.extensionMethodReorder methodFilters
    
    let stringMethodFilters = [IdentifyMethods.matchesSigniture "Join" ["System.String";"System.Collections.Generic.IEnumerable`1<System.String>"]]
-   Generate.writeWrappers header srcDir mscorlibAsm "System" "String" true Reorder.noChange stringMethodFilters
+   Generate.writeWrappers header srcDir mscorlibAsm "System" "String" Reorder.noChange stringMethodFilters
     
    let fileMethodFilters = [IdentifyMethods.matchesSigniture "WriteAllLines" ["System.String";"System.Collections.Generic.IEnumerable`1<System.String>"]]
-   Generate.writeWrappers header srcDir mscorlibAsm "System.IO" "File" true Reorder.noChange  fileMethodFilters
+   Generate.writeWrappers header srcDir mscorlibAsm "System.IO" "File" Reorder.noChange  fileMethodFilters
    
    CreateFSharpAssemblyInfo (Path.Combine(srcDir, "AssemblyInfo.fsx"))
         [Attribute.Title title
