@@ -13,7 +13,7 @@ Seq.empty<int> |> Enumerable.defaultIfEmpty // seq [0]
 ```
 ##API
 
-See [gensrc](https://github.com/jbtule/ComposableExtensions/tree/master/gensrc)
+See [src](https://github.com/jbtule/ComposableExtensions/tree/master/src)
 
 ##Use
 To use precompiled dll, add with [nuget](https://www.nuget.org/packages/ComposableExtensions/)
@@ -23,9 +23,9 @@ PM> Install-Package ComposableExtensions
 ##Build
 To build on Mono
 ```
-./build.sh 
+./build.fsx 
 ```
 or on Windows
 ```
-./build.cmd
+fsi -exec build.fsx
 ```

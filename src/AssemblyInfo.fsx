@@ -6,9 +6,9 @@ open System.Runtime.InteropServices
 [<assembly: AssemblyDescriptionAttribute("Automated composable F# functions for .net BCL extension methods.")>]
 [<assembly: GuidAttribute("68ebe4ce-c63b-478d-a084-c5e36b3e8091")>]
 [<assembly: AssemblyProductAttribute("ComposableExtensions")>]
-[<assembly: AssemblyVersionAttribute("0.6.2")>]
-[<assembly: AssemblyFileVersionAttribute("0.6.2")>]
+[<assembly: AssemblyVersionAttribute("0.6.3")>]
+[<assembly: AssemblyFileVersionAttribute("0.6.3")>]
 do ()
 
 module internal AssemblyVersionInformation =
-    let [<Literal>] Version = "0.6.2"
+    let [<Literal>] Version = "0.6.3"
