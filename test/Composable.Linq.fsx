@@ -2,7 +2,6 @@ namespace Test.Composable.Linq
 
 #load "includes.fsx"
 
-
 open Xunit
 open FsUnit.Xunit
 open Composable.Linq
