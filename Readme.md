@@ -1,6 +1,6 @@
 #FSharp Composable Extensions
 
-inline composable fsharp functions around BCL static methods.
+inlined composable fsharp functions around BCL static methods.
 
 ##Examples
 ```fsharp
@@ -36,7 +36,7 @@ PM> Install-Package ComposableExtensions
 
 ##Contribute
 
-The `generate` target of the F# make file [Make.fsx](https://github.com/jbtule/ComposableExtensions/blob/master/tools/Make.fsx) provides a mechansim to identify static base class libraries and alter their parameter order and writing out the module on a per class basis.
+The `generate` target of the F# make file [Make.fsx](https://github.com/jbtule/ComposableExtensions/blob/master/tools/Make.fsx) provides a mechansim to identify static base class libraries and alter their parameter order and write out the module on a per class basis.
 
 The [tool/Generate.fsx](https://github.com/jbtule/ComposableExtensions/blob/master/tools/Generate.fsx) script provides the generalized api for generating those wrappers.
 
