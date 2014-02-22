@@ -18,33 +18,14 @@
 #r "packages/FAKE/tools/FakeLib.dll"
 #I "packages/FSharp.Compiler.Service/lib/net40/"
 #r "FSharp.Compiler.Service.dll"
-#r "packages/Microsoft.AspNet.Razor/lib/net40/System.Web.Razor.dll"
-#I "packages/RazorEngine/lib/net40/"
-#I "packages/FSharp.Formatting/lib/net40/"
-#r "FSharp.MetadataFormat.dll"
 
 open Fake
 open Fake.AssemblyInfoFile
 open System.IO
 open Microsoft.FSharp.Compiler.SimpleSourceCodeServices
-open FSharp.MetadataFormat
 open Tools
 
-// Properties
-let root = System.Environment.CurrentDirectory
-let buildDir = "./build/"
-let srcDir = "./src/"
-let docsDir = "./docs/"
-let publishDir = "./publish/"
-let testDir = "./test/"
-let testBuildDir = Path.Combine(testDir,"build/")
-let version = "0.7.2"
-let projectName = "ComposableExtensions"
-let projectUrl = "https://github.com/jbtule/ComposableExtensions"
-let title = "FSharp Composable Extension Functions"
-let description = "Inline composable fsharp functions around BCL static methods."
-let authors = ["Jay Tuley"]
-let guid = "68ebe4ce-c63b-478d-a084-c5e36b3e8091"
+#load "Vars.fsx"
 
 // Targets
 Target "CleanSrc" (fun _ ->
@@ -115,22 +96,8 @@ Target "Build" (fun _ ->
 )
 
 Target "Docs" (fun _ ->
-    let output = Path.Combine(root, buildDir, projectName + ".dll")
-    
-    let projInfo =
-      [ "page-author",  authors |> Seq.head
-        "page-description", description
-        "github-link",  projectUrl
-        "project-name", projectName
-        "root", root ]
-    
-    MetadataFormat.Generate(output, docsDir,
-        [ Path.Combine("tools", "packages","FSharp.Formatting", "templates", "reference") ],
-            parameters = projInfo,
-            sourceRepo = "https://github.com/jbtule/ComposableExtension/tree/master",
-            sourceFolder = Path.Combine(root, srcDir))
+    FSIHelper.executeFSI root "tools/Docs.fsx" [] |> ignore
 )
-
 
 Target "Test" (fun _ ->
 
