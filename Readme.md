@@ -3,7 +3,7 @@
 Searches through BCL libraries and wraps extensions methods to become composable.
 
 ##Example
-```F#
+```fsharp
 open Composable.Linq
 
 seq { 1 .. 5 } |> Enumerable.reverse // seq [5; 4; 3; 2; ...]
