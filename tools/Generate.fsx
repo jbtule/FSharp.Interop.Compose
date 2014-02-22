@@ -64,7 +64,7 @@ module Reformat =
         else
             sprintf "Composable.%s" x
     
-    let methodWrapper (x:MethodDefinition) =
+    let methodWrapper (reorderedParameters:MethodDefinition->seq<ParameterDefinition>) (x:MethodDefinition) =
         let paramCnt = x.Parameters |> Seq.length
         let specifyAllTypes = 
             (x.DeclaringType.Methods
@@ -72,7 +72,7 @@ module Reformat =
                  |> Seq.length) > 1
         let fsharpName = camelCase x.Name
         let parameterFix = parameterFixer specifyAllTypes
-        let fsharpParams = (x.Parameters |> Seq.map parameterFix |> String.concat " ")
+        let fsharpParams = (x |> reorderedParameters |> Seq.map parameterFix |> String.concat " ")
         let csharpParams = (x.Parameters |> Seq.map csharpCastFunc |> String.concat ", ")
         sprintf "let inline %s %s = %s.%s(%s)" fsharpName fsharpParams x.DeclaringType.FullName x.Name csharpParams
 
@@ -178,4 +178,4 @@ module Generate =
                 for m in mlist |> Seq.sortBy (fun x->x.Name) do
                     if not isMain then
                         writer.Write(String.replicate 4 " ")
-                    writer.WriteLine(Reformat.methodWrapper m)
+                    writer.WriteLine(Reformat.methodWrapper orderedParameters m)

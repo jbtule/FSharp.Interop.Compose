@@ -28,7 +28,9 @@ open Tools
 let buildDir = "./build/"
 let srcDir = "./src/"
 let publishDir = "./publish/"
-let version = "0.6.3"
+let testDir = "./test/"
+let testBuildDir = Path.Combine(testDir,"build/")
+let version = "0.7.1"
 let projectName = "ComposableExtensions"
 let projectUrl = "https://github.com/jbtule/ComposableExtensions"
 let title = "FSharp Composable Extension Methods"
@@ -45,6 +47,9 @@ Target "Clean" (fun _ ->
     CleanDir buildDir
 )
 
+Target "CleanTest" (fun _ ->
+    CleanDir testBuildDir
+)
 
 Target "Generate" (fun _ ->
    
@@ -76,7 +81,7 @@ Target "Generate" (fun _ ->
 )
 
 
-Target "Default" (fun _ ->
+Target "Build" (fun _ ->
     
     let scs = SimpleSourceCodeServices()
     let output = Path.Combine(buildDir, projectName + ".dll")
@@ -96,6 +101,43 @@ Target "Default" (fun _ ->
         raise (System.AggregateException(exs))
 )
 
+
+Target "Test" (fun _ ->
+
+    let testDll = Path.Combine(testBuildDir,"Test.dll")
+    let scs = SimpleSourceCodeServices()
+    let files = Directory.GetFiles(testDir,"*.fsx") |> Seq.toList
+    
+    let refdlls = 
+        [ "./build/ComposableExtensions.dll"
+          "./tools/packages/xunit/lib/net20/xunit.dll"
+          "./tools/packages/FsUnit.xUnit/Lib/net40/NHamcrest.dll"
+          "./tools/packages/FsUnit.xUnit/Lib/net40/FsUnit.CustomMatchers.dll"
+          "./tools/packages/FsUnit.xUnit/Lib/net40/FsUnit.Xunit.dll"
+          ] 
+    
+    for f in refdlls do 
+       FileHelper.CopyFile testBuildDir f
+  
+    
+    let compilerOpts = ["fsc.exe"; "-o";  testDll; "-a"] @ files
+    
+    let errors,errorCode = scs.Compile(compilerOpts |> List.toArray)
+    if errorCode = 0 then
+        trace "test build success"
+    else
+        let exs = errors |> Seq.map (fun e -> System.Exception(e.ToString()))
+        raise (System.AggregateException(exs))
+    
+    let runner = Path.Combine("tools","packages", "xunit.runners", "tools", "xunit.console.clr4.exe") 
+    
+    !! (testDll)
+         |> xUnit (fun p -> {p with OutputDir = testDir; ToolPath =  runner })
+)
+
+Target "BuildOnly" (fun _ ->
+    ()
+)
 
 Target "CreatePackage" (fun _ ->
 
@@ -117,11 +159,15 @@ Target "CreatePackage" (fun _ ->
     ==> "Generate"
 
 "Clean" 
-    =?> ("Generate",hasBuildParam "CreatePackage")
-    ==> "Default"
+    =?> ("Generate", not (hasBuildParam "BuildOnly"))
+    ==> "Build"
     
-"Default"
+"CleanTest"
+    ==> "Build"
+    ==> "Test"
+    
+"Test"
     ==> "CreatePackage"
 
 // start build
-RunTargetOrDefault "Default"
+RunTargetOrDefault "Test"
