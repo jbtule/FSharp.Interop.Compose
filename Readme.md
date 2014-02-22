@@ -9,6 +9,11 @@ open Composable.Linq
 seq { 1 .. 5 } |> Enumerable.reverse // seq [5; 4; 3; 2; ...]
 
 Seq.empty<int> |> Enumerable.defaultIfEmpty // seq [0]
+    
+[("Rust", "Cohle"); ("Marty", "Hart"); ("Maggie", "Hart")] 
+    |> Enumerable.orderBy (fun (_, lastname) -> lastname)
+    |> Enumerable.thenBy (fun (firstname, _) -> firstname)
+  //seq [("Rust", "Cohle"); ("Maggie", "Hart"); ("Marty", "Hart")]
 
 ```
 ##API
