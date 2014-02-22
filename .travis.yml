@@ -1,0 +1,17 @@
+language: c
+
+env:
+  - EnableNuGetPackageRestore=true
+
+before_install:
+  # add future ubuntu repo for mono 3.0 and fsharp
+  - sudo add-apt-repository -y "deb http://archive.ubuntu.com/ubuntu/ trusty main universe"
+  - sudo apt-get update -qq > /dev/null
+  # Make sure mono is installed,
+  # pipe stdout to dev/null because qq is still too chatty
+  - sudo apt-get install -qq mono-complete > /dev/null
+  - sudo apt-get install -qq fsharp > /dev/null
+  - mozroots --import --sync
+ 
+script:
+    - ./build.fsx
