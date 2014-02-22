@@ -1,17 +1,14 @@
-language: c
+language: objective-c
 
 env:
-  - EnableNuGetPackageRestore=true
+ global:
+  - EnableNuGetPackageRestore=true 
+ matrix:
+  - MONO_VERSION="3.2.6"
 
 before_install:
-  # add future ubuntu repo for mono 3.0 and fsharp
-  - sudo add-apt-repository -y "deb http://archive.ubuntu.com/ubuntu/ trusty main universe"
-  - sudo apt-get update -qq > /dev/null
-  # Make sure mono is installed,
-  # pipe stdout to dev/null because qq is still too chatty
-  - sudo apt-get install -qq mono-complete > /dev/null
-  - sudo apt-get install -qq fsharp > /dev/null
-  - mozroots --import --sync
- 
+ - wget "http://download.xamarin.com/MonoFrameworkMDK/Macx86/MonoFramework-MDK-${MONO_VERSION}.macos10.xamarin.x86.pkg"
+ - sudo installer -pkg "MonoFramework-MDK-${MONO_VERSION}.macos10.xamarin.x86.pkg" -target /
+
 script:
-    - ./build.fsx
+ - ./build.fsx
