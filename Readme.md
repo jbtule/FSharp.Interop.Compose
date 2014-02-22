@@ -21,7 +21,7 @@ To use precompiled dll, add with [nuget](https://www.nuget.org/packages/Composab
 PM> Install-Package ComposableExtensions
 ```
 ##Build
-To build on Mono
+To build on Mono [![Build Status](https://travis-ci.org/jbtule/ComposableExtensions.png?branch=master)](https://travis-ci.org/jbtule/ComposableExtensions)
 ```
 ./build.fsx 
 ```
