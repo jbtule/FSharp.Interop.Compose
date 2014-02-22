@@ -16,17 +16,25 @@
 
 #I "packages/FAKE/tools"
 #r "packages/FAKE/tools/FakeLib.dll"
-#r "packages/FSharp.Compiler.Service/lib/net40/FSharp.Compiler.Service.dll"
+#I "packages/FSharp.Compiler.Service/lib/net40/"
+#r "FSharp.Compiler.Service.dll"
+#r "packages/Microsoft.AspNet.Razor/lib/net40/System.Web.Razor.dll"
+#I "packages/RazorEngine/lib/net40/"
+#I "packages/FSharp.Formatting/lib/net40/"
+#r "FSharp.MetadataFormat.dll"
 
 open Fake
 open Fake.AssemblyInfoFile
 open System.IO
 open Microsoft.FSharp.Compiler.SimpleSourceCodeServices
+open FSharp.MetadataFormat
 open Tools
 
 // Properties
+let root = System.Environment.CurrentDirectory
 let buildDir = "./build/"
 let srcDir = "./src/"
+let docsDir = "./docs/"
 let publishDir = "./publish/"
 let testDir = "./test/"
 let testBuildDir = Path.Combine(testDir,"build/")
@@ -49,6 +57,10 @@ Target "Clean" (fun _ ->
 
 Target "CleanTest" (fun _ ->
     CleanDir testBuildDir
+)
+
+Target "CleanDocs" (fun _ ->
+    CleanDir  docsDir
 )
 
 Target "Generate" (fun _ ->
@@ -85,12 +97,13 @@ Target "Build" (fun _ ->
     
     let scs = SimpleSourceCodeServices()
     let output = Path.Combine(buildDir, projectName + ".dll")
+    let xml = Path.Combine(buildDir, projectName + ".xml")
 
     let files = Directory.GetDirectories(srcDir) 
                     |> Seq.collect (fun d -> Directory.GetFiles(d,"*.fsx"))
                     |> Seq.toList
 
-    let compilerOpts = ["fsc.exe"; "-o"; output; "-a"; Path.Combine(srcDir, "AssemblyInfo.fsx")] @ files
+    let compilerOpts = ["fsc.exe"; "-o"; output; "--doc:"+ xml; "-a"; Path.Combine(srcDir, "AssemblyInfo.fsx")] @ files
 
 
     let errors,errorCode = scs.Compile(compilerOpts |> List.toArray)
@@ -99,6 +112,23 @@ Target "Build" (fun _ ->
     else
         let exs = errors |> Seq.map (fun e -> System.Exception(e.ToString()))
         raise (System.AggregateException(exs))
+)
+
+Target "Docs" (fun _ ->
+    let output = Path.Combine(root, buildDir, projectName + ".dll")
+    
+    let projInfo =
+      [ "page-author",  authors |> Seq.head
+        "page-description", description
+        "github-link",  projectUrl
+        "project-name", projectName
+        "root", root ]
+    
+    MetadataFormat.Generate(output, docsDir,
+        [ Path.Combine("tools", "packages","FSharp.Formatting", "templates", "reference") ],
+            parameters = projInfo,
+            sourceRepo = "https://github.com/jbtule/ComposableExtension/tree/master",
+            sourceFolder = Path.Combine(root, srcDir))
 )
 
 
@@ -166,7 +196,11 @@ Target "Deploy" (fun _ ->
     ==> "Build"
     ==> "Test"
     
+"CleanDocs"
+    ==> "Docs"
+    
 "Test"
+    ==> "Docs"
     ==> "Deploy"
 
 // start build
