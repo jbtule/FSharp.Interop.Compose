@@ -139,18 +139,18 @@ Target "BuildOnly" (fun _ ->
     ()
 )
 
-Target "CreatePackage" (fun _ ->
+Target "Deploy" (fun _ ->
 
     NuGet (fun p -> 
         {p with
             Authors = authors
             Project = projectName                           
-            OutputPath = publishDir
-            WorkingDir = publishDir
+            OutputPath = buildDir
+            WorkingDir = buildDir
             Description = description
             Version = version
             Publish = false })
-            (Path.Combine(publishDir, projectName + ".nuspec"))
+            (projectName + ".nuspec")
 )
 
 
@@ -167,7 +167,7 @@ Target "CreatePackage" (fun _ ->
     ==> "Test"
     
 "Test"
-    ==> "CreatePackage"
+    ==> "Deploy"
 
 // start build
 RunTargetOrDefault "Test"
