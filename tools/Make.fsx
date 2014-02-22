@@ -30,11 +30,11 @@ let srcDir = "./src/"
 let publishDir = "./publish/"
 let testDir = "./test/"
 let testBuildDir = Path.Combine(testDir,"build/")
-let version = "0.7.1"
+let version = "0.7.2"
 let projectName = "ComposableExtensions"
 let projectUrl = "https://github.com/jbtule/ComposableExtensions"
-let title = "FSharp Composable Extension Methods"
-let description = "Automated composable F# functions for .net BCL extension methods."
+let title = "FSharp Composable Extension Functions"
+let description = "Inline composable fsharp functions around BCL static methods."
 let authors = ["Jay Tuley"]
 let guid = "68ebe4ce-c63b-478d-a084-c5e36b3e8091"
 

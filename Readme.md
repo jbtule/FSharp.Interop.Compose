@@ -1,6 +1,6 @@
 #FSharp Composable Extensions
 
-Searches through BCL libraries and wraps extensions methods to become composable.
+inline composable fsharp functions around BCL static methods.
 
 ##Example
 ```fsharp
