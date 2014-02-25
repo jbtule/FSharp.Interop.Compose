@@ -109,8 +109,8 @@ Target "Docs" (fun _ ->
     CopyRecursive docOutput localRepo true |> printfn "%A"
 )
 
-Target "Test" (fun _ ->
-
+Target "BuildTest" (fun _ ->
+    
     let testDll = Path.Combine(testBuildDir,"Test.dll")
     let scs = SimpleSourceCodeServices()
     let files = Directory.GetFiles(testDir,"*.fsx") |> Seq.toList
@@ -136,6 +136,12 @@ Target "Test" (fun _ ->
     else
         let exs = errors |> Seq.map (fun e -> System.Exception(e.ToString()))
         raise (System.AggregateException(exs))
+    
+)
+
+Target "Test" (fun _ ->
+
+    let testDll = Path.Combine(testBuildDir,"Test.dll")
     
     let runner = Path.Combine("tools","packages", "xunit.runners", "tools", "xunit.console.clr4.exe") 
     
@@ -172,6 +178,7 @@ Target "Deploy" (fun _ ->
     
 "CleanTest"
     ==> "Build"
+    ==> "BuildTest"
     ==> "Test"
     
 "CleanDocs"
