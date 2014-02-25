@@ -42,7 +42,7 @@ let passedArgs = (fsi.CommandLineArgs |> Seq.skip 1 |> String.concat " ");
 let fakeExitCode =  
     ProcessStartInfo(
         Path.Combine(toolsDir, "packages","FAKE","tools", "FAKE.exe"),
-        sprintf "%s %s" (Path.Combine(toolsDir,"Make.fsx")) passedArgs,
+        sprintf "\"%s\" %s" (Path.Combine("tools","Make.fsx")) passedArgs,
         UseShellExecute = false)
     |> processStart
 

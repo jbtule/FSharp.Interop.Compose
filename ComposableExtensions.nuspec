@@ -17,6 +17,7 @@
     @references@
   </metadata>
  <files>
-  <file src="ComposableExtensions.dll" target="lib/net40" />
+  <file src="ComposableExtensions.dll" target="lib/net40" />  
+  <file src="ComposableExtensions.xml" target="lib/net40" />
  </files>
 </package>

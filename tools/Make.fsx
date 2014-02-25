@@ -16,7 +16,8 @@
 
 #I "packages/FAKE/tools"
 #r "packages/FAKE/tools/FakeLib.dll"
-#r "packages/FSharp.Compiler.Service/lib/net40/FSharp.Compiler.Service.dll"
+#I "packages/FSharp.Compiler.Service/lib/net40/"
+#r "FSharp.Compiler.Service.dll"
 
 open Fake
 open Fake.AssemblyInfoFile
@@ -24,19 +25,7 @@ open System.IO
 open Microsoft.FSharp.Compiler.SimpleSourceCodeServices
 open Tools
 
-// Properties
-let buildDir = "./build/"
-let srcDir = "./src/"
-let publishDir = "./publish/"
-let testDir = "./test/"
-let testBuildDir = Path.Combine(testDir,"build/")
-let version = "0.7.2"
-let projectName = "ComposableExtensions"
-let projectUrl = "https://github.com/jbtule/ComposableExtensions"
-let title = "FSharp Composable Extension Functions"
-let description = "Inline composable fsharp functions around BCL static methods."
-let authors = ["Jay Tuley"]
-let guid = "68ebe4ce-c63b-478d-a084-c5e36b3e8091"
+#load "Vars.fsx"
 
 // Targets
 Target "CleanSrc" (fun _ ->
@@ -49,6 +38,10 @@ Target "Clean" (fun _ ->
 
 Target "CleanTest" (fun _ ->
     CleanDir testBuildDir
+)
+
+Target "CleanDocs" (fun _ ->
+    CleanDir docsBuildDir
 )
 
 Target "Generate" (fun _ ->
@@ -85,12 +78,13 @@ Target "Build" (fun _ ->
     
     let scs = SimpleSourceCodeServices()
     let output = Path.Combine(buildDir, projectName + ".dll")
+    let xml = Path.Combine(buildDir, projectName + ".xml")
 
     let files = Directory.GetDirectories(srcDir) 
                     |> Seq.collect (fun d -> Directory.GetFiles(d,"*.fsx"))
                     |> Seq.toList
 
-    let compilerOpts = ["fsc.exe"; "-o"; output; "-a"; Path.Combine(srcDir, "AssemblyInfo.fsx")] @ files
+    let compilerOpts = ["fsc.exe"; "-o"; output; "--doc:"+ xml; "-a"; Path.Combine(srcDir, "AssemblyInfo.fsx")] @ files
 
 
     let errors,errorCode = scs.Compile(compilerOpts |> List.toArray)
@@ -101,6 +95,19 @@ Target "Build" (fun _ ->
         raise (System.AggregateException(exs))
 )
 
+Target "Docs" (fun _ ->
+
+    //run doc script
+    FSIHelper.runBuildScriptAt root true "tools/Docs.fsx" [] [] |> ignore
+
+    let docOutput = Path.Combine(docsBuildDir, "output")
+    let localRepo = Path.Combine(docsBuildDir,"gh-pages");
+
+    //Copy to gh-pages branch
+    Git.Repository.clone "" githubCloneUrl localRepo
+    Git.Branches.checkoutBranch localRepo "gh-pages"
+    CopyRecursive docOutput localRepo true |> printfn "%A"
+)
 
 Target "Test" (fun _ ->
 
@@ -166,7 +173,11 @@ Target "Deploy" (fun _ ->
     ==> "Build"
     ==> "Test"
     
+"CleanDocs"
+    ==> "Docs"
+    
 "Test"
+    ==> "Docs"
     ==> "Deploy"
 
 // start build
