@@ -3,36 +3,36 @@
 inlined composable fsharp functions around BCL static methods.
 
 ##Examples
-```fsharp
-open Composable.Linq
 
-seq { 1 .. 5 } |> Enumerable.reverse // seq [5; 4; 3; 2; ...]
+`Composable.Linq.Enumerable`
 
-Seq.empty<int> |> Enumerable.defaultIfEmpty // seq [0]
-    
-[("Rust", "Cohle"); ("Marty", "Hart"); ("Maggie", "Hart")] 
-    |> Enumerable.orderBy (fun (_, lastname) -> lastname)
-    |> Enumerable.thenBy (fun (firstname, _) -> firstname)
-  //seq [("Rust", "Cohle"); ("Maggie", "Hart"); ("Marty", "Hart")]
+    open Composable.Linq
 
-```
+    seq { 1 .. 5 } |> Enumerable.reverse // seq [5; 4; 3; 2; ...]
 
-```fsharp
-open Composable.System
+    Seq.empty<int> |> Enumerable.defaultIfEmpty // seq [0]
+        
+    [("Rust", "Cohle"); ("Marty", "Hart"); ("Maggie", "Hart")] 
+        |> Enumerable.orderBy (fun (_, lastname) -> lastname)
+        |> Enumerable.thenBy (fun (firstname, _) -> firstname)
+      //seq [("Rust", "Cohle"); ("Maggie", "Hart"); ("Marty", "Hart")]
 
-["1";"";"2";"  "; "3"; null; "4"] 
-   |> Seq.filter (not << String.isNullOrWhiteSpace) //seq["1";"2";"3";"4"]
+`Composable.System.String`
 
-```
+    open Composable.System
+
+    ["1";"";"2";"  "; "3"; null; "4"] 
+       |> Seq.filter (not << String.isNullOrWhiteSpace) //seq["1";"2";"3";"4"]
+
 ##API
 
-See [src](https://github.com/jbtule/ComposableExtensions/tree/master/src) for wrapper functions
+See [api-docs](http://jbtule.github.io/ComposableExtensions/reference/index.html) for wrapper functions
 
 ##Use
 To use precompiled dll, add with [nuget](https://www.nuget.org/packages/ComposableExtensions/)
-```
-PM> Install-Package ComposableExtensions
-```
+
+    PM> Install-Package ComposableExtensions
+
 
 ##Contribute
 
@@ -45,10 +45,10 @@ FSUnit xUnit tests can be added in `.fsx` files in the [test](https://github.com
 
 ##Build
 To build on Mono [![Build Status](https://travis-ci.org/jbtule/ComposableExtensions.png?branch=master)](https://travis-ci.org/jbtule/ComposableExtensions)
-```
-./build.fsx 
-```
-or on Windows
-```
-fsi -exec build.fsx
-```
+
+    ./build.fsx 
+
+or on Windows [![Build status](https://ci-beta.appveyor.com/api/projects/status/gy56e6su3e02e20i)](https://ci-beta.appveyor.com/project/jbtule/composableextensions)
+
+    fsi -exec build.fsx
+

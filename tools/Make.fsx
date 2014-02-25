@@ -41,7 +41,7 @@ Target "CleanTest" (fun _ ->
 )
 
 Target "CleanDocs" (fun _ ->
-    CleanDir  docsDir
+    CleanDir docsBuildDir
 )
 
 Target "Generate" (fun _ ->
@@ -96,7 +96,17 @@ Target "Build" (fun _ ->
 )
 
 Target "Docs" (fun _ ->
-    FSIHelper.executeFSI root "tools/Docs.fsx" [] |> ignore
+
+    //run doc script
+    FSIHelper.runBuildScriptAt root true "tools/Docs.fsx" [] [] |> ignore
+
+    let docOutput = Path.Combine(docsBuildDir, "output")
+    let localRepo = Path.Combine(docsBuildDir,"gh-pages");
+
+    //Copy to gh-pages branch
+    Git.Repository.clone "" githubCloneUrl localRepo
+    Git.Branches.checkoutBranch localRepo "gh-pages"
+    CopyRecursive docOutput localRepo true |> printfn "%A"
 )
 
 Target "Test" (fun _ ->

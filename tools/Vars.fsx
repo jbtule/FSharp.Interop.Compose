@@ -2,15 +2,19 @@
 module Vars
 
 // Properties
-let buildDir = "./build/"
-let srcDir = "./src/"
-let docsDir = "./docs/"
-let publishDir = "./publish/"
-let testDir = "./test/"
-let testBuildDir = "./test/build/"
-let version = "0.7.2"
+let buildDir = "build"
+let srcDir = "src"
+let docsDir = "docs"
+let docsBuildDir = Path.Combine(docsDir, "build")
+let testDir = "test"
+let testBuildDir = Path.Combine(testDir, "build")
+let version = "0.8.1"
 let projectName = "ComposableExtensions"
-let projectUrl = "https://github.com/jbtule/ComposableExtensions"
+let projectUrl = "http://jbtule.github.io/ComposableExtensions"
+let gitHubProjectUrl = "https://github.com/jbtule/ComposableExtensions"
+let githubCloneUrl = gitHubProjectUrl + ".git"
+let githubSourceUrl = gitHubProjectUrl + "/tree/master/src/"
+let nugetUrl = "http://nuget.org/packages/" + projectName
 let title = "FSharp Composable Extension Functions"
 let description = "Inline composable fsharp functions around BCL static methods."
 let authors = ["Jay Tuley"]

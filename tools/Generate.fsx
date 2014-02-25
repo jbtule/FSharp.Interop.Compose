@@ -64,17 +64,51 @@ module Reformat =
         else
             sprintf "Composable.%s" x
     
+    let rec private matchesGenericParameter (matcher:GenericParameter) (t:TypeReference) =
+        if t.IsGenericParameter then
+            t.Name = matcher.Name
+        elif t.IsGenericInstance then
+            let g = t :?> GenericInstanceType
+            let findMatch = matchesGenericParameter matcher
+            g.GenericArguments |> Seq.exists findMatch
+        else
+            false
+
+    let private matchesGenericParameters (matcher:GenericParameter) (plist:seq<TypeReference>) =
+        let findMatch = matchesGenericParameter matcher
+        plist |> Seq.exists findMatch
+
+    let private explictGenericParameters (x:MethodDefinition) =
+        x.GenericParameters
+            |> (fun p -> System.Linq.Enumerable.Reverse(p))
+            |> Seq.fold (fun list p -> if matchesGenericParameters p (x.Parameters |> Seq.map (fun p->p.ParameterType)) then 
+                                            list 
+                                       else 
+                                            (sprintf "'%s" p.Name)::list) []
+
+    let explictGenericParameterName (changeName:string->string) (x:MethodDefinition) =
+        let baseName = changeName x.Name
+        if x.HasGenericParameters then
+            let glist = explictGenericParameters x
+            if glist |> Seq.isEmpty then
+                baseName
+            else
+                sprintf "%s<%s>" baseName (glist |> String.concat ", ")
+        else
+            baseName
+
     let methodWrapper (reorderedParameters:MethodDefinition->seq<ParameterDefinition>) (x:MethodDefinition) =
         let paramCnt = x.Parameters |> Seq.length
         let specifyAllTypes = 
             (x.DeclaringType.Methods
                  |> Seq.filter (fun m-> m.Name = x.Name && (m.Parameters |> Seq.length) = paramCnt)
                  |> Seq.length) > 1
-        let fsharpName = camelCase x.Name
+        let fsharpName = explictGenericParameterName camelCase x
+        let csharpName = explictGenericParameterName (fun n->n) x
         let parameterFix = parameterFixer specifyAllTypes
         let fsharpParams = (x |> reorderedParameters |> Seq.map parameterFix |> String.concat " ")
         let csharpParams = (x.Parameters |> Seq.map csharpCastFunc |> String.concat ", ")
-        sprintf "let inline %s %s = %s.%s(%s)" fsharpName fsharpParams x.DeclaringType.FullName x.Name csharpParams
+        sprintf "let inline %s %s = %s.%s(%s)" fsharpName fsharpParams x.DeclaringType.FullName csharpName csharpParams
 
 module Reorder =
     let noChange (m:MethodDefinition) : seq<ParameterDefinition> = upcast m.Parameters
@@ -169,13 +203,20 @@ module Generate =
                 Directory.CreateDirectory(path) |> ignore
                 use writer = System.IO.File.AppendText(Path.Combine(path, typeName+".fsx"))
                 if isMain then
-                     writer.WriteLine(header)
-                     writer.WriteLine()
-                     writer.WriteLine(sprintf "module %s.%s" nsp typeName)
+                    writer.WriteLine(header)
+                    writer.WriteLine()
+                    writer.WriteLine(sprintf "/// Corresponding `%s.%s` static methods as functions" namesp typeName)
+                    writer.WriteLine(sprintf "module %s.%s" nsp typeName)
                 else
-                     writer.WriteLine()
-                     writer.WriteLine("module Full =")
+                    writer.WriteLine()
+                    writer.WriteLine(sprintf "/// Longer parameter versions of `%s.%s` methods" namesp typeName)
+                    writer.WriteLine("module Full =")
                 for m in mlist |> Seq.sortBy (fun x->x.Name) do
+                    writer.WriteLine()
+                    let csharpParams = (m.Parameters |> Seq.map Reformat.csharpCastFunc |> String.concat ", ")
+                    if not isMain then
+                        writer.Write(String.replicate 4 " ")
+                    writer.WriteLine(sprintf "/// Calls `%s(%s)`" (Reformat.explictGenericParameterName (fun x->x) m) csharpParams)
                     if not isMain then
                         writer.Write(String.replicate 4 " ")
                     writer.WriteLine(Reformat.methodWrapper orderedParameters m)
