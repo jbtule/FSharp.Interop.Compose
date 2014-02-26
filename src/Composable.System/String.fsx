@@ -1,4 +1,4 @@
-// Generated with ComposableExtensions (0.8.1) http://jbtule.github.io/ComposableExtensions
+// Generated with ComposableExtensions (0.8.2) http://jbtule.github.io/ComposableExtensions
 
 /// Corresponding `System.String` static methods as functions
 module Composable.System.String

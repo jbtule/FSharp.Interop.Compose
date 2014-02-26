@@ -1,4 +1,4 @@
-// Generated with ComposableExtensions (0.8.1) http://jbtule.github.io/ComposableExtensions
+// Generated with ComposableExtensions (0.8.2) http://jbtule.github.io/ComposableExtensions
 
 /// Corresponding `System.Linq.Enumerable` static methods as functions
 module Composable.Linq.Enumerable
@@ -40,7 +40,7 @@ let inline elementAt index source = System.Linq.Enumerable.ElementAt(source, ind
 let inline elementAtOrDefault index source = System.Linq.Enumerable.ElementAtOrDefault(source, index)
 
 /// Calls `Except(first, second)`
-let inline except first second = System.Linq.Enumerable.Except(first, second)
+let inline except second first = System.Linq.Enumerable.Except(first, second)
 
 /// Calls `First(source)`
 let inline first source = System.Linq.Enumerable.First(source)
@@ -142,7 +142,7 @@ module Full =
     let inline distinct comparer source = System.Linq.Enumerable.Distinct(source, comparer)
 
     /// Calls `Except(first, second, comparer)`
-    let inline except comparer first second = System.Linq.Enumerable.Except(first, second, comparer)
+    let inline except second comparer first = System.Linq.Enumerable.Except(first, second, comparer)
 
     /// Calls `First(source, System.Func<'TSource, System.Boolean>(predicate))`
     let inline first (predicate:'TSource->System.Boolean) source = System.Linq.Enumerable.First(source, System.Func<'TSource, System.Boolean>(predicate))

@@ -41,9 +41,66 @@ module Enumerable =
             i |> should be ofExactType<int>
 
     [<Fact>]
+    let concat () =
+        (seq { 1 .. 3 }, seq{ 4 .. 6 })
+            ||> Enumerable.concat
+            |> Seq.toList |> should equal [1;2;3;4;5;6]
+
+    [<Fact>]
+    let contains () =
+        seq { 1 .. 10 }
+            |> Enumerable.contains 5 |> should be True
+        seq { 1 .. 10 }
+            |> Enumerable.contains 11 |> should be False
+
+    [<Fact>]
+    let Count () =
+        seq { 0 .. 9 }
+            |> Enumerable.count |> should equal 10
+
+    [<Fact>]
     let defaultIfEmpty () =
         Seq.empty<int> |> Enumerable.defaultIfEmpty |> Seq.toList |> should equal [0]
         
+    [<Fact>]
+    let distinct () =
+        [1;1;2;1;1;3;3;4;5;5;5]
+            |> Enumerable.distinct
+            |> Seq.toList |> should equal [1;2;3;4;5]
+
+    [<Fact>]
+    let elementAt () =
+        seq { 1 .. 9 }
+            |> Enumerable.elementAt 4 |> should equal 5
+
+    [<Fact>]
+    let elementAtOrDefault () =
+        seq { 1 .. 9 }
+            |> Enumerable.elementAtOrDefault 10 |> should equal 0
+
+    [<Fact>]
+    let except () =
+        seq { 1 .. 7 }
+            |> Enumerable.except (seq { 2 .. 5 })
+            |> Seq.toList |> should equal [1;6;7]
+
+    [<Fact>]
+    let first () =
+        seq {1 .. 7}
+            |> Enumerable.first |> should equal 1
+
+    [<Fact>]
+    let firstOrDefault () =
+        Seq.empty<int>
+            |> Enumerable.firstOrDefault |> should equal 0
+
+    [<Fact>]
+    let groupBy () =
+        seq { 1..9 }
+            |> Enumerable.groupBy (fun i -> i % 2)
+            |> Seq.find (fun g-> g.Key = 0)
+            |> Seq.toList |> should equal [2;4;6;8]
+   
     [<Fact>]
     let orderByDescending () =
         seq { 'a' .. 'c' } |> Enumerable.orderByDescending (fun c -> c) |> Seq.toList |> should equal ['c';'b';'a']

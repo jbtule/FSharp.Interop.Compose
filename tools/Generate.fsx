@@ -137,13 +137,18 @@ module Reorder =
         else
             false
 
-    let private reorderExtParameters (ps:ParameterDefinition seq) =
-         if (ps |> Seq.length) > 1 && identifyReorder2 ps then
-             Seq.append (ps |> Seq.skip 2) (ps |> Seq.take 2)
-         else
-             Seq.append (ps |> Seq.skip 1) (ps |> Seq.take 1)
+    let private fullmethodname (m:MethodDefinition) =
+        sprintf "%s.%s.%s" m.DeclaringType.Namespace m.DeclaringType.Name m.Name
 
-    let extensionMethodReorder (m:MethodDefinition) = reorderExtParameters m.Parameters
+    let extensionMethodReorder (m:MethodDefinition) = 
+        let ps = m.Parameters
+        let exceptions = ["System.Linq.Enumerable.Except"]
+        if (ps |> Seq.length) > 1
+            && identifyReorder2 ps 
+            && not (exceptions |> Seq.exists (fun n->(fullmethodname m).StartsWith(n))) then
+             Seq.append (ps |> Seq.skip 2) (ps |> Seq.take 2)
+        else
+             Seq.append (ps |> Seq.skip 1) (ps |> Seq.take 1)
 
 module IdentifyMethods =
 
