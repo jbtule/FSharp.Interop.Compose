@@ -96,10 +96,55 @@ module Enumerable =
 
     [<Fact>]
     let groupBy () =
-        seq { 1..9 }
+        seq { 1 .. 9 }
             |> Enumerable.groupBy (fun i -> i % 2)
             |> Seq.find (fun g-> g.Key = 0)
             |> Seq.toList |> should equal [2;4;6;8]
+            
+    [<Fact>]
+    let groupJoin () =
+        (["One",1;"Two",2;"Three",3],[1;1;1;2;2])
+            ||> Enumerable.groupJoin (fun (_,o)->o) (fun i->i) (fun (o,_) ic -> (o, Seq.length ic))
+            |> Seq.toList |> should equal ["One",3;"Two",2;"Three",0]
+             
+    [<Fact>]
+    let intersect () =
+        (seq { 1 .. 7 }, seq { 5 .. 9 })
+            ||> Enumerable.intersect
+            |> Seq.toList |> should equal [5;6;7]
+            
+    [<Fact>]
+    let join () =
+        (["One",1;"Two",2;"Three",3],["Ichi",1;"Ni",2;"San",3])
+            ||> Enumerable.join (fun (_,o)->o) (fun (_,i)->i) (fun (o,_) (i,_) -> (o, i))
+            |> Seq.toList |> should equal ["One","Ichi";"Two","Ni";"Three","San"]
+   
+    [<Fact>]
+    let last () =
+        seq { 1 .. 9 } |> Enumerable.last |> should equal 9
+    
+    [<Fact>] 
+    let lastOrDefault () =
+        Seq.empty<int> |> Enumerable.lastOrDefault |> should equal 0
+    
+    [<Fact>]    
+    let longCount () =
+        seq { 0 .. 9 } |> Enumerable.longCount |> should equal 10L
+   
+    [<Fact>]
+    let ofType () =
+       let list = System.Collections.ArrayList()
+       list.Add(1)
+       list.Add("2")
+       list.Add(3)
+       list.Add("4")
+       list
+           |> Enumerable.ofType<int>
+           |> Seq.toList |> should equal [1;3]
+   
+    [<Fact>]
+    let orderBy () =
+        ['t';'a';'n'] |> Enumerable.orderBy (fun c -> c) |> Seq.toList |> should equal ['a';'n';'t']
    
     [<Fact>]
     let orderByDescending () =
@@ -109,6 +154,21 @@ module Enumerable =
     let reverse () =
         seq { 1 .. 5 } |> Enumerable.reverse |> Seq.toList |> should equal [5;4;3;2;1]
 
+    [<Fact>]
+    let sequenceEqual () =
+        (seq { 1 .. 5 }, [5;3;4;1;2] |> Seq.sortBy (fun i->i))
+            ||> Enumerable.sequenceEqual |> should be True
+    [<Fact>]     
+    let single () =
+        [1] |> Enumerable.single |> should equal 1
+        (fun () -> [] |> Enumerable.single |> ignore) |> should throw typeof<System.InvalidOperationException>
+      
+    [<Fact>]   
+    let singleOrDefault () =
+            Seq.empty<int> |> Enumerable.singleOrDefault |> should equal 0
+            (fun () -> [1;2] |> Enumerable.singleOrDefault |> ignore) |> should throw typeof<System.InvalidOperationException>
+    
+    
     [<Fact>]
     let thenBy () =
         let p1 = (seq { 'a' .. 'c' }, seq { 1 .. 3}) ||> Seq.zip 
