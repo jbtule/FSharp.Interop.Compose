@@ -5,7 +5,7 @@ environment:
     EnableNuGetPackageRestore:true
     
 build_script:
-  - "set PATH=%PATH%;C:\Program Files (x86)\Microsoft SDKs\F#\3.1\Framework\v4.0\" 
+  - "set PATH=%PATH%;C:\\Program Files (x86)\\Microsoft SDKs\\F#\\3.1\\Framework\\v4.0\\" 
   - fsi --exec build.fsx BuildTest
   
 test:
