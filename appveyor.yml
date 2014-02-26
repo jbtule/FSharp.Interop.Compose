@@ -1,8 +1,7 @@
 os: Windows Server 2012
 
 environment:
-  global:
-    EnableNuGetPackageRestore:true
+  EnableNuGetPackageRestore:true
     
 build_script:
   - "set PATH=%PATH%;C:\\Program Files (x86)\\Microsoft SDKs\\F#\\3.1\\Framework\\v4.0\\" 
@@ -10,4 +9,4 @@ build_script:
   
 test:
   assemblies:
-    - test/build/Test.dll
+    - test\build\Test.dll
