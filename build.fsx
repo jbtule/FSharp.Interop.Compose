@@ -1,49 +1,75 @@
 #if run_with_bin_sh 
   # See why this works at http://stackoverflow.com/a/21948918/637783 
-  exec fsharpi --exec $0 $*
+  exec fsharpi --define:mono_posix --exec $0 $*
 #endif
+
+(*
+ * CrossPlatform FSharp Makefile bootstraper - jay+code@tuley.name
+ *
+ * How to use:
+ *   On Windows `fsi --exec build.fsx <buildtarget>
+ *
+ *  On Mac Or Linux `./build.fsx <buildtarget>`
+ *    *Note:* But if you have trouble then use `sh build.fsx <buildtarget>`
+ *
+ *)
 
 open System
 open System.IO
 open System.Diagnostics
 
-let toolsDir = Path.Combine(Environment.CurrentDirectory, "tools")
-
 (* helper functions *)
-let processStart (psi:ProcessStartInfo) =
-    let ps = Process.Start(psi)
-    ps.WaitForExit();
-    ps.ExitCode
 
-let setAccessPermissionUnix (path:string) =
-    try 
-        let monoSysCall = Type.GetType("Mono.Unix.Native.Syscall, Mono.Posix")
-        if monoSysCall <> null then
-            let monoEnum = Type.GetType("Mono.Unix.Native.FilePermissions, Mono.Posix")
-            monoSysCall.GetMethod("chmod").Invoke(null, [|path; Enum.Parse(monoEnum,"ACCESSPERMS")|]) |> ignore
-    with
-        _ -> ()
+#if mono_posix
+#r "Mono.Posix.dll"
+open Mono.Unix.Native
+let applyExecutionPermissionUnix path =
+    let _,stat = Syscall.lstat(path)
+    Syscall.chmod(path, FilePermissions.S_IXUSR ||| stat.st_mode) |> ignore
+#else
+let applyExecutionPermissionUnix path = ()
+#endif
 
-(* Restore Nuget *)
-let nugetExitCode =  
-    ProcessStartInfo(
-            Path.Combine(toolsDir, "NuGet","NuGet.exe"),
-            @"install packages.config -OutputDirectory packages -ExcludeVersion",
-            WorkingDirectory = toolsDir,
-            UseShellExecute = false) 
-    |> processStart
+let doesNotExist path =
+    path |> Path.GetFullPath |> File.Exists |> not
 
-(* Fix permissions for Fake if Mono *)
-let fakePath = Path.Combine(toolsDir, "packages","FAKE","tools", "FAKE.exe")
-setAccessPermissionUnix fakePath
-(* Run fake *)
-let passedArgs = (fsi.CommandLineArgs |> Seq.skip 1 |> String.concat " ");
+let execAt (workingDir:string) (exePath:string) (args:string seq) =
+    let processStart (psi:ProcessStartInfo) =
+        let ps = Process.Start(psi)
+        ps.WaitForExit ()
+        ps.ExitCode
+    let fullExePath = exePath |> Path.GetFullPath
+    applyExecutionPermissionUnix fullExePath
+    let exitCode = ProcessStartInfo(
+                        fullExePath,
+                        args |> String.concat " ",
+                        WorkingDirectory = (workingDir |> Path.GetFullPath),
+                        UseShellExecute = false) 
+                   |> processStart
+    if exitCode <> 0 then
+        exit exitCode
+    ()
 
-let fakeExitCode =  
-    ProcessStartInfo(
-        Path.Combine(toolsDir, "packages","FAKE","tools", "FAKE.exe"),
-        sprintf "\"%s\" %s" (Path.Combine("tools","Make.fsx")) passedArgs,
-        UseShellExecute = false)
-    |> processStart
+let exec = execAt Environment.CurrentDirectory
 
-exit fakeExitCode
+let downloadNugetTo path =
+    let fullPath = path |> Path.GetFullPath;
+    if doesNotExist fullPath then 
+        printf "Downloading NuGet..."
+        use webClient = new System.Net.WebClient()
+        fullPath |> Path.GetDirectoryName |> Directory.CreateDirectory |> ignore
+        webClient.DownloadFile("https://nuget.org/nuget.exe", path |> Path.GetFullPath)
+        printfn "Done."
+
+let passedArgs = fsi.CommandLineArgs.[1..] |> Array.toList
+
+(* execution script customize below *)
+
+downloadNugetTo "tools/NuGet/NuGet.exe"
+
+execAt
+    "tools/"
+    "tools/NuGet/NuGet.exe"
+    ["install"; "packages.config"; "-OutputDirectory packages"; "-ExcludeVersion"]
+
+exec "tools/packages/FAKE/tools/FAKE.exe" ("tools/Make.fsx"::passedArgs)
