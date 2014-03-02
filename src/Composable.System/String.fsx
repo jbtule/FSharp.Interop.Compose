@@ -1,4 +1,4 @@
-// Generated with ComposableExtensions (0.9.0) http://jbtule.github.io/ComposableExtensions
+// Generated with ComposableExtensions (0.9.1) http://jbtule.github.io/ComposableExtensions
 
 namespace Composable.System
 /// Corresponding `System.String` static methods as functions
@@ -8,7 +8,7 @@ module String =
     let inline contains value (``{instance}``:System.String) = ``{instance}``.Contains(value)
 
     /// Calls `EndsWith(value)`
-    let inline endsWith value (``{instance}``:System.String) = ``{instance}``.EndsWith(value)
+    let inline endsWith (value:System.String) (``{instance}``:System.String) = ``{instance}``.EndsWith(value)
 
     /// Calls `IsNullOrEmpty(value)`
     let inline isNullOrEmpty value = System.String.IsNullOrEmpty(value)

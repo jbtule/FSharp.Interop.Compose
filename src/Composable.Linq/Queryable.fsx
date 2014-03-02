@@ -1,4 +1,4 @@
-// Generated with ComposableExtensions (0.9.0) http://jbtule.github.io/ComposableExtensions
+// Generated with ComposableExtensions (0.9.1) http://jbtule.github.io/ComposableExtensions
 
 #load "../../helpers/Quotations.fsx"
 
