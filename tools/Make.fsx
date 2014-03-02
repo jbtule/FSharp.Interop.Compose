@@ -55,6 +55,10 @@ Target "Generate" (fun _ ->
    generateWrapper coreAsm "System.Linq" "Enumerable" Reorder.extensionMethodReorder [IdentifyMethods.isExtensionMethod]
    generateWrapper coreAsm "System.Linq" "ParallelEnumerable" Reorder.extensionMethodReorder [IdentifyMethods.isExtensionMethod]
    
+   let queryHeader = header + "\n\n" + "#load \"../../helpers/Quotations.fsx\""
+   Generate.writeWrappers queryHeader srcDir coreAsm "System.Linq" "Queryable" Reorder.extensionMethodReorder [IdentifyMethods.isExtensionMethod]
+   
+
    let stringMethodFilters = [IdentifyMethods.matchesSignature "Join" ["System.String";"System.Collections.Generic.IEnumerable`1<System.String>"]
                               IdentifyMethods.matchesName "IsNullOrWhiteSpace"
                               IdentifyMethods.matchesName "IsNullOrEmpty"
