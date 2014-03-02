@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <package xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">    
+  <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <id>@project@</id>
     <version>@build.number@</version>
+    <title>FSharp Composable Extensions</title>
     <authors>@authors@</authors>
     <owners>@authors@</owners>
     <summary>@summary@</summary>
@@ -11,13 +12,13 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>@description@</description>
     <releaseNotes>@releaseNotes@</releaseNotes>
-    <copyright>Copyright Jay Tuley 2014</copyright>    
+    <copyright>Copyright Jay Tuley 2014</copyright>
     <tags>FSharp linq functional composition</tags>
     @dependencies@
     @references@
   </metadata>
  <files>
-  <file src="ComposableExtensions.dll" target="lib/net40" />  
+  <file src="ComposableExtensions.dll" target="lib/net40" />
   <file src="ComposableExtensions.xml" target="lib/net40" />
  </files>
 </package>
