@@ -21,8 +21,8 @@ inlined composable fsharp functions around BCL static methods.
 
     open Composable.System
 
-    ["1";"";"2";"  "; "3"; null; "4"]
-       |> Seq.filter (not << String.isNullOrWhiteSpace) //seq["1";"2";"3";"4"]
+    ["One";"Two";"Three"]
+       |> Seq.filter (String.startsWith "T") // seq ["Two";"Three"]
 
 ##API
 

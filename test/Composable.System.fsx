@@ -27,6 +27,13 @@ module String =
     [<Fact>]
     let trim () =
         " hello " |> String.trim |> should equal "hello"
+        
+    [<Fact>]
+    let startsWith () =
+        ["One";"Two";"Three"]
+           |> Seq.filter (String.startsWith "T")
+           |> Seq.toList
+           |> should equal ["Two";"Three"]
 
     [<Fact>]
     let join () =
