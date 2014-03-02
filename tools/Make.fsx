@@ -1,11 +1,11 @@
 // Copyright 2014 Jay Tuley <jay+code@tuley.name>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 //     http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -45,29 +45,33 @@ Target "CleanDocs" (fun _ ->
 )
 
 Target "Generate" (fun _ ->
-   
+
    let header  = sprintf "// Generated with %s (%s) %s" projectName version projectUrl
    let generateWrapper = Generate.writeWrappers header srcDir
-    
+
    let coreAsm = "System.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
    let mscorlibAsm = "mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
 
    generateWrapper coreAsm "System.Linq" "Enumerable" Reorder.extensionMethodReorder [IdentifyMethods.isExtensionMethod]
    generateWrapper coreAsm "System.Linq" "ParallelEnumerable" Reorder.extensionMethodReorder [IdentifyMethods.isExtensionMethod]
-   
+
    let queryHeader = header + "\n\n" + "#load \"../../helpers/Quotations.fsx\""
    Generate.writeWrappers queryHeader srcDir coreAsm "System.Linq" "Queryable" Reorder.extensionMethodReorder [IdentifyMethods.isExtensionMethod]
-   
 
-   let stringMethodFilters = [IdentifyMethods.matchesSignature "Join" ["System.String";"System.Collections.Generic.IEnumerable`1<System.String>"]
-                              IdentifyMethods.matchesName "IsNullOrWhiteSpace"
-                              IdentifyMethods.matchesName "IsNullOrEmpty"
+
+   let stringMethodFilters = [IdentifyMethods.matchesSignature Static "Join" ["System.String";"System.Collections.Generic.IEnumerable`1<System.String>"]
+                              IdentifyMethods.matchesName Static "IsNullOrWhiteSpace"
+                              IdentifyMethods.matchesName Static "IsNullOrEmpty"
+                              IdentifyMethods.matchesSignature Instance "Replace" ["System.String";"System.String"]
+                              IdentifyMethods.matchesSignature Instance "Split" ["System.Char"]
+                              IdentifyMethods.matchesSignature Instance "Split" ["System.Char[]"]
+                              IdentifyMethods.matchesNames Instance ["StartsWith";"Contains";"EndsWith"; "Trim"; "TrimStart"; "TrimEnd" ; "ToLower" ; "ToUpper"; "PadRight";"PadLeft"]
                               ]
    generateWrapper mscorlibAsm "System" "String" Reorder.noChange stringMethodFilters
-    
-   let fileMethodFilters = [IdentifyMethods.matchesSignature "WriteAllLines" ["System.String";"System.Collections.Generic.IEnumerable`1<System.String>"]]
+
+   let fileMethodFilters = [IdentifyMethods.matchesSignature Static "WriteAllLines" ["System.String";"System.Collections.Generic.IEnumerable`1<System.String>"]]
    generateWrapper mscorlibAsm "System.IO" "File" Reorder.noChange  fileMethodFilters
-   
+
    CreateFSharpAssemblyInfo (Path.Combine(srcDir, "AssemblyInfo.fsx"))
         [Attribute.Title title
          Attribute.Description description
@@ -79,12 +83,12 @@ Target "Generate" (fun _ ->
 
 
 Target "Build" (fun _ ->
-    
+
     let scs = SimpleSourceCodeServices()
     let output = Path.Combine(buildDir, projectName + ".dll")
     let xml = Path.Combine(buildDir, projectName + ".xml")
 
-    let files = Directory.GetDirectories(srcDir) 
+    let files = Directory.GetDirectories(srcDir)
                     |> Seq.collect (fun d -> Directory.GetFiles(d,"*.fsx"))
                     |> Seq.toList
 
@@ -114,41 +118,41 @@ Target "Docs" (fun _ ->
 )
 
 Target "BuildTest" (fun _ ->
-    
+
     let testDll = Path.Combine(testBuildDir,"Test.dll")
     let scs = SimpleSourceCodeServices()
     let files = Directory.GetFiles(testDir,"*.fsx") |> Seq.toList
-    
-    let refdlls = 
+
+    let refdlls =
         [ "./build/ComposableExtensions.dll"
           "./tools/packages/xunit/lib/net20/xunit.dll"
           "./tools/packages/FsUnit.xUnit/Lib/net40/NHamcrest.dll"
           "./tools/packages/FsUnit.xUnit/Lib/net40/FsUnit.CustomMatchers.dll"
           "./tools/packages/FsUnit.xUnit/Lib/net40/FsUnit.Xunit.dll"
           "./tools/packages/FSharp.Core/lib/FSharp.Core.dll"
-          ] 
-    
-    for f in refdlls do 
+          ]
+
+    for f in refdlls do
        FileHelper.CopyFile testBuildDir f
-  
-    
+
+
     let compilerOpts = ["fsc.exe"; "-o";  testDll; "-a"] @ files
-    
+
     let errors,errorCode = scs.Compile(compilerOpts |> List.toArray)
     if errorCode = 0 then
         trace "test build success"
     else
         let exs = errors |> Seq.map (fun e -> System.Exception(e.ToString()))
         raise (System.AggregateException(exs))
-    
+
 )
 
 Target "Test" (fun _ ->
 
     let testDll = Path.Combine(testBuildDir,"Test.dll")
-    
-    let runner = Path.Combine("tools","packages", "xunit.runners", "tools", "xunit.console.clr4.exe") 
-    
+
+    let runner = Path.Combine("tools","packages", "xunit.runners", "tools", "xunit.console.clr4.exe")
+
     !! (testDll)
          |> xUnit (fun p -> {p with OutputDir = testDir; ToolPath =  runner })
 )
@@ -159,10 +163,10 @@ Target "BuildOnly" (fun _ ->
 
 Target "Deploy" (fun _ ->
 
-    NuGet (fun p -> 
+    NuGet (fun p ->
         {p with
             Authors = authors
-            Project = projectName                           
+            Project = projectName
             OutputPath = buildDir
             WorkingDir = buildDir
             Description = description
@@ -176,18 +180,18 @@ Target "Deploy" (fun _ ->
 "CleanSrc"
     ==> "Generate"
 
-"Clean" 
+"Clean"
     =?> ("Generate", not (hasBuildParam "BuildOnly"))
     ==> "Build"
-    
+
 "CleanTest"
     ==> "Build"
     ==> "BuildTest"
     ==> "Test"
-    
+
 "CleanDocs"
     ==> "Docs"
-    
+
 "Test"
     ==> "Docs"
     ==> "Deploy"

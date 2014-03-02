@@ -1,11 +1,11 @@
 // Copyright 2014 Jay Tuley <jay+code@tuley.name>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 //     http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,16 +20,20 @@ open System.Reflection
 open System.IO
 open Mono.Cecil
 
+type MethodContext =
+    | Static
+    | Instance
+
 module Reformat =
 
     let private keywordSet = Set(Microsoft.FSharp.Compiler.Lexhelp.Keywords.keywordNames)
 
     let camelCase (x:string) = System.String.Join("", System.Char.ToLower(x.[0])::(x |> Seq.skip 1 |> Seq.toList))
-                    
+
     let slimGenericName x = System.Text.RegularExpressions.Regex.Replace(x, "`\d+", "")
-    
+
     let private wrapKeywords (s:string) = if keywordSet.Contains(s) then "``" + s + "``" else s
-    
+
     let (|CSharpFunc|CSharpExpr|CSharpOther|) (x:TypeReference) =
         if x.FullName.StartsWith("System.Func") then
             CSharpFunc
@@ -37,9 +41,9 @@ module Reformat =
             CSharpExpr
         else
             CSharpOther
-    
+
     let private getGenericParameters (x:TypeReference) =
-        (x :?> GenericInstanceType).GenericArguments 
+        (x :?> GenericInstanceType).GenericArguments
 
 
 
@@ -61,13 +65,13 @@ module Reformat =
             else
                 PlainType
         match x with
-            | GenericType   -> 
+            | GenericType   ->
                 sprintf "%s.%s<%s>"
                     x.Namespace
                     (slimGenericName x.Name)
                     (x |> getGenericParameters |> Seq.map typeNameFix |> String.concat ", ")
-            | FSharpQuote   -> 
-                sprintf "Quotations.Expr<%s>" 
+            | FSharpQuote   ->
+                sprintf "Quotations.Expr<%s>"
                     (x |> getGenericParameters |> Seq.head |> getGenericParameters |> Seq.map typeNameFix |> appendUnitWhenSingle |> String.concat "->")
             | FSharpFunc    -> x |> getGenericParameters |> Seq.map typeNameFix |> appendUnitWhenSingle |> String.concat "->"
             | ParameterName -> sprintf "'%s" x.Name
@@ -80,7 +84,7 @@ module Reformat =
             | CSharpFunc -> fullDef
             | CSharpExpr -> fullDef
             | __________ -> if specifyAllTypes then fullDef else justName
-    
+
     let private unwrapExpressionType (x:ParameterDefinition) =
         x.ParameterType |> getGenericParameters |> Seq.head
 
@@ -89,13 +93,13 @@ module Reformat =
             | CSharpFunc -> sprintf "%s(%s)" (typeNameFixer false x.ParameterType) x.Name
             | CSharpExpr -> sprintf "ComposableExtensions.Quotations.toExpression<%s>(%s)" (typeNameFixer false (unwrapExpressionType x)) x.Name
             | __________ -> x.Name
-    
+
     let namespaceComposable (x:string) =
         if x.StartsWith("System") && x <> "System" then
             x.Replace("System", "Composable")
         else
             sprintf "Composable.%s" x
-    
+
     let rec private matchesGenericParameter (matcher:GenericParameter) (t:TypeReference) =
         if t.IsGenericParameter then
             t.Name = matcher.Name
@@ -113,9 +117,9 @@ module Reformat =
     let private explictGenericParameters (x:MethodDefinition) =
         x.GenericParameters
             |> (fun p -> System.Linq.Enumerable.Reverse(p))
-            |> Seq.fold (fun list p -> if matchesGenericParameters p (x.Parameters |> Seq.map (fun p->p.ParameterType)) then 
-                                            list 
-                                       else 
+            |> Seq.fold (fun list p -> if matchesGenericParameters p (x.Parameters |> Seq.map (fun p->p.ParameterType)) then
+                                            list
+                                       else
                                             (sprintf "'%s" p.Name)::list) []
 
     let explictGenericParameterName (changeName:string->string) (x:MethodDefinition) =
@@ -131,7 +135,7 @@ module Reformat =
 
     let methodWrapper (reorderedParameters:MethodDefinition->seq<ParameterDefinition>) (x:MethodDefinition) =
         let paramCnt = x.Parameters |> Seq.length
-        let specifyAllTypes = 
+        let specifyAllTypes =
             (x.DeclaringType.Methods
                  |> Seq.filter (fun m-> m.Name = x.Name && (m.Parameters |> Seq.length) = paramCnt)
                  |> Seq.length) > 1
@@ -140,18 +144,21 @@ module Reformat =
         let parameterFix = parameterFixer specifyAllTypes
         let fsharpParams = (x |> reorderedParameters |> Seq.map parameterFix |> String.concat " ")
         let csharpParams = (x.Parameters |> Seq.map csharpCastFunc |> String.concat ", ")
-        sprintf "let inline %s %s = %s.%s(%s)" fsharpName fsharpParams x.DeclaringType.FullName csharpName csharpParams
+        if x.IsStatic then
+            sprintf "let inline %s %s = %s.%s(%s)" fsharpName fsharpParams x.DeclaringType.FullName csharpName csharpParams
+        else
+            sprintf "let inline %s %s (``{instance}``:%s) = ``{instance}``.%s(%s)" fsharpName fsharpParams x.DeclaringType.FullName csharpName csharpParams
 
 module Reorder =
     let noChange (m:MethodDefinition) : seq<ParameterDefinition> = upcast m.Parameters
 
     let private equivalentTypes (t1:TypeReference) (t2:TypeReference) =
-        let replaceName (t:GenericInstanceType) = 
+        let replaceName (t:GenericInstanceType) =
              t.GenericArguments |> Seq.fold (fun (acc:string) gp -> acc.Replace(gp.Name,"_")) t.FullName
         if t1.IsGenericInstance && t2.IsGenericInstance then
             (downcast t1 |> replaceName) = (downcast t2 |> replaceName )
         else
-            t1.FullName = t2.FullName    
+            t1.FullName = t2.FullName
 
     let private endsWithNumber = System.Text.RegularExpressions.Regex(@"^.*\d+$")
 
@@ -160,18 +167,18 @@ module Reorder =
         let p1 = (ps |> Seq.nth 0)
         let p2 = (ps |> Seq.nth 1)
 
-        equivalentTypes p1.ParameterType p2.ParameterType 
+        equivalentTypes p1.ParameterType p2.ParameterType
             || endsWithNumber.IsMatch(p1.Name) && endsWithNumber.IsMatch(p2.Name)
             || p2.Name = "inner"
 
     let private fullmethodname (m:MethodDefinition) =
         sprintf "%s.%s.%s" m.DeclaringType.Namespace m.DeclaringType.Name m.Name
 
-    let extensionMethodReorder (m:MethodDefinition) = 
+    let extensionMethodReorder (m:MethodDefinition) =
         let ps = m.Parameters
         let exceptions = ["System.Linq.Enumerable.Except";"System.Linq.Queryable.Except"]
         if (ps |> Seq.length) > 1
-            && identifyReorder2 ps 
+            && identifyReorder2 ps
             && not (exceptions |> Seq.exists (fun n->(fullmethodname m).StartsWith(n))) then
              Seq.append (ps |> Seq.skip 2) (ps |> Seq.take 2)
         else
@@ -181,20 +188,23 @@ module IdentifyMethods =
 
     let isPublicStaticMethod (x:MethodDefinition) = x.IsStatic && x.IsPublic
 
-    let private hasExtensionMember (x:IMemberDefinition) = 
-        x.HasCustomAttributes && x.CustomAttributes 
+    let private hasExtensionMember (x:IMemberDefinition) =
+        x.HasCustomAttributes && x.CustomAttributes
             |> Seq.exists (fun a -> a.AttributeType.FullName = "System.Runtime.CompilerServices.ExtensionAttribute")
 
     let isExtensionMethod (x:MethodDefinition) = hasExtensionMember x
-    
-    let matchesSignature (name:string) (argTypes:string seq) (m:MethodDefinition) =
-        let nameMatch =  m.Name = name
+
+    let matchesSignature (c:MethodContext) (name:string) (argTypes:string seq) (m:MethodDefinition) =
+        let nameMatch =  m.Name = name && (m.IsStatic <> (c = Instance))
         let paramTypes = (m.Parameters |> Seq.map (fun p -> p.ParameterType.FullName))
         nameMatch && System.Linq.Enumerable.SequenceEqual(paramTypes, argTypes)
 
-    let matchesName (name:string) (m:MethodDefinition) =
-        m.Name = name
-    
+    let matchesName  (c:MethodContext)  (name:string) (m:MethodDefinition) =
+        (m.IsStatic <> (c = Instance)) && m.Name = name
+
+    let matchesNames (c:MethodContext) (names:string seq) (m:MethodDefinition) =
+        (m.IsStatic <> (c = Instance)) && names |> Seq.exists (fun n -> m.Name = n)
+
 module Generate =
 
     let writeWrappers (header:string) (srcDir:string) (asm:string) (namesp:string) (typeName:string) (orderedParameters:MethodDefinition->seq<ParameterDefinition>) (methodSelectors:(MethodDefinition->bool) list) =
@@ -203,7 +213,7 @@ module Generate =
                         |> Seq.filter (fun t -> t.IsPublic)
                         |> Seq.filter (fun t -> t.Namespace.StartsWith(namesp))
                         |> Seq.filter (fun t -> t.Name.StartsWith(typeName))
-                        |> Seq.collect (fun t -> t.Methods |> Seq.filter IdentifyMethods.isPublicStaticMethod)
+                        |> Seq.collect (fun t -> t.Methods |> Seq.filter (fun m -> m.IsPublic))
 
         let chosenMethods = methodSelectors |> Seq.fold (fun acc pred -> methods |> Seq.filter pred |> Seq.append acc) Seq.empty |> Seq.distinct
 
@@ -211,7 +221,7 @@ module Generate =
                                     |> Seq.groupBy (fun m -> (m.Name,m.Parameters |> Seq.length))
                                     |> Seq.filter (fun (k,g) -> g |> Seq.length <= 2) //Skip over the numeric overloads
                                     |> Seq.collect (fun (k,g) -> g)
-            
+
         let foldHighLowLists (minL:MethodDefinition list,maxL:MethodDefinition list) (minC:int, maxC:int, g:MethodDefinition seq) =
             let low = g |> Seq.find (fun m-> (m.Parameters |> Seq.length) = minC)
             let high = g |> Seq.toList |> List.rev |> Seq.find (fun m-> (m.Parameters |> Seq.length) = maxC)
@@ -219,18 +229,18 @@ module Generate =
                 (low::minL, maxL)
             else
                 (low::minL, high::maxL)
-        
+
         let main,full = removedMostOverloads
                             |> Seq.groupBy (fun m -> m.Name)
                             |> Seq.map (fun (k,g) -> (g |> Seq.map (fun m->Seq.length m.Parameters), g))
                             |> Seq.map (fun (c,g) -> (c |> Seq.min, c |> Seq.max, g))
                             |> Seq.fold foldHighLowLists (List.empty, List.empty)
-        
-        
+
+
         let list = [true,main;false,full]
         let nsp = Reformat.namespaceComposable namesp
         for (isMain, mlist) in list do
-            if not (Seq.isEmpty mlist) then 
+            if not (Seq.isEmpty mlist) then
                 let path = Path.Combine(srcDir, nsp)
                 Directory.CreateDirectory(path) |> ignore
                 use writer = System.IO.File.AppendText(Path.Combine(path, typeName+".fsx"))
