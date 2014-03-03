@@ -135,6 +135,7 @@ Target "BuildTest" (fun _ ->
     for f in refdlls do
        FileHelper.CopyFile testBuildDir f
 
+    File.Copy("./tools/fsharp-redirect.config",testDll+".config")
 
     let compilerOpts = ["fsc.exe"; "-o";  testDll; "-a"] @ files
 
