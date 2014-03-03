@@ -129,7 +129,7 @@ Target "BuildTest" (fun _ ->
           "./tools/packages/FsUnit.xUnit/Lib/net40/NHamcrest.dll"
           "./tools/packages/FsUnit.xUnit/Lib/net40/FsUnit.CustomMatchers.dll"
           "./tools/packages/FsUnit.xUnit/Lib/net40/FsUnit.Xunit.dll"
-          "./tools/packages/FSharp.Core/lib/FSharp.Core.dll"
+          "./tools/packages/FSharp.Core.3/lib/net40/FSharp.Core.dll"
           ]
 
     for f in refdlls do
