@@ -1,4 +1,4 @@
-// Generated with ComposableExtensions (0.9.1) http://jbtule.github.io/ComposableExtensions
+// Generated with ComposableExtensions (0.10.1) http://jbtule.github.io/ComposableExtensions
 
 namespace Composable.System
 /// Corresponding `System.String` static methods as functions
@@ -8,7 +8,7 @@ module String =
     let inline contains value (``{instance}``:System.String) = ``{instance}``.Contains(value)
 
     /// Calls `EndsWith(value)`
-    let inline endsWith (value:System.String) (``{instance}``:System.String) = ``{instance}``.EndsWith(value)
+    let inline endsWith value (``{instance}``:System.String) = ``{instance}``.EndsWith(value)
 
     /// Calls `IsNullOrEmpty(value)`
     let inline isNullOrEmpty value = System.String.IsNullOrEmpty(value)
@@ -60,9 +60,6 @@ module String =
 
         /// Calls `PadRight(totalWidth, paddingChar)`
         let inline padRight totalWidth paddingChar (``{instance}``:System.String) = ``{instance}``.PadRight(totalWidth, paddingChar)
-
-        /// Calls `Replace(oldValue, newValue)`
-        let inline replace (oldValue:System.String) (newValue:System.String) (``{instance}``:System.Text.StringBuilder) = ``{instance}``.Replace(oldValue, newValue)
 
         /// Calls `StartsWith(value, ignoreCase, culture)`
         let inline startsWith value ignoreCase culture (``{instance}``:System.String) = ``{instance}``.StartsWith(value, ignoreCase, culture)

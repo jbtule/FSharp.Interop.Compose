@@ -1,4 +1,4 @@
-// Generated with ComposableExtensions (0.9.1) http://jbtule.github.io/ComposableExtensions
+// Generated with ComposableExtensions (0.10.1) http://jbtule.github.io/ComposableExtensions
 
 namespace Composable.Linq
 /// Corresponding `System.Linq.Enumerable` static methods as functions
@@ -196,8 +196,8 @@ module Enumerable =
         /// Calls `Select(source, System.Func<'TSource, System.Int32, 'TResult>(selector))`
         let inline select (selector:'TSource->System.Int32->'TResult) (source:System.Collections.Generic.IEnumerable<'TSource>) = System.Linq.Enumerable.Select(source, System.Func<'TSource, System.Int32, 'TResult>(selector))
 
-        /// Calls `SelectMany(source, System.Func<'TSource, System.Collections.Generic.IEnumerable<'TCollection>>(collectionSelector), System.Func<'TSource, 'TCollection, 'TResult>(resultSelector))`
-        let inline selectMany (collectionSelector:'TSource->System.Collections.Generic.IEnumerable<'TCollection>) (resultSelector:'TSource->'TCollection->'TResult) (source:System.Collections.Generic.IEnumerable<'TSource>) = System.Linq.Enumerable.SelectMany(source, System.Func<'TSource, System.Collections.Generic.IEnumerable<'TCollection>>(collectionSelector), System.Func<'TSource, 'TCollection, 'TResult>(resultSelector))
+        /// Calls `SelectMany(source, System.Func<'TSource, System.Int32, System.Collections.Generic.IEnumerable<'TCollection>>(collectionSelector), System.Func<'TSource, 'TCollection, 'TResult>(resultSelector))`
+        let inline selectMany (collectionSelector:'TSource->System.Int32->System.Collections.Generic.IEnumerable<'TCollection>) (resultSelector:'TSource->'TCollection->'TResult) (source:System.Collections.Generic.IEnumerable<'TSource>) = System.Linq.Enumerable.SelectMany(source, System.Func<'TSource, System.Int32, System.Collections.Generic.IEnumerable<'TCollection>>(collectionSelector), System.Func<'TSource, 'TCollection, 'TResult>(resultSelector))
 
         /// Calls `SequenceEqual(first, second, comparer)`
         let inline sequenceEqual comparer first second = System.Linq.Enumerable.SequenceEqual(first, second, comparer)

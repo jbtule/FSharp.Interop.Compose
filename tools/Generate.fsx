@@ -24,6 +24,37 @@ type MethodContext =
     | Static
     | Instance
 
+module internal Helpers =
+    let hasNamePrefix (n:string) (typeOrMethodName:string) =
+        let testBoundry = 
+            lazy
+                let b = typeOrMethodName.Replace(n,"")
+                b.Length = 0 || not (System.Char.IsLetterOrDigit(b.[0]))
+        typeOrMethodName.StartsWith(n) && testBoundry.Value
+
+module IdentifyMethods =
+
+    let isPublicStaticMethod (x:MethodDefinition) = x.IsStatic && x.IsPublic
+
+    let private hasExtensionMember (x:IMemberDefinition) =
+        x.HasCustomAttributes && x.CustomAttributes
+            |> Seq.exists (fun a -> a.AttributeType.FullName = "System.Runtime.CompilerServices.ExtensionAttribute")
+
+    let isExtensionMethod (x:MethodDefinition) = hasExtensionMember x
+
+    let matchesSignature (c:MethodContext) (name:string) (argTypes:string seq) (m:MethodDefinition) =
+        let nameMatch =  m.Name = name && (m.IsStatic <> (c = Instance))
+        let paramTypes = (m.Parameters |> Seq.map (fun p -> p.ParameterType.FullName))
+        nameMatch 
+            && Seq.length argTypes = Seq.length paramTypes
+            && (paramTypes,argTypes) ||> Seq.zip |> Seq.fold (fun acc (t1,t2) -> acc && t1 |> Helpers.hasNamePrefix t2) true
+
+    let matchesName  (c:MethodContext)  (name:string) (m:MethodDefinition) =
+        (m.IsStatic <> (c = Instance)) && m.Name = name
+
+    let matchesNames (c:MethodContext) (names:string seq) (m:MethodDefinition) =
+        (m.IsStatic <> (c = Instance)) && names |> Seq.exists (fun n -> m.Name = n)
+
 module Reformat =
 
     let private keywordSet = Set(Microsoft.FSharp.Compiler.Lexhelp.Keywords.keywordNames)
@@ -35,17 +66,15 @@ module Reformat =
     let private wrapKeywords (s:string) = if keywordSet.Contains(s) then "``" + s + "``" else s
 
     let (|CSharpFunc|CSharpExpr|CSharpOther|) (x:TypeReference) =
-        if x.FullName.StartsWith("System.Func") then
+        if x.FullName |> Helpers.hasNamePrefix "System.Func" then
             CSharpFunc
-        elif x.FullName.StartsWith("System.Linq.Expressions.Expression") then
+        elif x.FullName |> Helpers.hasNamePrefix "System.Linq.Expressions.Expression" then
             CSharpExpr
         else
             CSharpOther
 
     let private getGenericParameters (x:TypeReference) =
         (x :?> GenericInstanceType).GenericArguments
-
-
 
     let rec typeNameFixer forFSharp (x:TypeReference) =
         let appendUnitWhenSingle (argNames:string seq) =
@@ -137,7 +166,7 @@ module Reformat =
         let paramCnt = x.Parameters |> Seq.length
         let specifyAllTypes =
             (x.DeclaringType.Methods
-                 |> Seq.filter (fun m-> m.Name = x.Name && (m.Parameters |> Seq.length) = paramCnt)
+                 |> Seq.filter (fun m-> m.IsPublic && m.Name = x.Name && (m.Parameters |> Seq.length) = paramCnt)
                  |> Seq.length) > 1
         let fsharpName = explictGenericParameterName camelCase x
         let csharpName = explictGenericParameterName (fun n->n) x
@@ -151,6 +180,12 @@ module Reformat =
 
 module Reorder =
     let noChange (m:MethodDefinition) : seq<ParameterDefinition> = upcast m.Parameters
+
+    let moveTypeToTheEnd (typeName:string) (m:MethodDefinition) : seq<ParameterDefinition> =
+        m.Parameters
+            |> Seq.mapi (fun i p -> (i,p))
+            |> Seq.sortBy (fun (i,p)-> i + if p.ParameterType.FullName |> Helpers.hasNamePrefix typeName then 100 else 0)
+            |> Seq.map (fun (_,p)-> p)
 
     let private equivalentTypes (t1:TypeReference) (t2:TypeReference) =
         let replaceName (t:GenericInstanceType) =
@@ -170,6 +205,7 @@ module Reorder =
         equivalentTypes p1.ParameterType p2.ParameterType
             || endsWithNumber.IsMatch(p1.Name) && endsWithNumber.IsMatch(p2.Name)
             || p2.Name = "inner"
+            || p2.Name = "second"
 
     let private fullmethodname (m:MethodDefinition) =
         sprintf "%s.%s.%s" m.DeclaringType.Namespace m.DeclaringType.Name m.Name
@@ -179,31 +215,10 @@ module Reorder =
         let exceptions = ["System.Linq.Enumerable.Except";"System.Linq.Queryable.Except"]
         if (ps |> Seq.length) > 1
             && identifyReorder2 ps
-            && not (exceptions |> Seq.exists (fun n->(fullmethodname m).StartsWith(n))) then
+            && exceptions |> Seq.exists (fun n-> (fullmethodname m) |> Helpers.hasNamePrefix n) |> not then
              Seq.append (ps |> Seq.skip 2) (ps |> Seq.take 2)
         else
              Seq.append (ps |> Seq.skip 1) (ps |> Seq.take 1)
-
-module IdentifyMethods =
-
-    let isPublicStaticMethod (x:MethodDefinition) = x.IsStatic && x.IsPublic
-
-    let private hasExtensionMember (x:IMemberDefinition) =
-        x.HasCustomAttributes && x.CustomAttributes
-            |> Seq.exists (fun a -> a.AttributeType.FullName = "System.Runtime.CompilerServices.ExtensionAttribute")
-
-    let isExtensionMethod (x:MethodDefinition) = hasExtensionMember x
-
-    let matchesSignature (c:MethodContext) (name:string) (argTypes:string seq) (m:MethodDefinition) =
-        let nameMatch =  m.Name = name && (m.IsStatic <> (c = Instance))
-        let paramTypes = (m.Parameters |> Seq.map (fun p -> p.ParameterType.FullName))
-        nameMatch && System.Linq.Enumerable.SequenceEqual(paramTypes, argTypes)
-
-    let matchesName  (c:MethodContext)  (name:string) (m:MethodDefinition) =
-        (m.IsStatic <> (c = Instance)) && m.Name = name
-
-    let matchesNames (c:MethodContext) (names:string seq) (m:MethodDefinition) =
-        (m.IsStatic <> (c = Instance)) && names |> Seq.exists (fun n -> m.Name = n)
 
 module Generate =
 
@@ -211,8 +226,8 @@ module Generate =
         let asmDef = AssemblyDefinition.ReadAssembly((Assembly.Load(asm)).Location)
         let methods = asmDef.MainModule.Types
                         |> Seq.filter (fun t -> t.IsPublic)
-                        |> Seq.filter (fun t -> t.Namespace.StartsWith(namesp))
-                        |> Seq.filter (fun t -> t.Name.StartsWith(typeName))
+                        |> Seq.filter (fun t -> t.Namespace |> Helpers.hasNamePrefix namesp)
+                        |> Seq.filter (fun t -> t.Name |> Helpers.hasNamePrefix typeName)
                         |> Seq.collect (fun t -> t.Methods |> Seq.filter (fun m -> m.IsPublic))
 
         let chosenMethods = methodSelectors |> Seq.fold (fun acc pred -> methods |> Seq.filter pred |> Seq.append acc) Seq.empty |> Seq.distinct
@@ -231,6 +246,13 @@ module Generate =
                 (low::minL, high::maxL)
 
         let main,full = removedMostOverloads
+                            |> Seq.sortBy (fun m ->
+                                                 sprintf "%s(%s)%s(%s)"
+                                                    m.Name
+                                                    (m.Parameters |> Seq.map (fun p-> p.Name) |> String.concat ",")
+                                                    (if m.HasGenericParameters then " " else "~")
+                                                    (m.Parameters |> Seq.map (fun p-> p.ParameterType.FullName) |> String.concat ",")
+                                            )
                             |> Seq.groupBy (fun m -> m.Name)
                             |> Seq.map (fun (k,g) -> (g |> Seq.map (fun m->Seq.length m.Parameters), g))
                             |> Seq.map (fun (c,g) -> (c |> Seq.min, c |> Seq.max, g))

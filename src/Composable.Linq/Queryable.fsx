@@ -1,4 +1,4 @@
-// Generated with ComposableExtensions (0.9.1) http://jbtule.github.io/ComposableExtensions
+// Generated with ComposableExtensions (0.10.1) http://jbtule.github.io/ComposableExtensions
 
 #load "../../helpers/Quotations.fsx"
 
@@ -201,8 +201,8 @@ module Queryable =
         /// Calls `Select(source, ComposableExtensions.Quotations.toExpression<System.Func<'TSource, System.Int32, 'TResult>>(selector))`
         let inline select (selector:Quotations.Expr<'TSource->System.Int32->'TResult>) (source:System.Linq.IQueryable<'TSource>) = System.Linq.Queryable.Select(source, ComposableExtensions.Quotations.toExpression<System.Func<'TSource, System.Int32, 'TResult>>(selector))
 
-        /// Calls `SelectMany(source, ComposableExtensions.Quotations.toExpression<System.Func<'TSource, System.Collections.Generic.IEnumerable<'TCollection>>>(collectionSelector), ComposableExtensions.Quotations.toExpression<System.Func<'TSource, 'TCollection, 'TResult>>(resultSelector))`
-        let inline selectMany (collectionSelector:Quotations.Expr<'TSource->System.Collections.Generic.IEnumerable<'TCollection>>) (resultSelector:Quotations.Expr<'TSource->'TCollection->'TResult>) (source:System.Linq.IQueryable<'TSource>) = System.Linq.Queryable.SelectMany(source, ComposableExtensions.Quotations.toExpression<System.Func<'TSource, System.Collections.Generic.IEnumerable<'TCollection>>>(collectionSelector), ComposableExtensions.Quotations.toExpression<System.Func<'TSource, 'TCollection, 'TResult>>(resultSelector))
+        /// Calls `SelectMany(source, ComposableExtensions.Quotations.toExpression<System.Func<'TSource, System.Int32, System.Collections.Generic.IEnumerable<'TCollection>>>(collectionSelector), ComposableExtensions.Quotations.toExpression<System.Func<'TSource, 'TCollection, 'TResult>>(resultSelector))`
+        let inline selectMany (collectionSelector:Quotations.Expr<'TSource->System.Int32->System.Collections.Generic.IEnumerable<'TCollection>>) (resultSelector:Quotations.Expr<'TSource->'TCollection->'TResult>) (source:System.Linq.IQueryable<'TSource>) = System.Linq.Queryable.SelectMany(source, ComposableExtensions.Quotations.toExpression<System.Func<'TSource, System.Int32, System.Collections.Generic.IEnumerable<'TCollection>>>(collectionSelector), ComposableExtensions.Quotations.toExpression<System.Func<'TSource, 'TCollection, 'TResult>>(resultSelector))
 
         /// Calls `SequenceEqual(source1, source2, comparer)`
         let inline sequenceEqual comparer source1 source2 = System.Linq.Queryable.SequenceEqual(source1, source2, comparer)

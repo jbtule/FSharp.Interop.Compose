@@ -1,4 +1,4 @@
-// Generated with ComposableExtensions (0.9.1) http://jbtule.github.io/ComposableExtensions
+// Generated with ComposableExtensions (0.10.1) http://jbtule.github.io/ComposableExtensions
 
 namespace Composable.Linq
 /// Corresponding `System.Linq.ParallelEnumerable` static methods as functions
@@ -29,7 +29,7 @@ module ParallelEnumerable =
     let inline cast<'TResult> source = System.Linq.ParallelEnumerable.Cast<'TResult>(source)
 
     /// Calls `Concat(first, second)`
-    let inline concat (first:System.Linq.ParallelQuery<'TSource>) (second:System.Linq.ParallelQuery<'TSource>) = System.Linq.ParallelEnumerable.Concat(first, second)
+    let inline concat (first:System.Linq.ParallelQuery<'TSource>) (second:System.Collections.Generic.IEnumerable<'TSource>) = System.Linq.ParallelEnumerable.Concat(first, second)
 
     /// Calls `Contains(source, value)`
     let inline contains value source = System.Linq.ParallelEnumerable.Contains(source, value)
@@ -50,7 +50,7 @@ module ParallelEnumerable =
     let inline elementAtOrDefault index source = System.Linq.ParallelEnumerable.ElementAtOrDefault(source, index)
 
     /// Calls `Except(first, second)`
-    let inline except (first:System.Linq.ParallelQuery<'TSource>) (second:System.Linq.ParallelQuery<'TSource>) = System.Linq.ParallelEnumerable.Except(first, second)
+    let inline except (first:System.Linq.ParallelQuery<'TSource>) (second:System.Collections.Generic.IEnumerable<'TSource>) = System.Linq.ParallelEnumerable.Except(first, second)
 
     /// Calls `First(source)`
     let inline first source = System.Linq.ParallelEnumerable.First(source)
@@ -65,13 +65,13 @@ module ParallelEnumerable =
     let inline groupBy (keySelector:'TSource->'TKey) source = System.Linq.ParallelEnumerable.GroupBy(source, System.Func<'TSource, 'TKey>(keySelector))
 
     /// Calls `GroupJoin(outer, inner, System.Func<'TOuter, 'TKey>(outerKeySelector), System.Func<'TInner, 'TKey>(innerKeySelector), System.Func<'TOuter, System.Collections.Generic.IEnumerable<'TInner>, 'TResult>(resultSelector))`
-    let inline groupJoin (outerKeySelector:'TOuter->'TKey) (innerKeySelector:'TInner->'TKey) (resultSelector:'TOuter->System.Collections.Generic.IEnumerable<'TInner>->'TResult) (outer:System.Linq.ParallelQuery<'TOuter>) (inner:System.Linq.ParallelQuery<'TInner>) = System.Linq.ParallelEnumerable.GroupJoin(outer, inner, System.Func<'TOuter, 'TKey>(outerKeySelector), System.Func<'TInner, 'TKey>(innerKeySelector), System.Func<'TOuter, System.Collections.Generic.IEnumerable<'TInner>, 'TResult>(resultSelector))
+    let inline groupJoin (outerKeySelector:'TOuter->'TKey) (innerKeySelector:'TInner->'TKey) (resultSelector:'TOuter->System.Collections.Generic.IEnumerable<'TInner>->'TResult) (outer:System.Linq.ParallelQuery<'TOuter>) (inner:System.Collections.Generic.IEnumerable<'TInner>) = System.Linq.ParallelEnumerable.GroupJoin(outer, inner, System.Func<'TOuter, 'TKey>(outerKeySelector), System.Func<'TInner, 'TKey>(innerKeySelector), System.Func<'TOuter, System.Collections.Generic.IEnumerable<'TInner>, 'TResult>(resultSelector))
 
     /// Calls `Intersect(first, second)`
-    let inline intersect (first:System.Linq.ParallelQuery<'TSource>) (second:System.Linq.ParallelQuery<'TSource>) = System.Linq.ParallelEnumerable.Intersect(first, second)
+    let inline intersect (first:System.Linq.ParallelQuery<'TSource>) (second:System.Collections.Generic.IEnumerable<'TSource>) = System.Linq.ParallelEnumerable.Intersect(first, second)
 
     /// Calls `Join(outer, inner, System.Func<'TOuter, 'TKey>(outerKeySelector), System.Func<'TInner, 'TKey>(innerKeySelector), System.Func<'TOuter, 'TInner, 'TResult>(resultSelector))`
-    let inline join (outerKeySelector:'TOuter->'TKey) (innerKeySelector:'TInner->'TKey) (resultSelector:'TOuter->'TInner->'TResult) (outer:System.Linq.ParallelQuery<'TOuter>) (inner:System.Linq.ParallelQuery<'TInner>) = System.Linq.ParallelEnumerable.Join(outer, inner, System.Func<'TOuter, 'TKey>(outerKeySelector), System.Func<'TInner, 'TKey>(innerKeySelector), System.Func<'TOuter, 'TInner, 'TResult>(resultSelector))
+    let inline join (outerKeySelector:'TOuter->'TKey) (innerKeySelector:'TInner->'TKey) (resultSelector:'TOuter->'TInner->'TResult) (outer:System.Linq.ParallelQuery<'TOuter>) (inner:System.Collections.Generic.IEnumerable<'TInner>) = System.Linq.ParallelEnumerable.Join(outer, inner, System.Func<'TOuter, 'TKey>(outerKeySelector), System.Func<'TInner, 'TKey>(innerKeySelector), System.Func<'TOuter, 'TInner, 'TResult>(resultSelector))
 
     /// Calls `Last(source)`
     let inline last source = System.Linq.ParallelEnumerable.Last(source)
@@ -101,7 +101,7 @@ module ParallelEnumerable =
     let inline selectMany (selector:'TSource->System.Collections.Generic.IEnumerable<'TResult>) (source:System.Linq.ParallelQuery<'TSource>) = System.Linq.ParallelEnumerable.SelectMany(source, System.Func<'TSource, System.Collections.Generic.IEnumerable<'TResult>>(selector))
 
     /// Calls `SequenceEqual(first, second)`
-    let inline sequenceEqual (first:System.Linq.ParallelQuery<'TSource>) (second:System.Linq.ParallelQuery<'TSource>) = System.Linq.ParallelEnumerable.SequenceEqual(first, second)
+    let inline sequenceEqual (first:System.Linq.ParallelQuery<'TSource>) (second:System.Collections.Generic.IEnumerable<'TSource>) = System.Linq.ParallelEnumerable.SequenceEqual(first, second)
 
     /// Calls `Single(source)`
     let inline single source = System.Linq.ParallelEnumerable.Single(source)
@@ -140,7 +140,7 @@ module ParallelEnumerable =
     let inline toLookup (keySelector:'TSource->'TKey) source = System.Linq.ParallelEnumerable.ToLookup(source, System.Func<'TSource, 'TKey>(keySelector))
 
     /// Calls `Union(first, second)`
-    let inline union (first:System.Linq.ParallelQuery<'TSource>) (second:System.Linq.ParallelQuery<'TSource>) = System.Linq.ParallelEnumerable.Union(first, second)
+    let inline union (first:System.Linq.ParallelQuery<'TSource>) (second:System.Collections.Generic.IEnumerable<'TSource>) = System.Linq.ParallelEnumerable.Union(first, second)
 
     /// Calls `Where(source, System.Func<'TSource, System.Boolean>(predicate))`
     let inline where (predicate:'TSource->System.Boolean) (source:System.Linq.ParallelQuery<'TSource>) = System.Linq.ParallelEnumerable.Where(source, System.Func<'TSource, System.Boolean>(predicate))
@@ -158,7 +158,7 @@ module ParallelEnumerable =
     let inline withMergeOptions mergeOptions source = System.Linq.ParallelEnumerable.WithMergeOptions(source, mergeOptions)
 
     /// Calls `Zip(first, second, System.Func<'TFirst, 'TSecond, 'TResult>(resultSelector))`
-    let inline zip (resultSelector:'TFirst->'TSecond->'TResult) (first:System.Linq.ParallelQuery<'TFirst>) (second:System.Linq.ParallelQuery<'TSecond>) = System.Linq.ParallelEnumerable.Zip(first, second, System.Func<'TFirst, 'TSecond, 'TResult>(resultSelector))
+    let inline zip (resultSelector:'TFirst->'TSecond->'TResult) (first:System.Linq.ParallelQuery<'TFirst>) (second:System.Collections.Generic.IEnumerable<'TSecond>) = System.Linq.ParallelEnumerable.Zip(first, second, System.Func<'TFirst, 'TSecond, 'TResult>(resultSelector))
 
     /// Longer parameter versions of `System.Linq.ParallelEnumerable` methods
     module Full =
@@ -173,7 +173,7 @@ module ParallelEnumerable =
         let inline asOrdered (source:System.Linq.ParallelQuery) = System.Linq.ParallelEnumerable.AsOrdered(source)
 
         /// Calls `Concat(first, second)`
-        let inline concat (second:System.Collections.Generic.IEnumerable<'TSource>) (first:System.Linq.ParallelQuery<'TSource>) = System.Linq.ParallelEnumerable.Concat(first, second)
+        let inline concat (first:System.Linq.ParallelQuery<'TSource>) (second:System.Linq.ParallelQuery<'TSource>) = System.Linq.ParallelEnumerable.Concat(first, second)
 
         /// Calls `Contains(source, value, comparer)`
         let inline contains value comparer source = System.Linq.ParallelEnumerable.Contains(source, value, comparer)
@@ -188,7 +188,7 @@ module ParallelEnumerable =
         let inline distinct comparer source = System.Linq.ParallelEnumerable.Distinct(source, comparer)
 
         /// Calls `Except(first, second, comparer)`
-        let inline except (second:System.Collections.Generic.IEnumerable<'TSource>) (comparer:System.Collections.Generic.IEqualityComparer<'TSource>) (first:System.Linq.ParallelQuery<'TSource>) = System.Linq.ParallelEnumerable.Except(first, second, comparer)
+        let inline except (comparer:System.Collections.Generic.IEqualityComparer<'TSource>) (first:System.Linq.ParallelQuery<'TSource>) (second:System.Linq.ParallelQuery<'TSource>) = System.Linq.ParallelEnumerable.Except(first, second, comparer)
 
         /// Calls `First(source, System.Func<'TSource, System.Boolean>(predicate))`
         let inline first (predicate:'TSource->System.Boolean) source = System.Linq.ParallelEnumerable.First(source, System.Func<'TSource, System.Boolean>(predicate))
@@ -200,13 +200,13 @@ module ParallelEnumerable =
         let inline groupBy (keySelector:'TSource->'TKey) (elementSelector:'TSource->'TElement) (resultSelector:'TKey->System.Collections.Generic.IEnumerable<'TElement>->'TResult) comparer source = System.Linq.ParallelEnumerable.GroupBy(source, System.Func<'TSource, 'TKey>(keySelector), System.Func<'TSource, 'TElement>(elementSelector), System.Func<'TKey, System.Collections.Generic.IEnumerable<'TElement>, 'TResult>(resultSelector), comparer)
 
         /// Calls `GroupJoin(outer, inner, System.Func<'TOuter, 'TKey>(outerKeySelector), System.Func<'TInner, 'TKey>(innerKeySelector), System.Func<'TOuter, System.Collections.Generic.IEnumerable<'TInner>, 'TResult>(resultSelector), comparer)`
-        let inline groupJoin (outerKeySelector:'TOuter->'TKey) (innerKeySelector:'TInner->'TKey) (resultSelector:'TOuter->System.Collections.Generic.IEnumerable<'TInner>->'TResult) (comparer:System.Collections.Generic.IEqualityComparer<'TKey>) (outer:System.Linq.ParallelQuery<'TOuter>) (inner:System.Collections.Generic.IEnumerable<'TInner>) = System.Linq.ParallelEnumerable.GroupJoin(outer, inner, System.Func<'TOuter, 'TKey>(outerKeySelector), System.Func<'TInner, 'TKey>(innerKeySelector), System.Func<'TOuter, System.Collections.Generic.IEnumerable<'TInner>, 'TResult>(resultSelector), comparer)
+        let inline groupJoin (outerKeySelector:'TOuter->'TKey) (innerKeySelector:'TInner->'TKey) (resultSelector:'TOuter->System.Collections.Generic.IEnumerable<'TInner>->'TResult) (comparer:System.Collections.Generic.IEqualityComparer<'TKey>) (outer:System.Linq.ParallelQuery<'TOuter>) (inner:System.Linq.ParallelQuery<'TInner>) = System.Linq.ParallelEnumerable.GroupJoin(outer, inner, System.Func<'TOuter, 'TKey>(outerKeySelector), System.Func<'TInner, 'TKey>(innerKeySelector), System.Func<'TOuter, System.Collections.Generic.IEnumerable<'TInner>, 'TResult>(resultSelector), comparer)
 
         /// Calls `Intersect(first, second, comparer)`
-        let inline intersect (second:System.Collections.Generic.IEnumerable<'TSource>) (comparer:System.Collections.Generic.IEqualityComparer<'TSource>) (first:System.Linq.ParallelQuery<'TSource>) = System.Linq.ParallelEnumerable.Intersect(first, second, comparer)
+        let inline intersect (comparer:System.Collections.Generic.IEqualityComparer<'TSource>) (first:System.Linq.ParallelQuery<'TSource>) (second:System.Linq.ParallelQuery<'TSource>) = System.Linq.ParallelEnumerable.Intersect(first, second, comparer)
 
         /// Calls `Join(outer, inner, System.Func<'TOuter, 'TKey>(outerKeySelector), System.Func<'TInner, 'TKey>(innerKeySelector), System.Func<'TOuter, 'TInner, 'TResult>(resultSelector), comparer)`
-        let inline join (outerKeySelector:'TOuter->'TKey) (innerKeySelector:'TInner->'TKey) (resultSelector:'TOuter->'TInner->'TResult) (comparer:System.Collections.Generic.IEqualityComparer<'TKey>) (outer:System.Linq.ParallelQuery<'TOuter>) (inner:System.Collections.Generic.IEnumerable<'TInner>) = System.Linq.ParallelEnumerable.Join(outer, inner, System.Func<'TOuter, 'TKey>(outerKeySelector), System.Func<'TInner, 'TKey>(innerKeySelector), System.Func<'TOuter, 'TInner, 'TResult>(resultSelector), comparer)
+        let inline join (outerKeySelector:'TOuter->'TKey) (innerKeySelector:'TInner->'TKey) (resultSelector:'TOuter->'TInner->'TResult) (comparer:System.Collections.Generic.IEqualityComparer<'TKey>) (outer:System.Linq.ParallelQuery<'TOuter>) (inner:System.Linq.ParallelQuery<'TInner>) = System.Linq.ParallelEnumerable.Join(outer, inner, System.Func<'TOuter, 'TKey>(outerKeySelector), System.Func<'TInner, 'TKey>(innerKeySelector), System.Func<'TOuter, 'TInner, 'TResult>(resultSelector), comparer)
 
         /// Calls `Last(source, System.Func<'TSource, System.Boolean>(predicate))`
         let inline last (predicate:'TSource->System.Boolean) source = System.Linq.ParallelEnumerable.Last(source, System.Func<'TSource, System.Boolean>(predicate))
@@ -230,7 +230,7 @@ module ParallelEnumerable =
         let inline selectMany (collectionSelector:'TSource->System.Int32->System.Collections.Generic.IEnumerable<'TCollection>) (resultSelector:'TSource->'TCollection->'TResult) (source:System.Linq.ParallelQuery<'TSource>) = System.Linq.ParallelEnumerable.SelectMany(source, System.Func<'TSource, System.Int32, System.Collections.Generic.IEnumerable<'TCollection>>(collectionSelector), System.Func<'TSource, 'TCollection, 'TResult>(resultSelector))
 
         /// Calls `SequenceEqual(first, second, comparer)`
-        let inline sequenceEqual (second:System.Collections.Generic.IEnumerable<'TSource>) (comparer:System.Collections.Generic.IEqualityComparer<'TSource>) (first:System.Linq.ParallelQuery<'TSource>) = System.Linq.ParallelEnumerable.SequenceEqual(first, second, comparer)
+        let inline sequenceEqual (comparer:System.Collections.Generic.IEqualityComparer<'TSource>) (first:System.Linq.ParallelQuery<'TSource>) (second:System.Linq.ParallelQuery<'TSource>) = System.Linq.ParallelEnumerable.SequenceEqual(first, second, comparer)
 
         /// Calls `Single(source, System.Func<'TSource, System.Boolean>(predicate))`
         let inline single (predicate:'TSource->System.Boolean) source = System.Linq.ParallelEnumerable.Single(source, System.Func<'TSource, System.Boolean>(predicate))
@@ -257,10 +257,10 @@ module ParallelEnumerable =
         let inline toLookup (keySelector:'TSource->'TKey) (elementSelector:'TSource->'TElement) comparer source = System.Linq.ParallelEnumerable.ToLookup(source, System.Func<'TSource, 'TKey>(keySelector), System.Func<'TSource, 'TElement>(elementSelector), comparer)
 
         /// Calls `Union(first, second, comparer)`
-        let inline union (second:System.Collections.Generic.IEnumerable<'TSource>) (comparer:System.Collections.Generic.IEqualityComparer<'TSource>) (first:System.Linq.ParallelQuery<'TSource>) = System.Linq.ParallelEnumerable.Union(first, second, comparer)
+        let inline union (comparer:System.Collections.Generic.IEqualityComparer<'TSource>) (first:System.Linq.ParallelQuery<'TSource>) (second:System.Linq.ParallelQuery<'TSource>) = System.Linq.ParallelEnumerable.Union(first, second, comparer)
 
         /// Calls `Where(source, System.Func<'TSource, System.Int32, System.Boolean>(predicate))`
         let inline where (predicate:'TSource->System.Int32->System.Boolean) (source:System.Linq.ParallelQuery<'TSource>) = System.Linq.ParallelEnumerable.Where(source, System.Func<'TSource, System.Int32, System.Boolean>(predicate))
 
         /// Calls `Zip(first, second, System.Func<'TFirst, 'TSecond, 'TResult>(resultSelector))`
-        let inline zip (second:System.Collections.Generic.IEnumerable<'TSecond>) (resultSelector:'TFirst->'TSecond->'TResult) (first:System.Linq.ParallelQuery<'TFirst>) = System.Linq.ParallelEnumerable.Zip(first, second, System.Func<'TFirst, 'TSecond, 'TResult>(resultSelector))
+        let inline zip (resultSelector:'TFirst->'TSecond->'TResult) (first:System.Linq.ParallelQuery<'TFirst>) (second:System.Linq.ParallelQuery<'TSecond>) = System.Linq.ParallelEnumerable.Zip(first, second, System.Func<'TFirst, 'TSecond, 'TResult>(resultSelector))

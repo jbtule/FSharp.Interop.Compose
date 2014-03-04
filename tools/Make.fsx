@@ -46,8 +46,11 @@ Target "CleanDocs" (fun _ ->
 
 Target "Generate" (fun _ ->
 
+   let br = System.Environment.NewLine
    let header  = sprintf "// Generated with %s (%s) %s" projectName version projectUrl
    let generateWrapper = Generate.writeWrappers header srcDir
+   let queryHeader = header + br + br + "#load \"../../helpers/Quotations.fsx\""
+   let generateQueryWrapper = Generate.writeWrappers queryHeader srcDir
 
    let coreAsm = "System.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
    let mscorlibAsm = "mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
@@ -55,9 +58,7 @@ Target "Generate" (fun _ ->
    generateWrapper coreAsm "System.Linq" "Enumerable" Reorder.extensionMethodReorder [IdentifyMethods.isExtensionMethod]
    generateWrapper coreAsm "System.Linq" "ParallelEnumerable" Reorder.extensionMethodReorder [IdentifyMethods.isExtensionMethod]
 
-   let queryHeader = header + "\n\n" + "#load \"../../helpers/Quotations.fsx\""
-   Generate.writeWrappers queryHeader srcDir coreAsm "System.Linq" "Queryable" Reorder.extensionMethodReorder [IdentifyMethods.isExtensionMethod]
-
+   generateQueryWrapper coreAsm "System.Linq" "Queryable" Reorder.extensionMethodReorder [IdentifyMethods.isExtensionMethod]
 
    let stringMethodFilters = [IdentifyMethods.matchesSignature Static "Join" ["System.String";"System.Collections.Generic.IEnumerable`1<System.String>"]
                               IdentifyMethods.matchesName Static "IsNullOrWhiteSpace"
@@ -69,8 +70,13 @@ Target "Generate" (fun _ ->
                               ]
    generateWrapper mscorlibAsm "System" "String" Reorder.noChange stringMethodFilters
 
-   let fileMethodFilters = [IdentifyMethods.matchesSignature Static "WriteAllLines" ["System.String";"System.Collections.Generic.IEnumerable`1<System.String>"]]
-   generateWrapper mscorlibAsm "System.IO" "File" Reorder.noChange  fileMethodFilters
+   let fileMethodFilters = [IdentifyMethods.matchesSignature Static "WriteAllLines" ["System.String";"System.Collections.Generic.IEnumerable`1<System.String>"]
+                            IdentifyMethods.matchesSignature Static "WriteAllLines" ["System.String";"System.Collections.Generic.IEnumerable`1<System.String>";"System.Text.Encoding"]
+                            IdentifyMethods.matchesName Static "AppendAllLines" 
+                            ]
+
+   let reorderForFile = Reorder.moveTypeToTheEnd "System.Collections.Generic.IEnumerable`1<System.String>"
+   generateWrapper mscorlibAsm "System.IO" "File" reorderForFile fileMethodFilters
 
    CreateFSharpAssemblyInfo (Path.Combine(srcDir, "AssemblyInfo.fsx"))
         [Attribute.Title title
