@@ -1,4 +1,4 @@
-// Generated with ComposableExtensions (0.10.1) http://jbtule.github.io/ComposableExtensions
+// Generated with ComposableExtensions (0.10.2) http://jbtule.github.io/ComposableExtensions
 
 namespace Composable.Linq
 /// Corresponding `System.Linq.ParallelEnumerable` static methods as functions

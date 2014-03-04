@@ -10,7 +10,17 @@ module Enumerable =
 
     [<Fact>]
     let aggregate () =
-        seq { 1 .. 5 } |> Enumerable.aggregate (fun acc i -> acc + i) |> should equal 15
+        seq { 1 .. 5 }
+            |> Enumerable.aggregate (fun acc i -> acc + i) |> should equal 15
+
+    [<Fact>]
+    let aggregateFull () =
+        seq { 1 .. 5 }
+            |> Enumerable.Full.aggregate
+                0
+                (fun acc i -> acc + i)
+                (fun i -> i.ToString())
+            |> should equal "15"
 
     [<Fact>]
     let ``all of 1-5 is less than 6`` () =
@@ -57,6 +67,15 @@ module Enumerable =
             |> Enumerable.contains 5 |> should be True
         seq { 1 .. 10 }
             |> Enumerable.contains 11 |> should be False
+
+    [<Fact>]
+    let containsFull () =
+        seq { 1 .. 10 }
+            |> Enumerable.Full.contains 5 System.Collections.Generic.EqualityComparer.Default
+            |> should be True
+        seq { 1 .. 10 }
+            |> Enumerable.Full.contains 11 System.Collections.Generic.EqualityComparer.Default
+            |> should be False
 
     [<Fact>]
     let Count () =

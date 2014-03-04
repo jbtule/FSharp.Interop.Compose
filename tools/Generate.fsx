@@ -26,7 +26,7 @@ type MethodContext =
 
 module internal Helpers =
     let hasNamePrefix (n:string) (typeOrMethodName:string) =
-        let testBoundry = 
+        let testBoundry =
             lazy
                 let b = typeOrMethodName.Replace(n,"")
                 b.Length = 0 || not (System.Char.IsLetterOrDigit(b.[0]))
@@ -45,9 +45,11 @@ module IdentifyMethods =
     let matchesSignature (c:MethodContext) (name:string) (argTypes:string seq) (m:MethodDefinition) =
         let nameMatch =  m.Name = name && (m.IsStatic <> (c = Instance))
         let paramTypes = (m.Parameters |> Seq.map (fun p -> p.ParameterType.FullName))
-        nameMatch 
+        nameMatch
             && Seq.length argTypes = Seq.length paramTypes
-            && (paramTypes,argTypes) ||> Seq.zip |> Seq.fold (fun acc (t1,t2) -> acc && t1 |> Helpers.hasNamePrefix t2) true
+            && (paramTypes,argTypes)
+                ||> Seq.zip
+                |> Seq.fold (fun acc (t1,t2) -> acc && t1 |> Helpers.hasNamePrefix t2) true
 
     let matchesName  (c:MethodContext)  (name:string) (m:MethodDefinition) =
         (m.IsStatic <> (c = Instance)) && m.Name = name
@@ -65,9 +67,11 @@ module Reformat =
 
     let private wrapKeywords (s:string) = if keywordSet.Contains(s) then "``" + s + "``" else s
 
-    let (|CSharpFunc|CSharpExpr|CSharpOther|) (x:TypeReference) =
+    let (|CSharpFunc|CSharpExpr|CSharpComparison|CSharpOther|) (x:TypeReference) =
         if x.FullName |> Helpers.hasNamePrefix "System.Func" then
             CSharpFunc
+        elif x.FullName |> Helpers.hasNamePrefix "System.Comparison" then
+            CSharpComparison
         elif x.FullName |> Helpers.hasNamePrefix "System.Linq.Expressions.Expression" then
             CSharpExpr
         else
@@ -80,12 +84,13 @@ module Reformat =
         let appendUnitWhenSingle (argNames:string seq) =
             if argNames |> Seq.length = 1 then Seq.append ["unit"] argNames else argNames
         let typeNameFix = typeNameFixer forFSharp
-        let (|GenericType|FSharpFunc|FSharpQuote|ParameterName|PlainType|) (tr:TypeReference) =
+        let (|GenericType|FSharpFunc|FSharpComparison|FSharpQuote|ParameterName|PlainType|) (tr:TypeReference) =
             if tr.IsGenericInstance then
                 if not forFSharp then
                     GenericType
                 else
                     match tr with
+                        | CSharpComparison -> FSharpComparison
                         | CSharpFunc -> FSharpFunc
                         | CSharpExpr -> FSharpQuote
                         | __________ -> GenericType
@@ -99,10 +104,25 @@ module Reformat =
                     x.Namespace
                     (slimGenericName x.Name)
                     (x |> getGenericParameters |> Seq.map typeNameFix |> String.concat ", ")
-            | FSharpQuote   ->
-                sprintf "Quotations.Expr<%s>"
-                    (x |> getGenericParameters |> Seq.head |> getGenericParameters |> Seq.map typeNameFix |> appendUnitWhenSingle |> String.concat "->")
-            | FSharpFunc    -> x |> getGenericParameters |> Seq.map typeNameFix |> appendUnitWhenSingle |> String.concat "->"
+            | FSharpQuote   -> x
+                                |> getGenericParameters
+                                |> Seq.head
+                                |> getGenericParameters
+                                |> Seq.map typeNameFix
+                                |> appendUnitWhenSingle
+                                |> String.concat "->"
+                                |> sprintf "Quotations.Expr<%s>"
+            | FSharpFunc    -> x
+                                |> getGenericParameters
+                                |> Seq.map typeNameFix
+                                |> appendUnitWhenSingle
+                                |> String.concat "->"
+            | FSharpComparison -> x
+                                    |> getGenericParameters
+                                    |> Seq.head
+                                    |> typeNameFix
+                                    |> (fun y->(y,y))
+                                    ||> sprintf "%s -> %s -> int"
             | ParameterName -> sprintf "'%s" x.Name
             | PlainType     -> sprintf "%s.%s" x.Namespace x.Name
 
@@ -110,18 +130,21 @@ module Reformat =
         let justName = wrapKeywords x.Name
         let fullDef = sprintf "(%s:%s)" justName (typeNameFixer true x.ParameterType)
         match x.ParameterType with
-            | CSharpFunc -> fullDef
-            | CSharpExpr -> fullDef
-            | __________ -> if specifyAllTypes then fullDef else justName
+            | CSharpFunc
+            | CSharpExpr
+            | CSharpComparison -> fullDef
+            | ________________ -> if specifyAllTypes then fullDef else justName
 
     let private unwrapExpressionType (x:ParameterDefinition) =
         x.ParameterType |> getGenericParameters |> Seq.head
 
     let csharpCastFunc (x:ParameterDefinition) =
         match x.ParameterType with
-            | CSharpFunc -> sprintf "%s(%s)" (typeNameFixer false x.ParameterType) x.Name
-            | CSharpExpr -> sprintf "ComposableExtensions.Quotations.toExpression<%s>(%s)" (typeNameFixer false (unwrapExpressionType x)) x.Name
-            | __________ -> x.Name
+            | CSharpFunc
+            | CSharpComparison -> sprintf "%s(%s)" (typeNameFixer false x.ParameterType) x.Name
+            | CSharpExpr       -> sprintf "ComposableExtensions.Quotations.toExpression<%s>(%s)"
+                                            (typeNameFixer false (unwrapExpressionType x)) x.Name
+            | ________________ -> x.Name
 
     let namespaceComposable (x:string) =
         if x.StartsWith("System") && x <> "System" then
@@ -170,13 +193,15 @@ module Reformat =
                  |> Seq.length) > 1
         let fsharpName = explictGenericParameterName camelCase x
         let csharpName = explictGenericParameterName (fun n->n) x
+        let csharpType = slimGenericName x.DeclaringType.FullName
         let parameterFix = parameterFixer specifyAllTypes
         let fsharpParams = (x |> reorderedParameters |> Seq.map parameterFix |> String.concat " ")
         let csharpParams = (x.Parameters |> Seq.map csharpCastFunc |> String.concat ", ")
         if x.IsStatic then
-            sprintf "let inline %s %s = %s.%s(%s)" fsharpName fsharpParams x.DeclaringType.FullName csharpName csharpParams
+            sprintf "let inline %s %s = %s.%s(%s)" fsharpName fsharpParams csharpType csharpName csharpParams
         else
-            sprintf "let inline %s %s (``{instance}``:%s) = ``{instance}``.%s(%s)" fsharpName fsharpParams x.DeclaringType.FullName csharpName csharpParams
+            sprintf "let inline %s %s (``{instance}``:%s) = ``{instance}``.%s(%s)"
+                fsharpName fsharpParams csharpType csharpName csharpParams
 
 module Reorder =
     let noChange (m:MethodDefinition) : seq<ParameterDefinition> = upcast m.Parameters
@@ -222,7 +247,14 @@ module Reorder =
 
 module Generate =
 
-    let writeWrappers (header:string) (srcDir:string) (asm:string) (namesp:string) (typeName:string) (orderedParameters:MethodDefinition->seq<ParameterDefinition>) (methodSelectors:(MethodDefinition->bool) list) =
+    let writeWrappers
+            (header:string)
+            (srcDir:string)
+            (asm:string)
+            (namesp:string)
+            (typeName:string)
+            (orderedParameters:MethodDefinition->seq<ParameterDefinition>)
+            (methodSelectors:(MethodDefinition->bool) list) =
         let asmDef = AssemblyDefinition.ReadAssembly((Assembly.Load(asm)).Location)
         let methods = asmDef.MainModule.Types
                         |> Seq.filter (fun t -> t.IsPublic)
@@ -230,14 +262,18 @@ module Generate =
                         |> Seq.filter (fun t -> t.Name |> Helpers.hasNamePrefix typeName)
                         |> Seq.collect (fun t -> t.Methods |> Seq.filter (fun m -> m.IsPublic))
 
-        let chosenMethods = methodSelectors |> Seq.fold (fun acc pred -> methods |> Seq.filter pred |> Seq.append acc) Seq.empty |> Seq.distinct
+        let chosenMethods =
+            methodSelectors
+                |> Seq.fold (fun acc pred -> methods |> Seq.filter pred |> Seq.append acc) Seq.empty
+                |> Seq.distinct
 
         let removedMostOverloads = chosenMethods
                                     |> Seq.groupBy (fun m -> (m.Name,m.Parameters |> Seq.length))
                                     |> Seq.filter (fun (k,g) -> g |> Seq.length <= 2) //Skip over the numeric overloads
                                     |> Seq.collect (fun (k,g) -> g)
 
-        let foldHighLowLists (minL:MethodDefinition list,maxL:MethodDefinition list) (minC:int, maxC:int, g:MethodDefinition seq) =
+        let foldHighLowLists (minL:MethodDefinition list,maxL:MethodDefinition list)
+                             (minC:int, maxC:int, g:MethodDefinition seq) =
             let low = g |> Seq.find (fun m-> (m.Parameters |> Seq.length) = minC)
             let high = g |> Seq.toList |> List.rev |> Seq.find (fun m-> (m.Parameters |> Seq.length) = maxC)
             if low = high then
@@ -245,18 +281,19 @@ module Generate =
             else
                 (low::minL, high::maxL)
 
-        let main,full = removedMostOverloads
-                            |> Seq.sortBy (fun m ->
-                                                 sprintf "%s(%s)%s(%s)"
-                                                    m.Name
-                                                    (m.Parameters |> Seq.map (fun p-> p.Name) |> String.concat ",")
-                                                    (if m.HasGenericParameters then " " else "~")
-                                                    (m.Parameters |> Seq.map (fun p-> p.ParameterType.FullName) |> String.concat ",")
-                                            )
-                            |> Seq.groupBy (fun m -> m.Name)
-                            |> Seq.map (fun (k,g) -> (g |> Seq.map (fun m->Seq.length m.Parameters), g))
-                            |> Seq.map (fun (c,g) -> (c |> Seq.min, c |> Seq.max, g))
-                            |> Seq.fold foldHighLowLists (List.empty, List.empty)
+        let main,full =
+            removedMostOverloads
+                |> Seq.sortBy (fun m ->
+                                     sprintf "%s(%s)%s(%s)"
+                                        m.Name
+                                        (m.Parameters |> Seq.map (fun p-> p.Name) |> String.concat ",")
+                                        (if m.HasGenericParameters then " " else "~")
+                                        (m.Parameters |> Seq.map (fun p-> p.ParameterType.FullName) |> String.concat ",")
+                                )
+                |> Seq.groupBy (fun m -> m.Name)
+                |> Seq.map (fun (k,g) -> (g |> Seq.map (fun m->Seq.length m.Parameters), g))
+                |> Seq.map (fun (c,g) -> (c |> Seq.min, c |> Seq.max, g))
+                |> Seq.fold foldHighLowLists (List.empty, List.empty)
 
 
         let list = [true,main;false,full]

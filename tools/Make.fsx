@@ -72,11 +72,14 @@ Target "Generate" (fun _ ->
 
    let fileMethodFilters = [IdentifyMethods.matchesSignature Static "WriteAllLines" ["System.String";"System.Collections.Generic.IEnumerable`1<System.String>"]
                             IdentifyMethods.matchesSignature Static "WriteAllLines" ["System.String";"System.Collections.Generic.IEnumerable`1<System.String>";"System.Text.Encoding"]
-                            IdentifyMethods.matchesName Static "AppendAllLines" 
+                            IdentifyMethods.matchesName Static "AppendAllLines"
                             ]
 
    let reorderForFile = Reorder.moveTypeToTheEnd "System.Collections.Generic.IEnumerable`1<System.String>"
    generateWrapper mscorlibAsm "System.IO" "File" reorderForFile fileMethodFilters
+
+   //todo:
+   //generateWrapper mscorlibAsm "System.Collections.Generic" "Comparer" Reorder.noChange [IdentifyMethods.matchesName Static "Create"]
 
    CreateFSharpAssemblyInfo (Path.Combine(srcDir, "AssemblyInfo.fsx"))
         [Attribute.Title title
