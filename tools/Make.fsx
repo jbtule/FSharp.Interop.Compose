@@ -78,8 +78,10 @@ Target "Generate" (fun _ ->
    let reorderForFile = Reorder.moveTypeToTheEnd "System.Collections.Generic.IEnumerable`1<System.String>"
    generateWrapper mscorlibAsm "System.IO" "File" reorderForFile fileMethodFilters
 
-   //todo:
-   //generateWrapper mscorlibAsm "System.Collections.Generic" "Comparer" Reorder.noChange [IdentifyMethods.matchesName Static "Create"]
+
+   generateWrapper mscorlibAsm "System.Collections.Generic" "Comparer" Reorder.noChange [IdentifyMethods.matchesName Static "Create"]
+   generateWrapper mscorlibAsm "System.Collections.Generic" "EqualityComparer" Reorder.noChange [IdentifyMethods.matchesName Static "Default"]
+
 
    CreateFSharpAssemblyInfo (Path.Combine(srcDir, "AssemblyInfo.fsx"))
         [Attribute.Title title

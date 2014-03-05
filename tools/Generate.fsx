@@ -67,6 +67,11 @@ module Reformat =
 
     let private wrapKeywords (s:string) = if keywordSet.Contains(s) then "``" + s + "``" else s
 
+    let docNameMethod (m:MethodDefinition) =
+        sprintf "%s.%s"
+            ((slimGenericName m.DeclaringType.FullName).ToLower())
+            ((slimGenericName m.Name).ToLower())
+
     let (|CSharpFunc|CSharpExpr|CSharpComparison|CSharpOther|) (x:TypeReference) =
         if x.FullName |> Helpers.hasNamePrefix "System.Func" then
             CSharpFunc
@@ -166,6 +171,9 @@ module Reformat =
         let findMatch = matchesGenericParameter matcher
         plist |> Seq.exists findMatch
 
+    let private fsGenParamName (p:GenericParameter) =
+        (sprintf "'%s" p.Name)
+
     let private explictGenericParameters (x:MethodDefinition) =
         x.GenericParameters
             |> (fun p -> System.Linq.Enumerable.Reverse(p))
@@ -174,26 +182,36 @@ module Reformat =
                                        else
                                             (sprintf "'%s" p.Name)::list) []
 
-    let explictGenericParameterName (changeName:string->string) (x:MethodDefinition) =
+    let explictGenericParameterName (typeParams:GenericParameter seq) (changeName:string->string) (x:MethodDefinition) =
         let baseName = changeName x.Name
-        if x.HasGenericParameters then
-            let glist = explictGenericParameters x
-            if glist |> Seq.isEmpty then
-                baseName
-            else
-                sprintf "%s<%s>" baseName (glist |> String.concat ", ")
-        else
+        let slist = (typeParams |> Seq.toList |> List.map fsGenParamName)
+        let glist = if x.HasGenericParameters then
+                        List.append slist (explictGenericParameters x)
+                    else
+                        slist
+        if glist |> Seq.isEmpty then
             baseName
+        else
+            sprintf "%s<%s>" baseName (glist |> String.concat ", ")
+
+    let private csharpTypeNameFixer (t:TypeDefinition) =
+        if t.HasGenericParameters then
+            sprintf "%s<%s>"
+                (slimGenericName t.FullName)
+                (t.GenericParameters |> Seq.map fsGenParamName |> String.concat ",")
+        else
+            t.FullName
 
     let methodWrapper (reorderedParameters:MethodDefinition->seq<ParameterDefinition>) (x:MethodDefinition) =
         let paramCnt = x.Parameters |> Seq.length
         let specifyAllTypes =
-            (x.DeclaringType.Methods
+            x.DeclaringType.HasGenericParameters
+            || (x.DeclaringType.Methods
                  |> Seq.filter (fun m-> m.IsPublic && m.Name = x.Name && (m.Parameters |> Seq.length) = paramCnt)
                  |> Seq.length) > 1
-        let fsharpName = explictGenericParameterName camelCase x
-        let csharpName = explictGenericParameterName (fun n->n) x
-        let csharpType = slimGenericName x.DeclaringType.FullName
+        let fsharpName = explictGenericParameterName x.DeclaringType.GenericParameters camelCase x
+        let csharpName = explictGenericParameterName [] (fun n->n) x
+        let csharpType = csharpTypeNameFixer x.DeclaringType
         let parameterFix = parameterFixer specifyAllTypes
         let fsharpParams = (x |> reorderedParameters |> Seq.map parameterFix |> String.concat " ")
         let csharpParams = (x.Parameters |> Seq.map csharpCastFunc |> String.concat ", ")
@@ -307,7 +325,8 @@ module Generate =
                     writer.WriteLine(header)
                     writer.WriteLine()
                     writer.WriteLine(sprintf "namespace %s" nsp)
-                    writer.WriteLine(sprintf "/// Corresponding `%s.%s` static methods as functions" namesp typeName)
+                    writer.WriteLine(sprintf "/// Corresponding static methods as functions for [`%s.%s`](http://msdn.microsoft.com/en-us/library/%s.%s)"
+                                        namesp typeName (namesp.ToLower()) (typeName.ToLower()))
                     writer.WriteLine(sprintf "module %s =" typeName)
                 else
                     writer.WriteLine()
@@ -321,7 +340,10 @@ module Generate =
                     writer.Write(String.replicate 4 " ")
                     if not isMain then
                         writer.Write(String.replicate 4 " ")
-                    writer.WriteLine(sprintf "/// Calls `%s(%s)`" (Reformat.explictGenericParameterName (fun x->x) m) csharpParams)
+                    writer.WriteLine(sprintf "/// Calls [`%s(%s)`](http://msdn.microsoft.com/en-us/library/%s)"
+                                        (Reformat.explictGenericParameterName [] (fun x->x) m)
+                                        csharpParams
+                                        (Reformat.docNameMethod m))
                     writer.Write(String.replicate 4 " ")
                     if not isMain then
                         writer.Write(String.replicate 4 " ")
