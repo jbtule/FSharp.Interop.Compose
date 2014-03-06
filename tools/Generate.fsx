@@ -36,11 +36,19 @@ module IdentifyMethods =
 
     let isPublicStaticMethod (x:MethodDefinition) = x.IsStatic && x.IsPublic
 
-    let private hasExtensionMember (x:IMemberDefinition) =
+    let private hasAttribute (attrName:string) (x:IMemberDefinition) =
         x.HasCustomAttributes && x.CustomAttributes
-            |> Seq.exists (fun a -> a.AttributeType.FullName = "System.Runtime.CompilerServices.ExtensionAttribute")
+            |> Seq.exists (fun a -> Helpers.hasNamePrefix attrName a.AttributeType.FullName)
+
+    let private hasExtensionMember =
+        hasAttribute "System.Runtime.CompilerServices.ExtensionAttribute"
+
+    let private isObsoleteMember =
+        hasAttribute "System.ObsoleteAttribute"
 
     let isExtensionMethod (x:MethodDefinition) = hasExtensionMember x
+
+    let isObsoleteMethod (x:MethodDefinition) = isObsoleteMember x
 
     let matchesSignature (c:MethodContext) (name:string) (argTypes:string seq) (m:MethodDefinition) =
         let nameMatch =  m.Name = name && (m.IsStatic <> (c = Instance))
@@ -268,83 +276,89 @@ module Generate =
     let writeWrappers
             (header:string)
             (srcDir:string)
-            (asm:string)
+            (asmPath:string)
             (namesp:string)
             (typeName:string)
             (orderedParameters:MethodDefinition->seq<ParameterDefinition>)
             (methodSelectors:(MethodDefinition->bool) list) =
-        let asmDef = AssemblyDefinition.ReadAssembly((Assembly.Load(asm)).Location)
-        let methods = asmDef.MainModule.Types
-                        |> Seq.filter (fun t -> t.IsPublic)
-                        |> Seq.filter (fun t -> t.Namespace |> Helpers.hasNamePrefix namesp)
-                        |> Seq.filter (fun t -> t.Name |> Helpers.hasNamePrefix typeName)
-                        |> Seq.collect (fun t -> t.Methods |> Seq.filter (fun m -> m.IsPublic))
 
-        let chosenMethods =
-            methodSelectors
-                |> Seq.fold (fun acc pred -> methods |> Seq.filter pred |> Seq.append acc) Seq.empty
-                |> Seq.distinct
+        if System.String.IsNullOrEmpty asmPath then
+            ()
+        else
+            let asmDef = AssemblyDefinition.ReadAssembly(asmPath)
+            let notObsolete = not << IdentifyMethods.isObsoleteMethod
+            let methods = asmDef.MainModule.Types
+                            |> Seq.filter (fun t -> t.IsPublic)
+                            |> Seq.filter (fun t -> t.Namespace |> Helpers.hasNamePrefix namesp)
+                            |> Seq.filter (fun t -> t.Name |> Helpers.hasNamePrefix typeName)
+                            |> Seq.collect (fun t -> t.Methods 
+                                                        |> Seq.filter (fun m -> m.IsPublic && (notObsolete m)))
 
-        let removedMostOverloads = chosenMethods
-                                    |> Seq.groupBy (fun m -> (m.Name,m.Parameters |> Seq.length))
-                                    |> Seq.filter (fun (k,g) -> g |> Seq.length <= 2) //Skip over the numeric overloads
-                                    |> Seq.collect (fun (k,g) -> g)
+            let chosenMethods =
+                methodSelectors
+                    |> Seq.fold (fun acc pred -> methods |> Seq.filter pred |> Seq.append acc) Seq.empty
+                    |> Seq.distinct
 
-        let foldHighLowLists (minL:MethodDefinition list,maxL:MethodDefinition list)
-                             (minC:int, maxC:int, g:MethodDefinition seq) =
-            let low = g |> Seq.find (fun m-> (m.Parameters |> Seq.length) = minC)
-            let high = g |> Seq.toList |> List.rev |> Seq.find (fun m-> (m.Parameters |> Seq.length) = maxC)
-            if low = high then
-                (low::minL, maxL)
-            else
-                (low::minL, high::maxL)
+            let removedMostOverloads = chosenMethods
+                                        |> Seq.groupBy (fun m -> (m.Name,m.Parameters |> Seq.length))
+                                        |> Seq.filter (fun (k,g) -> g |> Seq.length <= 2) //Skip over the numeric overloads
+                                        |> Seq.collect (fun (k,g) -> g)
 
-        let main,full =
-            removedMostOverloads
-                |> Seq.sortBy (fun m ->
-                                     sprintf "%s(%s)%s(%s)"
-                                        m.Name
-                                        (m.Parameters |> Seq.map (fun p-> p.Name) |> String.concat ",")
-                                        (if m.HasGenericParameters then " " else "~")
-                                        (m.Parameters |> Seq.map (fun p-> p.ParameterType.FullName) |> String.concat ",")
-                                )
-                |> Seq.groupBy (fun m -> m.Name)
-                |> Seq.map (fun (k,g) -> (g |> Seq.map (fun m->Seq.length m.Parameters), g))
-                |> Seq.map (fun (c,g) -> (c |> Seq.min, c |> Seq.max, g))
-                |> Seq.fold foldHighLowLists (List.empty, List.empty)
-
-
-        let list = [true,main;false,full]
-        let nsp = Reformat.namespaceComposable namesp
-        for (isMain, mlist) in list do
-            if not (Seq.isEmpty mlist) then
-                let path = Path.Combine(srcDir, nsp)
-                Directory.CreateDirectory(path) |> ignore
-                use writer = System.IO.File.AppendText(Path.Combine(path, typeName+".fsx"))
-                if isMain then
-                    writer.WriteLine(header)
-                    writer.WriteLine()
-                    writer.WriteLine(sprintf "namespace %s" nsp)
-                    writer.WriteLine(sprintf "/// Corresponding static methods as functions for [`%s.%s`](http://msdn.microsoft.com/en-us/library/%s.%s)"
-                                        namesp typeName (namesp.ToLower()) (typeName.ToLower()))
-                    writer.WriteLine(sprintf "module %s =" typeName)
+            let foldHighLowLists (minL:MethodDefinition list,maxL:MethodDefinition list)
+                                 (minC:int, maxC:int, g:MethodDefinition seq) =
+                let low = g |> Seq.find (fun m-> (m.Parameters |> Seq.length) = minC)
+                let high = g |> Seq.toList |> List.rev |> Seq.find (fun m-> (m.Parameters |> Seq.length) = maxC)
+                if low = high then
+                    (low::minL, maxL)
                 else
-                    writer.WriteLine()
-                    writer.Write(String.replicate 4 " ")
-                    writer.WriteLine(sprintf "/// Longer parameter versions of `%s.%s` methods" namesp typeName)
-                    writer.Write(String.replicate 4 " ")
-                    writer.WriteLine("module Full =")
-                for m in mlist |> Seq.sortBy (fun x->x.Name) do
-                    writer.WriteLine()
-                    let csharpParams = (m.Parameters |> Seq.map Reformat.csharpCastFunc |> String.concat ", ")
-                    writer.Write(String.replicate 4 " ")
-                    if not isMain then
+                    (low::minL, high::maxL)
+
+            let main,full =
+                removedMostOverloads
+                    |> Seq.sortBy (fun m ->
+                                         sprintf "%s(%s)%s(%s)"
+                                            m.Name
+                                            (m.Parameters |> Seq.map (fun p-> p.Name) |> String.concat ",")
+                                            (if m.HasGenericParameters then " " else "~")
+                                            (m.Parameters |> Seq.map (fun p-> p.ParameterType.FullName) |> String.concat ",")
+                                    )
+                    |> Seq.groupBy (fun m -> m.Name)
+                    |> Seq.map (fun (k,g) -> (g |> Seq.map (fun m->Seq.length m.Parameters), g))
+                    |> Seq.map (fun (c,g) -> (c |> Seq.min, c |> Seq.max, g))
+                    |> Seq.fold foldHighLowLists (List.empty, List.empty)
+
+
+            let list = [true,main;false,full]
+            let nsp = Reformat.namespaceComposable namesp
+            for (isMain, mlist) in list do
+                if not (Seq.isEmpty mlist) then
+                    let path = Path.Combine(srcDir, nsp)
+                    Directory.CreateDirectory(path) |> ignore
+                    use writer = System.IO.File.AppendText(Path.Combine(path, typeName+".fsx"))
+                    if isMain then
+                        writer.WriteLine(header)
+                        writer.WriteLine()
+                        writer.WriteLine(sprintf "namespace %s" nsp)
+                        writer.WriteLine(sprintf "/// Corresponding static methods as functions for [`%s.%s`](http://msdn.microsoft.com/en-us/library/%s.%s)"
+                                            namesp typeName (namesp.ToLower()) (typeName.ToLower()))
+                        writer.WriteLine(sprintf "module %s =" typeName)
+                    else
+                        writer.WriteLine()
                         writer.Write(String.replicate 4 " ")
-                    writer.WriteLine(sprintf "/// Calls [`%s(%s)`](http://msdn.microsoft.com/en-us/library/%s)"
-                                        (Reformat.explictGenericParameterName [] (fun x->x) m)
-                                        csharpParams
-                                        (Reformat.docNameMethod m))
-                    writer.Write(String.replicate 4 " ")
-                    if not isMain then
+                        writer.WriteLine(sprintf "/// Longer parameter versions of `%s.%s` methods" namesp typeName)
                         writer.Write(String.replicate 4 " ")
-                    writer.WriteLine(Reformat.methodWrapper orderedParameters m)
+                        writer.WriteLine("module Full =")
+                    for m in mlist |> Seq.sortBy (fun x->x.Name) do
+                        writer.WriteLine()
+                        let csharpParams = (m.Parameters |> Seq.map Reformat.csharpCastFunc |> String.concat ", ")
+                        writer.Write(String.replicate 4 " ")
+                        if not isMain then
+                            writer.Write(String.replicate 4 " ")
+                        writer.WriteLine(sprintf "/// Calls [`%s(%s)`](http://msdn.microsoft.com/en-us/library/%s)"
+                                            (Reformat.explictGenericParameterName [] (fun x->x) m)
+                                            csharpParams
+                                            (Reformat.docNameMethod m))
+                        writer.Write(String.replicate 4 " ")
+                        if not isMain then
+                            writer.Write(String.replicate 4 " ")
+                        writer.WriteLine(Reformat.methodWrapper orderedParameters m)

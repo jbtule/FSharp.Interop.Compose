@@ -1,4 +1,4 @@
-// Generated with ComposableExtensions (0.10.2) http://jbtule.github.io/ComposableExtensions
+// Generated with ComposableExtensions (0.10.3) http://jbtule.github.io/ComposableExtensions
 
 namespace Composable.Linq
 /// Corresponding static methods as functions for [`System.Linq.Enumerable`](http://msdn.microsoft.com/en-us/library/system.linq.enumerable)

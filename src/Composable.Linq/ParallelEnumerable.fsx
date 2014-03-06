@@ -1,4 +1,4 @@
-// Generated with ComposableExtensions (0.10.2) http://jbtule.github.io/ComposableExtensions
+// Generated with ComposableExtensions (0.10.3) http://jbtule.github.io/ComposableExtensions
 
 namespace Composable.Linq
 /// Corresponding static methods as functions for [`System.Linq.ParallelEnumerable`](http://msdn.microsoft.com/en-us/library/system.linq.parallelenumerable)
@@ -29,7 +29,7 @@ module ParallelEnumerable =
     let inline cast<'TResult> source = System.Linq.ParallelEnumerable.Cast<'TResult>(source)
 
     /// Calls [`Concat(first, second)`](http://msdn.microsoft.com/en-us/library/system.linq.parallelenumerable.concat)
-    let inline concat (first:System.Linq.ParallelQuery<'TSource>) (second:System.Collections.Generic.IEnumerable<'TSource>) = System.Linq.ParallelEnumerable.Concat(first, second)
+    let inline concat (first:System.Linq.ParallelQuery<'TSource>) (second:System.Linq.ParallelQuery<'TSource>) = System.Linq.ParallelEnumerable.Concat(first, second)
 
     /// Calls [`Contains(source, value)`](http://msdn.microsoft.com/en-us/library/system.linq.parallelenumerable.contains)
     let inline contains value source = System.Linq.ParallelEnumerable.Contains(source, value)
@@ -50,7 +50,7 @@ module ParallelEnumerable =
     let inline elementAtOrDefault index source = System.Linq.ParallelEnumerable.ElementAtOrDefault(source, index)
 
     /// Calls [`Except(first, second)`](http://msdn.microsoft.com/en-us/library/system.linq.parallelenumerable.except)
-    let inline except (first:System.Linq.ParallelQuery<'TSource>) (second:System.Collections.Generic.IEnumerable<'TSource>) = System.Linq.ParallelEnumerable.Except(first, second)
+    let inline except (first:System.Linq.ParallelQuery<'TSource>) (second:System.Linq.ParallelQuery<'TSource>) = System.Linq.ParallelEnumerable.Except(first, second)
 
     /// Calls [`First(source)`](http://msdn.microsoft.com/en-us/library/system.linq.parallelenumerable.first)
     let inline first source = System.Linq.ParallelEnumerable.First(source)
@@ -65,13 +65,13 @@ module ParallelEnumerable =
     let inline groupBy (keySelector:'TSource->'TKey) source = System.Linq.ParallelEnumerable.GroupBy(source, System.Func<'TSource, 'TKey>(keySelector))
 
     /// Calls [`GroupJoin(outer, inner, System.Func<'TOuter, 'TKey>(outerKeySelector), System.Func<'TInner, 'TKey>(innerKeySelector), System.Func<'TOuter, System.Collections.Generic.IEnumerable<'TInner>, 'TResult>(resultSelector))`](http://msdn.microsoft.com/en-us/library/system.linq.parallelenumerable.groupjoin)
-    let inline groupJoin (outerKeySelector:'TOuter->'TKey) (innerKeySelector:'TInner->'TKey) (resultSelector:'TOuter->System.Collections.Generic.IEnumerable<'TInner>->'TResult) (outer:System.Linq.ParallelQuery<'TOuter>) (inner:System.Collections.Generic.IEnumerable<'TInner>) = System.Linq.ParallelEnumerable.GroupJoin(outer, inner, System.Func<'TOuter, 'TKey>(outerKeySelector), System.Func<'TInner, 'TKey>(innerKeySelector), System.Func<'TOuter, System.Collections.Generic.IEnumerable<'TInner>, 'TResult>(resultSelector))
+    let inline groupJoin (outerKeySelector:'TOuter->'TKey) (innerKeySelector:'TInner->'TKey) (resultSelector:'TOuter->System.Collections.Generic.IEnumerable<'TInner>->'TResult) (outer:System.Linq.ParallelQuery<'TOuter>) (inner:System.Linq.ParallelQuery<'TInner>) = System.Linq.ParallelEnumerable.GroupJoin(outer, inner, System.Func<'TOuter, 'TKey>(outerKeySelector), System.Func<'TInner, 'TKey>(innerKeySelector), System.Func<'TOuter, System.Collections.Generic.IEnumerable<'TInner>, 'TResult>(resultSelector))
 
     /// Calls [`Intersect(first, second)`](http://msdn.microsoft.com/en-us/library/system.linq.parallelenumerable.intersect)
-    let inline intersect (first:System.Linq.ParallelQuery<'TSource>) (second:System.Collections.Generic.IEnumerable<'TSource>) = System.Linq.ParallelEnumerable.Intersect(first, second)
+    let inline intersect (first:System.Linq.ParallelQuery<'TSource>) (second:System.Linq.ParallelQuery<'TSource>) = System.Linq.ParallelEnumerable.Intersect(first, second)
 
     /// Calls [`Join(outer, inner, System.Func<'TOuter, 'TKey>(outerKeySelector), System.Func<'TInner, 'TKey>(innerKeySelector), System.Func<'TOuter, 'TInner, 'TResult>(resultSelector))`](http://msdn.microsoft.com/en-us/library/system.linq.parallelenumerable.join)
-    let inline join (outerKeySelector:'TOuter->'TKey) (innerKeySelector:'TInner->'TKey) (resultSelector:'TOuter->'TInner->'TResult) (outer:System.Linq.ParallelQuery<'TOuter>) (inner:System.Collections.Generic.IEnumerable<'TInner>) = System.Linq.ParallelEnumerable.Join(outer, inner, System.Func<'TOuter, 'TKey>(outerKeySelector), System.Func<'TInner, 'TKey>(innerKeySelector), System.Func<'TOuter, 'TInner, 'TResult>(resultSelector))
+    let inline join (outerKeySelector:'TOuter->'TKey) (innerKeySelector:'TInner->'TKey) (resultSelector:'TOuter->'TInner->'TResult) (outer:System.Linq.ParallelQuery<'TOuter>) (inner:System.Linq.ParallelQuery<'TInner>) = System.Linq.ParallelEnumerable.Join(outer, inner, System.Func<'TOuter, 'TKey>(outerKeySelector), System.Func<'TInner, 'TKey>(innerKeySelector), System.Func<'TOuter, 'TInner, 'TResult>(resultSelector))
 
     /// Calls [`Last(source)`](http://msdn.microsoft.com/en-us/library/system.linq.parallelenumerable.last)
     let inline last source = System.Linq.ParallelEnumerable.Last(source)
@@ -101,7 +101,7 @@ module ParallelEnumerable =
     let inline selectMany (selector:'TSource->System.Collections.Generic.IEnumerable<'TResult>) (source:System.Linq.ParallelQuery<'TSource>) = System.Linq.ParallelEnumerable.SelectMany(source, System.Func<'TSource, System.Collections.Generic.IEnumerable<'TResult>>(selector))
 
     /// Calls [`SequenceEqual(first, second)`](http://msdn.microsoft.com/en-us/library/system.linq.parallelenumerable.sequenceequal)
-    let inline sequenceEqual (first:System.Linq.ParallelQuery<'TSource>) (second:System.Collections.Generic.IEnumerable<'TSource>) = System.Linq.ParallelEnumerable.SequenceEqual(first, second)
+    let inline sequenceEqual (first:System.Linq.ParallelQuery<'TSource>) (second:System.Linq.ParallelQuery<'TSource>) = System.Linq.ParallelEnumerable.SequenceEqual(first, second)
 
     /// Calls [`Single(source)`](http://msdn.microsoft.com/en-us/library/system.linq.parallelenumerable.single)
     let inline single source = System.Linq.ParallelEnumerable.Single(source)
@@ -140,7 +140,7 @@ module ParallelEnumerable =
     let inline toLookup (keySelector:'TSource->'TKey) source = System.Linq.ParallelEnumerable.ToLookup(source, System.Func<'TSource, 'TKey>(keySelector))
 
     /// Calls [`Union(first, second)`](http://msdn.microsoft.com/en-us/library/system.linq.parallelenumerable.union)
-    let inline union (first:System.Linq.ParallelQuery<'TSource>) (second:System.Collections.Generic.IEnumerable<'TSource>) = System.Linq.ParallelEnumerable.Union(first, second)
+    let inline union (first:System.Linq.ParallelQuery<'TSource>) (second:System.Linq.ParallelQuery<'TSource>) = System.Linq.ParallelEnumerable.Union(first, second)
 
     /// Calls [`Where(source, System.Func<'TSource, System.Boolean>(predicate))`](http://msdn.microsoft.com/en-us/library/system.linq.parallelenumerable.where)
     let inline where (predicate:'TSource->System.Boolean) (source:System.Linq.ParallelQuery<'TSource>) = System.Linq.ParallelEnumerable.Where(source, System.Func<'TSource, System.Boolean>(predicate))
@@ -158,7 +158,7 @@ module ParallelEnumerable =
     let inline withMergeOptions mergeOptions source = System.Linq.ParallelEnumerable.WithMergeOptions(source, mergeOptions)
 
     /// Calls [`Zip(first, second, System.Func<'TFirst, 'TSecond, 'TResult>(resultSelector))`](http://msdn.microsoft.com/en-us/library/system.linq.parallelenumerable.zip)
-    let inline zip (resultSelector:'TFirst->'TSecond->'TResult) (first:System.Linq.ParallelQuery<'TFirst>) (second:System.Collections.Generic.IEnumerable<'TSecond>) = System.Linq.ParallelEnumerable.Zip(first, second, System.Func<'TFirst, 'TSecond, 'TResult>(resultSelector))
+    let inline zip (resultSelector:'TFirst->'TSecond->'TResult) (first:System.Linq.ParallelQuery<'TFirst>) (second:System.Linq.ParallelQuery<'TSecond>) = System.Linq.ParallelEnumerable.Zip(first, second, System.Func<'TFirst, 'TSecond, 'TResult>(resultSelector))
 
     /// Longer parameter versions of `System.Linq.ParallelEnumerable` methods
     module Full =
@@ -171,9 +171,6 @@ module ParallelEnumerable =
 
         /// Calls [`AsOrdered(source)`](http://msdn.microsoft.com/en-us/library/system.linq.parallelenumerable.asordered)
         let inline asOrdered (source:System.Linq.ParallelQuery) = System.Linq.ParallelEnumerable.AsOrdered(source)
-
-        /// Calls [`Concat(first, second)`](http://msdn.microsoft.com/en-us/library/system.linq.parallelenumerable.concat)
-        let inline concat (first:System.Linq.ParallelQuery<'TSource>) (second:System.Linq.ParallelQuery<'TSource>) = System.Linq.ParallelEnumerable.Concat(first, second)
 
         /// Calls [`Contains(source, value, comparer)`](http://msdn.microsoft.com/en-us/library/system.linq.parallelenumerable.contains)
         let inline contains value comparer source = System.Linq.ParallelEnumerable.Contains(source, value, comparer)
@@ -261,6 +258,3 @@ module ParallelEnumerable =
 
         /// Calls [`Where(source, System.Func<'TSource, System.Int32, System.Boolean>(predicate))`](http://msdn.microsoft.com/en-us/library/system.linq.parallelenumerable.where)
         let inline where (predicate:'TSource->System.Int32->System.Boolean) (source:System.Linq.ParallelQuery<'TSource>) = System.Linq.ParallelEnumerable.Where(source, System.Func<'TSource, System.Int32, System.Boolean>(predicate))
-
-        /// Calls [`Zip(first, second, System.Func<'TFirst, 'TSecond, 'TResult>(resultSelector))`](http://msdn.microsoft.com/en-us/library/system.linq.parallelenumerable.zip)
-        let inline zip (resultSelector:'TFirst->'TSecond->'TResult) (first:System.Linq.ParallelQuery<'TFirst>) (second:System.Linq.ParallelQuery<'TSecond>) = System.Linq.ParallelEnumerable.Zip(first, second, System.Func<'TFirst, 'TSecond, 'TResult>(resultSelector))

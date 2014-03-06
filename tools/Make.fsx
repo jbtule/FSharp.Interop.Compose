@@ -12,17 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+
 #load "Generate.fsx"
+#load "CompilerHelper.fsx"
 
 #I "packages/FAKE/tools"
-#r "packages/FAKE/tools/FakeLib.dll"
-#I "packages/FSharp.Compiler.Service/lib/net40/"
-#r "FSharp.Compiler.Service.dll"
+#r "FakeLib.dll"
 
 open Fake
 open Fake.AssemblyInfoFile
 open System.IO
-open Microsoft.FSharp.Compiler.SimpleSourceCodeServices
 open Tools
 
 #load "Vars.fsx"
@@ -48,12 +47,19 @@ Target "Generate" (fun _ ->
 
    let br = System.Environment.NewLine
    let header  = sprintf "// Generated with %s (%s) %s" projectName version projectUrl
-   let generateWrapper = Generate.writeWrappers header srcDir
-   let queryHeader = header + br + br + "#load \"../../helpers/Quotations.fsx\""
-   let generateQueryWrapper = Generate.writeWrappers queryHeader srcDir
 
-   let coreAsm = "System.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
-   let mscorlibAsm = "mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
+   let queryHeader = header + br + br + "#load \"../../helpers/Quotations.fsx\""
+   let sysMap = CompilerHelper.systemDllsTargeting projectTarget
+                      |> Seq.map (fun p -> Path.GetFileName p, p)
+                      |> Map.ofSeq
+   let resolvePath libName =
+        match (sysMap |> Map.tryFind libName) with | Some(p) -> p | _ -> ""
+
+   let generateWrapper libName  = Generate.writeWrappers header srcDir (resolvePath libName)
+   let generateQueryWrapper libName = Generate.writeWrappers queryHeader srcDir (resolvePath libName)
+
+   let coreAsm = "System.Core.dll"
+   let mscorlibAsm = "mscorlib.dll"
 
    generateWrapper coreAsm "System.Linq" "Enumerable" Reorder.extensionMethodReorder [IdentifyMethods.isExtensionMethod]
    generateWrapper coreAsm "System.Linq" "ParallelEnumerable" Reorder.extensionMethodReorder [IdentifyMethods.isExtensionMethod]
@@ -86,32 +92,28 @@ Target "Generate" (fun _ ->
    CreateFSharpAssemblyInfo (Path.Combine(srcDir, "AssemblyInfo.fsx"))
         [Attribute.Title title
          Attribute.Description description
-         Attribute.Guid guid
+         //Attribute.Guid guid
          Attribute.Product projectName
          Attribute.Version version
-         Attribute.FileVersion version]
+         Attribute.FileVersion version
+         ]
 )
 
 
 Target "Build" (fun _ ->
 
-    let scs = SimpleSourceCodeServices()
     let output = Path.Combine(buildDir, projectName + ".dll")
     let xml = Path.Combine(buildDir, projectName + ".xml")
 
     let files = Directory.GetDirectories(srcDir)
                     |> Seq.collect (fun d -> Directory.GetFiles(d,"*.fsx"))
                     |> Seq.toList
+      
+    let compilerOpts = 
+          ["-o"; output; "--doc:"+ xml; "-a"; Path.Combine(srcDir, "AssemblyInfo.fsx")]
+          @ files
 
-    let compilerOpts = ["fsc.exe"; "-o"; output; "--doc:"+ xml; "-a"; Path.Combine(srcDir, "AssemblyInfo.fsx")] @ files
-
-
-    let errors,errorCode = scs.Compile(compilerOpts |> List.toArray)
-    if errorCode = 0 then
-        trace "build success"
-    else
-        let exs = errors |> Seq.map (fun e -> System.Exception(e.ToString()))
-        raise (System.AggregateException(exs))
+    fscTargeting projectTarget compilerOpts
 )
 
 Target "Docs" (fun _ ->
@@ -131,7 +133,6 @@ Target "Docs" (fun _ ->
 Target "BuildTest" (fun _ ->
 
     let testDll = Path.Combine(testBuildDir,"Test.dll")
-    let scs = SimpleSourceCodeServices()
     let files = Directory.GetFiles(testDir,"*.fsx") |> Seq.toList
 
     let refdlls =
@@ -148,16 +149,12 @@ Target "BuildTest" (fun _ ->
 
     File.Copy("./tools/fsharp-redirect.config",testDll+".config")
 
-    let compilerOpts = ["fsc.exe"; "-o";  testDll; "-a"] @ files
+    let compilerOpts = 
+        ["-o";  testDll; "-a"]
+        @ files
 
-    let errors,errorCode = scs.Compile(compilerOpts |> List.toArray)
-    if errorCode = 0 then
-        trace "test build success"
-    else
-        let exs = errors |> Seq.map (fun e -> System.Exception(e.ToString()))
-        raise (System.AggregateException(exs))
-
-)
+    fscTargeting CompilerHelper.NET40 compilerOpts
+) 
 
 Target "Test" (fun _ ->
 

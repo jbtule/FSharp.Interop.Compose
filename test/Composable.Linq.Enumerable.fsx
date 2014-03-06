@@ -158,10 +158,10 @@ module Enumerable =
     [<Fact>]
     let ofType () =
        let list = System.Collections.ArrayList()
-       list.Add(1)
-       list.Add("2")
-       list.Add(3)
-       list.Add("4")
+       list.Add(1) |> ignore
+       list.Add("2") |> ignore
+       list.Add(3) |> ignore
+       list.Add("4") |> ignore
        list
            |> Enumerable.ofType<int>
            |> Seq.toList |> should equal [1;3]
