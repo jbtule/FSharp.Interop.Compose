@@ -49,7 +49,7 @@ Target "Generate" (fun _ ->
    let header  = sprintf "// Generated with %s (%s) %s" projectName version projectUrl
 
    let queryHeader = header + br + br + "#load \"../../helpers/Quotations.fsx\""
-   let sysMap = CompilerHelper.systemDllsTargeting projectTarget
+   let sysMap = CompilerHelper.systemDllsTargeting (projectSystemRefs, projectTarget, projectFSharpVersion) 
                       |> Seq.map (fun p -> Path.GetFileName p, p)
                       |> Map.ofSeq
    let resolvePath libName =
@@ -110,10 +110,10 @@ Target "Build" (fun _ ->
                     |> Seq.toList
       
     let compilerOpts = 
-          ["-o"; output; "--doc:"+ xml; "-a"; Path.Combine(srcDir, "AssemblyInfo.fsx")]
+          ["-o"; output; "--doc:"+ xml; "--debug:pdbonly" ; "-a"; Path.Combine(srcDir, "AssemblyInfo.fsx")]
           @ files
 
-    fscTargeting projectTarget compilerOpts
+    fscTargeting (projectSystemRefs,projectTarget,projectFSharpVersion) compilerOpts
 )
 
 Target "Docs" (fun _ ->
@@ -153,7 +153,7 @@ Target "BuildTest" (fun _ ->
         ["-o";  testDll; "-a"]
         @ files
 
-    fscTargeting CompilerHelper.NET40 compilerOpts
+    fscTargeting (projectSystemRefs,CompilerHelper.NET40,projectFSharpVersion) compilerOpts
 ) 
 
 Target "Test" (fun _ ->
@@ -192,6 +192,9 @@ Target "Deploy" (fun _ ->
 "Clean"
     =?> ("Generate", not (hasBuildParam "BuildOnly"))
     ==> "Build"
+
+"Build"
+    ==> "BuildOnly"
 
 "CleanTest"
     ==> "Build"

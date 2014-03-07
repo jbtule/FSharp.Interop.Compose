@@ -23,3 +23,11 @@ let authors = ["Jay Tuley"]
 //let guid = "68ebe4ce-c63b-478d-a084-c5e36b3e8091"
 let root = System.Environment.CurrentDirectory
 let projectTarget = CompilerHelper.NET40
+let projectFSharpVersion = CompilerHelper.FS30
+
+let projectSystemRefs =
+        [
+            "mscorlib.dll"
+            "System.dll"
+            "System.Core.dll"
+        ]
