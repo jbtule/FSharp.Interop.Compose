@@ -48,12 +48,17 @@ module Enumerable =
         //just a compilation test
         [1;2;3] |> Enumerable.asEnumerable
 
+#if TEST_PORTABLE_47
+#else
+
     [<Fact>]
     let cast () =
        let nonGeneric = new System.Collections.ArrayList([|1;2;3|]);
        let generic = nonGeneric |> Enumerable.cast<int>
        for i in generic do
             i |> should be ofExactType<int>
+
+#endif
 
     [<Fact>]
     let concat () =
@@ -290,9 +295,14 @@ module Enumerable =
             |> Seq.toList
             |> should equal [1;4;1;4]
 
+#if NET35
+#else
+
     [<Fact>]
     let zip () =
         ([1;2],["one";"two"])
             ||> Enumerable.zip (fun x y -> (x,y))
             |> Seq.toList
             |> should equal [1,"one";2,"two"]
+
+#endif

@@ -50,8 +50,8 @@ Target "Generate" (fun _ ->
 
   let queryHeader = header + br + br + "#load \"../../../helpers/Quotations.fsx\""
 
-  for target in [ NET45; NET40; NET35; PORTABLE_47 ] do
-    tracefn "%A" target
+  for target in projectTargets do
+    tracefn "Generating Source for %A" target
 
     let sysfull = systemTargetInfo target projectFSharpVersion
                       |> systemDllsResolver
@@ -109,8 +109,8 @@ Target "Generate" (fun _ ->
 
 Target "Build" (fun _ ->
 
-  for target in [ NET45; NET40; NET35; PORTABLE_47 ] do
-    tracefn "%A" target
+  for target in projectTargets do
+    tracefn "Build targeting %A" target
     let targetDir = Path.Combine(srcDir, sprintf "%A" target)
     let targetBuildDir = Path.Combine(buildDir, sprintf "%A" target)
     Directory.CreateDirectory targetBuildDir |> ignore
@@ -130,53 +130,82 @@ Target "Build" (fun _ ->
 )
 
 Target "Docs" (fun _ ->
+  //run doc script
+  FSIHelper.runBuildScriptAt root true "tools/Docs.fsx" [] [] |> ignore
 
-    //run doc script
-    FSIHelper.runBuildScriptAt root true "tools/Docs.fsx" [] [] |> ignore
+  let docOutput = Path.Combine(docsBuildDir, "output")
+  let localRepo = Path.Combine(docsBuildDir,"gh-pages");
 
-    let docOutput = Path.Combine(docsBuildDir, "output")
-    let localRepo = Path.Combine(docsBuildDir,"gh-pages");
-
-    //Copy to gh-pages branch
-    Git.Repository.clone "" githubCloneUrl localRepo
-    Git.Branches.checkoutBranch localRepo "gh-pages"
-    CopyRecursive docOutput localRepo true |> printfn "%A"
+  //Copy to gh-pages branch
+  Git.Repository.clone "" githubCloneUrl localRepo
+  Git.Branches.checkoutBranch localRepo "gh-pages"
+  CopyRecursive docOutput localRepo true |> printfn "%A"
 )
 
 Target "BuildTest" (fun _ ->
 
-    let testDll = Path.Combine(testBuildDir,"Test.dll")
+  for target in projectTargets do
+
+    let runningTarget =
+      match target with
+        | NET35 -> NET35
+        | _ -> NET45
+
+    tracefn "Build Tests targeting %A" target
+    let targetBuildDir = Path.Combine(buildDir, sprintf "%A" target)
+    let targetTestBuildDir = Path.Combine(testBuildDir, sprintf "%A" target)
+    Directory.CreateDirectory targetTestBuildDir |> ignore
+
+    let testDll = Path.Combine(targetTestBuildDir,"Test.dll")
     let files = Directory.GetFiles(testDir,"*.fsx") |> Seq.toList
 
     let refdlls =
-        [ "./build/NET45/ComposableExtensions.dll"
-          "./tools/packages/xunit/lib/net20/xunit.dll"
-          "./tools/packages/FsUnit.xUnit/Lib/net40/NHamcrest.dll"
-          "./tools/packages/FsUnit.xUnit/Lib/net40/FsUnit.CustomMatchers.dll"
-          "./tools/packages/FsUnit.xUnit/Lib/net40/FsUnit.Xunit.dll"
-          "./tools/packages/FSharp.Core.Open.FS30/lib/net40/FSharp.Core.dll"
-          ]
+      [
+        Path.Combine(targetBuildDir, "ComposableExtensions.dll")
+        "./tools/packages/xunit/lib/net20/xunit.dll"
+        systemDllsResolver ([], runningTarget, projectFSharpVersion) |> Seq.head
+      ]
+      @ match target with
+          | NET35 ->
+            [
+              "./tools/packages/FsUnit.xUnit/Lib/net20/NHamcrest.dll"
+              "./tools/packages/FsUnit.xUnit/Lib/net20/FsUnit.CustomMatchers.dll"
+              "./tools/packages/FsUnit.xUnit/Lib/net20/FsUnit.Xunit.dll"
+            ]
+          | _ ->
+            [
+              "./tools/packages/FsUnit.xUnit/Lib/net40/NHamcrest.dll"
+              "./tools/packages/FsUnit.xUnit/Lib/net40/FsUnit.CustomMatchers.dll"
+              "./tools/packages/FsUnit.xUnit/Lib/net40/FsUnit.Xunit.dll"
+            ]
 
     for f in refdlls do
-       FileHelper.CopyFile testBuildDir f
+       FileHelper.CopyFile targetTestBuildDir f
 
     File.Copy("./tools/fsharp-redirect.config",testDll+".config")
 
     let compilerOpts =
-        ["-o";  testDll; "-a"]
+        (refdlls |> List.map (fun d -> sprintf "--reference:%s" d))
+        @ [sprintf "--define:TEST_%A" target;"-o";  testDll; "-a"]
         @ files
 
-    fscTargeting (systemTargetInfo projectTarget projectFSharpVersion) compilerOpts
+    fscTargeting (systemTargetInfo runningTarget projectFSharpVersion) compilerOpts
 )
 
 Target "Test" (fun _ ->
 
-    let testDll = Path.Combine(testBuildDir,"Test.dll")
+  for target in projectTargets do
+    tracefn "Running Tests targeting %A" target
+    let targetTestBuildDir = Path.Combine(testBuildDir, sprintf "%A" target)
+    let testDll = Path.Combine(targetTestBuildDir,"Test.dll")
 
-    let runner = Path.Combine("tools","packages", "xunit.runners", "tools", "xunit.console.clr4.exe")
+    let runner =
+      match target with
+        | NET35 -> Path.Combine("tools","packages", "xunit.runners", "tools", "xunit.console.exe")
+        | _ -> Path.Combine("tools","packages", "xunit.runners", "tools", "xunit.console.clr4.exe")
 
     !! (testDll)
-         |> xUnit (fun p -> {p with OutputDir = testDir; ToolPath =  runner })
+         |> xUnit (fun p -> {p with OutputDir = targetTestBuildDir; ToolPath =  runner })
 )
 
 Target "BuildOnly" (fun _ ->

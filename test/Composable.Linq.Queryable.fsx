@@ -1,3 +1,5 @@
+#if NET35
+#else
 namespace Test.Composable.Linq
 
 #load "includes.fsx"
@@ -15,3 +17,7 @@ module ``Queryable Basic Tests`` =
             |> Queryable.where <@ (fun i -> i < 5) @>
             |> Seq.toList
             |> should equal [1;4;1;4]
+
+
+
+#endif

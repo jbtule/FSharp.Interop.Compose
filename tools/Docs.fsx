@@ -1,11 +1,11 @@
 // Copyright 2014 Jay Tuley <jay+code@tuley.name>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 //     http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -35,7 +35,7 @@ let projInfo =
     "project-name", projectName
     "root" , projectUrl ]
 
-let dll = Path.Combine(root, buildDir, projectName + ".dll")
+let dll = Path.Combine(root, buildDir, "NET45", projectName + ".dll")
 
 let outputDir = Path.Combine(docsBuildDir, "output")
 
@@ -50,7 +50,7 @@ for file in content do
     File.Copy(file, Path.Combine(outputContentDir, Path.GetFileName(file)))
 
 
-let options = "--reference:\"" + dll + "\"" 
+let options = "--reference:\"" + dll + "\""
 
 
 let template =Path.Combine(docsDir, "templates", "docpage.cshtml")
@@ -59,11 +59,11 @@ let templateDirs = [ Path.Combine(docsDir, "templates");
 
 
 Literate.ProcessMarkdown(
-    Path.Combine(root,"Readme.md"), 
-    templateFile = template, 
+    Path.Combine(root,"Readme.md"),
+    templateFile = template,
     output = Path.Combine(outputDir, "index.html"),
-    replacements = projInfo, 
-    compilerOptions = options, 
+    replacements = projInfo,
+    compilerOptions = options,
     layoutRoots = templateDirs,
     includeSource = true )
 

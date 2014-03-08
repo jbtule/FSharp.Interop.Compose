@@ -19,11 +19,22 @@ module String =
         "hello" |> String.endsWith "lo" |> should be True
         "hello" |> String.endsWith "he" |> should be False
 
+#if TEST_PORTABLE_47
+    [<Fact>]
+    let endsWithFull () =
+        "HELLO"
+            |> String.Full.endsWith "lo" System.StringComparison.InvariantCultureIgnoreCase
+            |> should be True
+#else
     [<Fact>]
     let endsWithFull () =
         "HELLO"
             |> String.Full.endsWith "lo" true System.Globalization.CultureInfo.InvariantCulture
             |> should be True
+#endif
+
+#if NET35
+#else
 
     [<Fact>]
     let isNullOrWhitespace () =
@@ -32,6 +43,8 @@ module String =
            |> Seq.toList
            |> should equal ["1";"2";"3";"4"]
 
+#endif
+
     [<Fact>]
     let isNullOrEmpty() =
         ["1";"";"2";"  "; "3"; null; "4"]
@@ -39,9 +52,14 @@ module String =
            |> Seq.toList
            |> should equal ["1";"2";"  ";"3";"4"]
 
+#if NET35
+#else
+
     [<Fact>]
     let join () =
         ["1";"2";"3"] |> String.join " " |> should equal "1 2 3"
+
+#endif
 
     [<Fact>]
     let padLeft () =
@@ -79,6 +97,14 @@ module String =
            |> Seq.toList
            |> should equal ["Two";"Three"]
 
+#if TEST_PORTABLE_47
+    [<Fact>]
+    let startsWithFull () =
+        ["One";"Two";"Three"]
+           |> Seq.filter (String.Full.startsWith "t" System.StringComparison.InvariantCultureIgnoreCase)
+           |> Seq.toList
+           |> should equal ["Two";"Three"]
+#else
     [<Fact>]
     let startsWithFull () =
         ["One";"Two";"Three"]
@@ -93,6 +119,8 @@ module String =
     [<Fact>]
     let toUpperFull () =
         "upper" |> String.Full.toUpper System.Globalization.CultureInfo.InvariantCulture |> should equal "UPPER"
+
+#endif
 
 
     [<Fact>]
