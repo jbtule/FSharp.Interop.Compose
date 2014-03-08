@@ -57,7 +57,6 @@ let template =Path.Combine(docsDir, "templates", "docpage.cshtml")
 let templateDirs = [ Path.Combine(docsDir, "templates");
         Path.Combine(docsDir, "templates", "reference") ]
 
-
 Literate.ProcessMarkdown(
     Path.Combine(root,"Readme.md"),
     templateFile = template,
@@ -79,4 +78,4 @@ MetadataFormat.Generate(dll, refDir,
         Path.Combine(docsDir, "templates", "reference") ],
         parameters = projInfo,
         sourceRepo = githubSourceUrl,
-        sourceFolder = Path.Combine(root, srcDir))
+        sourceFolder = root)
