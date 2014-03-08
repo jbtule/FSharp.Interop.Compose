@@ -49,22 +49,16 @@ Target "Generate" (fun _ ->
    let header  = sprintf "// Generated with %s (%s) %s" projectName version projectUrl
 
    let queryHeader = header + br + br + "#load \"../../helpers/Quotations.fsx\""
-   let sysMap = CompilerHelper.systemDllsTargeting (projectSystemRefs, projectTarget, projectFSharpVersion) 
-                      |> Seq.map (fun p -> Path.GetFileName p, p)
-                      |> Map.ofSeq
-   let resolvePath libName =
-        match (sysMap |> Map.tryFind libName) with | Some(p) -> p | _ -> ""
+   let sysfull = systemTargetInfo projectTarget projectFSharpVersion
+                    |> systemDllsResolver
 
-   let generateWrapper libName  = Generate.writeWrappers header srcDir (resolvePath libName)
-   let generateQueryWrapper libName = Generate.writeWrappers queryHeader srcDir (resolvePath libName)
+   let generateWrapper  = Generate.writeWrappers header srcDir sysfull
+   let generateQueryWrapper = Generate.writeWrappers queryHeader srcDir sysfull
 
-   let coreAsm = "System.Core.dll"
-   let mscorlibAsm = "mscorlib.dll"
+   generateWrapper "System.Linq" "Enumerable" Reorder.extensionMethodReorder [IdentifyMethods.isExtensionMethod]
+   generateWrapper "System.Linq" "ParallelEnumerable" Reorder.extensionMethodReorder [IdentifyMethods.isExtensionMethod]
 
-   generateWrapper coreAsm "System.Linq" "Enumerable" Reorder.extensionMethodReorder [IdentifyMethods.isExtensionMethod]
-   generateWrapper coreAsm "System.Linq" "ParallelEnumerable" Reorder.extensionMethodReorder [IdentifyMethods.isExtensionMethod]
-
-   generateQueryWrapper coreAsm "System.Linq" "Queryable" Reorder.extensionMethodReorder [IdentifyMethods.isExtensionMethod]
+   generateQueryWrapper "System.Linq" "Queryable" Reorder.extensionMethodReorder [IdentifyMethods.isExtensionMethod]
 
    let stringMethodFilters = [IdentifyMethods.matchesSignature Static "Join" ["System.String";"System.Collections.Generic.IEnumerable`1<System.String>"]
                               IdentifyMethods.matchesName Static "IsNullOrWhiteSpace"
@@ -74,7 +68,7 @@ Target "Generate" (fun _ ->
                               IdentifyMethods.matchesSignature Instance "Split" ["System.Char[]"]
                               IdentifyMethods.matchesNames Instance ["StartsWith";"Contains";"EndsWith"; "Trim"; "TrimStart"; "TrimEnd" ; "ToLower" ; "ToUpper"; "PadRight";"PadLeft"]
                               ]
-   generateWrapper mscorlibAsm "System" "String" Reorder.noChange stringMethodFilters
+   generateWrapper "System" "String" Reorder.noChange stringMethodFilters
 
    let fileMethodFilters = [IdentifyMethods.matchesSignature Static "WriteAllLines" ["System.String";"System.Collections.Generic.IEnumerable`1<System.String>"]
                             IdentifyMethods.matchesSignature Static "WriteAllLines" ["System.String";"System.Collections.Generic.IEnumerable`1<System.String>";"System.Text.Encoding"]
@@ -82,11 +76,11 @@ Target "Generate" (fun _ ->
                             ]
 
    let reorderForFile = Reorder.moveTypeToTheEnd "System.Collections.Generic.IEnumerable`1<System.String>"
-   generateWrapper mscorlibAsm "System.IO" "File" reorderForFile fileMethodFilters
+   generateWrapper "System.IO" "File" reorderForFile fileMethodFilters
 
 
-   generateWrapper mscorlibAsm "System.Collections.Generic" "Comparer" Reorder.noChange [IdentifyMethods.matchesName Static "Create"]
-   generateWrapper mscorlibAsm "System.Collections.Generic" "EqualityComparer" Reorder.noChange [IdentifyMethods.matchesName Static "Default"]
+   generateWrapper "System.Collections.Generic" "Comparer" Reorder.noChange [IdentifyMethods.matchesName Static "Create"]
+   generateWrapper "System.Collections.Generic" "EqualityComparer" Reorder.noChange [IdentifyMethods.matchesName Static "Default"]
 
 
    CreateFSharpAssemblyInfo (Path.Combine(srcDir, "AssemblyInfo.fsx"))
@@ -113,7 +107,7 @@ Target "Build" (fun _ ->
           ["-o"; output; "--doc:"+ xml; "--debug:pdbonly" ; "-a"; Path.Combine(srcDir, "AssemblyInfo.fsx")]
           @ files
 
-    fscTargeting (projectSystemRefs,projectTarget,projectFSharpVersion) compilerOpts
+    fscTargeting (systemTargetInfo projectTarget projectFSharpVersion) compilerOpts
 )
 
 Target "Docs" (fun _ ->
@@ -141,7 +135,7 @@ Target "BuildTest" (fun _ ->
           "./tools/packages/FsUnit.xUnit/Lib/net40/NHamcrest.dll"
           "./tools/packages/FsUnit.xUnit/Lib/net40/FsUnit.CustomMatchers.dll"
           "./tools/packages/FsUnit.xUnit/Lib/net40/FsUnit.Xunit.dll"
-          "./tools/packages/FSharp.Core.3/lib/net40/FSharp.Core.dll"
+          "./tools/packages/FSharp.Core.Open.FS30/lib/net40/FSharp.Core.dll"
           ]
 
     for f in refdlls do
@@ -153,7 +147,7 @@ Target "BuildTest" (fun _ ->
         ["-o";  testDll; "-a"]
         @ files
 
-    fscTargeting (projectSystemRefs,CompilerHelper.NET40,projectFSharpVersion) compilerOpts
+    fscTargeting (systemTargetInfo projectTarget projectFSharpVersion) compilerOpts
 ) 
 
 Target "Test" (fun _ ->

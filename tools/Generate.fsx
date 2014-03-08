@@ -276,18 +276,21 @@ module Generate =
     let writeWrappers
             (header:string)
             (srcDir:string)
-            (asmPath:string)
+            (asmPath:string list)
             (namesp:string)
             (typeName:string)
             (orderedParameters:MethodDefinition->seq<ParameterDefinition>)
             (methodSelectors:(MethodDefinition->bool) list) =
 
-        if System.String.IsNullOrEmpty asmPath then
+        if asmPath |> Seq.isEmpty then
             ()
         else
-            let asmDef = AssemblyDefinition.ReadAssembly(asmPath)
+        
             let notObsolete = not << IdentifyMethods.isObsoleteMethod
-            let methods = asmDef.MainModule.Types
+
+            let methods = asmPath
+                            |> Seq.map (fun p -> AssemblyDefinition.ReadAssembly(p))
+                            |> Seq.collect (fun a -> a. MainModule.Types)
                             |> Seq.filter (fun t -> t.IsPublic)
                             |> Seq.filter (fun t -> t.Namespace |> Helpers.hasNamePrefix namesp)
                             |> Seq.filter (fun t -> t.Name |> Helpers.hasNamePrefix typeName)

@@ -10,12 +10,12 @@ let docsDir = "docs"
 let docsBuildDir = Path.Combine(docsDir, "build")
 let testDir = "test"
 let testBuildDir = Path.Combine(testDir, "build")
-let version = "0.10.3"
+let version = "0.10.4"
 let projectName = "ComposableExtensions"
 let projectUrl = "http://jbtule.github.io/ComposableExtensions"
 let gitHubProjectUrl = "https://github.com/jbtule/ComposableExtensions"
 let githubCloneUrl = gitHubProjectUrl + ".git"
-let githubSourceUrl = gitHubProjectUrl + "/blob/master/src"
+let githubSourceUrl = gitHubProjectUrl + "/blob/stable/src"
 let nugetUrl = "http://nuget.org/packages/" + projectName
 let title = "FSharp Composable Extension Functions"
 let description = "Inline composable fsharp functions around BCL static methods."
@@ -24,10 +24,3 @@ let authors = ["Jay Tuley"]
 let root = System.Environment.CurrentDirectory
 let projectTarget = CompilerHelper.NET40
 let projectFSharpVersion = CompilerHelper.FS30
-
-let projectSystemRefs =
-        [
-            "mscorlib.dll"
-            "System.dll"
-            "System.Core.dll"
-        ]

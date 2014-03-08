@@ -1,4 +1,4 @@
-// Generated with ComposableExtensions (0.10.3) http://jbtule.github.io/ComposableExtensions
+// Generated with ComposableExtensions (0.10.4) http://jbtule.github.io/ComposableExtensions
 
 namespace Composable.System
 /// Corresponding static methods as functions for [`System.String`](http://msdn.microsoft.com/en-us/library/system.string)
@@ -60,6 +60,9 @@ module String =
 
         /// Calls [`PadRight(totalWidth, paddingChar)`](http://msdn.microsoft.com/en-us/library/system.string.padright)
         let inline padRight totalWidth paddingChar (``{instance}``:System.String) = ``{instance}``.PadRight(totalWidth, paddingChar)
+
+        /// Calls [`Split(separator)`](http://msdn.microsoft.com/en-us/library/system.string.split)
+        let inline split separator (``{instance}``:System.String) = ``{instance}``.Split(separator)
 
         /// Calls [`StartsWith(value, ignoreCase, culture)`](http://msdn.microsoft.com/en-us/library/system.string.startswith)
         let inline startsWith value ignoreCase culture (``{instance}``:System.String) = ``{instance}``.StartsWith(value, ignoreCase, culture)
