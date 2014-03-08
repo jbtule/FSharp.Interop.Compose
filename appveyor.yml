@@ -11,5 +11,5 @@ test:
   assemblies:
     - test\build\NET45\Test-NET45.dll
     - test\build\NET40\Test-NET40.dll
-    - test\build\NET35\Test-NET34.dll
+    - test\build\NET35\Test-NET35.dll
     - test\build\PORTABLE_47\Test-PORTABLE_47.dll
