@@ -18,7 +18,13 @@
     @references@
   </metadata>
  <files>
-  <file src="ComposableExtensions.dll" target="lib/net40" />
-  <file src="ComposableExtensions.xml" target="lib/net40" />
+  <file src="NET40/ComposableExtensions.dll" target="lib/net40" />
+  <file src="NET40/ComposableExtensions.xml" target="lib/net40" />
+  <file src="NET45/ComposableExtensions.dll" target="lib/net45" />
+  <file src="NET45/ComposableExtensions.xml" target="lib/net45" />
+  <file src="NET35/ComposableExtensions.dll" target="lib/net35" />
+  <file src="NET35/ComposableExtensions.xml" target="lib/net35" />
+  <file src="PORTABLE_47/ComposableExtensions.dll" target="lib/portable-net45+sl5+win8" />
+  <file src="PORTABLE_47/ComposableExtensions.xml" target="lib/portable-net45+sl5+win8" />
  </files>
 </package>

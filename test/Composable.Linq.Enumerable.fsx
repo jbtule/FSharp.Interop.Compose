@@ -48,17 +48,12 @@ module Enumerable =
         //just a compilation test
         [1;2;3] |> Enumerable.asEnumerable
 
-#if TEST_PORTABLE_47
-#else
-
     [<Fact>]
     let cast () =
        let nonGeneric = new System.Collections.ArrayList([|1;2;3|]);
        let generic = nonGeneric |> Enumerable.cast<int>
        for i in generic do
             i |> should be ofExactType<int>
-
-#endif
 
     [<Fact>]
     let concat () =
