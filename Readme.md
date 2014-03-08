@@ -1,6 +1,6 @@
 #FSharp Composable Extensions
 
-inlined composable fsharp functions around BCL static methods.
+inlined composable fsharp functions around BCL static methods. Supports F# 3.0 or later with .NET runtimes v2.0,v4.0, Sliverlight 5.0 and WinRT
 
 ##Examples
 
