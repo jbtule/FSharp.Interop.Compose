@@ -45,69 +45,88 @@ Target "CleanDocs" (fun _ ->
 
 Target "Generate" (fun _ ->
 
-   let br = System.Environment.NewLine
-   let header  = sprintf "// Generated with %s (%s) %s" projectName version projectUrl
+  let br = System.Environment.NewLine
+  let header  = sprintf "// Generated with %s (%s) %s" projectName version projectUrl
 
-   let queryHeader = header + br + br + "#load \"../../helpers/Quotations.fsx\""
-   let sysfull = systemTargetInfo projectTarget projectFSharpVersion
-                    |> systemDllsResolver
+  let queryHeader = header + br + br + "#load \"../../../helpers/Quotations.fsx\""
 
-   let generateWrapper  = Generate.writeWrappers header srcDir sysfull
-   let generateQueryWrapper = Generate.writeWrappers queryHeader srcDir sysfull
+  for target in [ NET45; NET40; NET35; PORTABLE_47 ] do
+    tracefn "%A" target
 
-   generateWrapper "System.Linq" "Enumerable" Reorder.extensionMethodReorder [IdentifyMethods.isExtensionMethod]
-   generateWrapper "System.Linq" "ParallelEnumerable" Reorder.extensionMethodReorder [IdentifyMethods.isExtensionMethod]
+    let sysfull = systemTargetInfo target projectFSharpVersion
+                      |> systemDllsResolver
 
-   generateQueryWrapper "System.Linq" "Queryable" Reorder.extensionMethodReorder [IdentifyMethods.isExtensionMethod]
+    let targetDir = Path.Combine(srcDir, sprintf "%A" target)
 
-   let stringMethodFilters = [IdentifyMethods.matchesSignature Static "Join" ["System.String";"System.Collections.Generic.IEnumerable`1<System.String>"]
-                              IdentifyMethods.matchesName Static "IsNullOrWhiteSpace"
-                              IdentifyMethods.matchesName Static "IsNullOrEmpty"
-                              IdentifyMethods.matchesSignature Instance "Replace" ["System.String";"System.String"]
-                              IdentifyMethods.matchesSignature Instance "Split" ["System.Char"]
-                              IdentifyMethods.matchesSignature Instance "Split" ["System.Char[]"]
-                              IdentifyMethods.matchesNames Instance ["StartsWith";"Contains";"EndsWith"; "Trim"; "TrimStart"; "TrimEnd" ; "ToLower" ; "ToUpper"; "PadRight";"PadLeft"]
+    Directory.CreateDirectory targetDir |> ignore
+
+    let generateWrapper  = Generate.writeWrappers header targetDir sysfull
+    let generateQueryWrapper = Generate.writeWrappers queryHeader targetDir sysfull
+
+    generateWrapper "System.Linq" "Enumerable" Reorder.extensionMethodReorder [IdentifyMethods.isExtensionMethod]
+    generateWrapper "System.Linq" "ParallelEnumerable" Reorder.extensionMethodReorder [IdentifyMethods.isExtensionMethod]
+
+    match target with
+      | NET35 -> ()
+      | _ -> generateQueryWrapper "System.Linq" "Queryable" Reorder.extensionMethodReorder [IdentifyMethods.isExtensionMethod]
+
+    let stringMethodFilters = [
+                                IdentifyMethods.matchesSignature Static "Join" ["System.String";"System.Collections.Generic.IEnumerable`1<System.String>"]
+                                IdentifyMethods.matchesName Static "IsNullOrWhiteSpace"
+                                IdentifyMethods.matchesName Static "IsNullOrEmpty"
+                                IdentifyMethods.matchesSignature Instance "Replace" ["System.String";"System.String"]
+                                IdentifyMethods.matchesSignature Instance "Split" ["System.Char"]
+                                IdentifyMethods.matchesSignature Instance "Split" ["System.Char[]"]
+                                IdentifyMethods.matchesNames Instance ["StartsWith";"Contains";"EndsWith"; "Trim"; "TrimStart"; "TrimEnd" ; "ToLower" ; "ToUpper"; "PadRight";"PadLeft"]
+                                ]
+
+    generateWrapper "System" "String" Reorder.noChange stringMethodFilters
+
+    let fileMethodFilters = [
+                              IdentifyMethods.matchesSignature Static "WriteAllLines" ["System.String";"System.Collections.Generic.IEnumerable`1<System.String>"]
+                              IdentifyMethods.matchesSignature Static "WriteAllLines" ["System.String";"System.Collections.Generic.IEnumerable`1<System.String>";"System.Text.Encoding"]
+                              IdentifyMethods.matchesName Static "AppendAllLines"
                               ]
-   generateWrapper "System" "String" Reorder.noChange stringMethodFilters
 
-   let fileMethodFilters = [IdentifyMethods.matchesSignature Static "WriteAllLines" ["System.String";"System.Collections.Generic.IEnumerable`1<System.String>"]
-                            IdentifyMethods.matchesSignature Static "WriteAllLines" ["System.String";"System.Collections.Generic.IEnumerable`1<System.String>";"System.Text.Encoding"]
-                            IdentifyMethods.matchesName Static "AppendAllLines"
-                            ]
-
-   let reorderForFile = Reorder.moveTypeToTheEnd "System.Collections.Generic.IEnumerable`1<System.String>"
-   generateWrapper "System.IO" "File" reorderForFile fileMethodFilters
+    let reorderForFile = Reorder.moveTypeToTheEnd "System.Collections.Generic.IEnumerable`1<System.String>"
+    generateWrapper "System.IO" "File" reorderForFile fileMethodFilters
 
 
-   generateWrapper "System.Collections.Generic" "Comparer" Reorder.noChange [IdentifyMethods.matchesName Static "Create"]
-   generateWrapper "System.Collections.Generic" "EqualityComparer" Reorder.noChange [IdentifyMethods.matchesName Static "Default"]
+    generateWrapper "System.Collections.Generic" "Comparer" Reorder.noChange [IdentifyMethods.matchesName Static "Create"]
+    generateWrapper "System.Collections.Generic" "EqualityComparer" Reorder.noChange [IdentifyMethods.matchesName Static "Default"]
 
 
-   CreateFSharpAssemblyInfo (Path.Combine(srcDir, "AssemblyInfo.fsx"))
-        [Attribute.Title title
-         Attribute.Description description
-         //Attribute.Guid guid
-         Attribute.Product projectName
-         Attribute.Version version
-         Attribute.FileVersion version
-         ]
+    CreateFSharpAssemblyInfo (Path.Combine(targetDir, "AssemblyInfo.fsx"))
+          [Attribute.Title title
+           Attribute.Description (sprintf "%A: %s" target description)
+           //Attribute.Guid guid
+           Attribute.Product projectName
+           Attribute.Version version
+           Attribute.FileVersion version
+           ]
 )
 
 
 Target "Build" (fun _ ->
 
-    let output = Path.Combine(buildDir, projectName + ".dll")
-    let xml = Path.Combine(buildDir, projectName + ".xml")
+  for target in [ NET45; NET40; NET35; PORTABLE_47 ] do
+    tracefn "%A" target
+    let targetDir = Path.Combine(srcDir, sprintf "%A" target)
+    let targetBuildDir = Path.Combine(buildDir, sprintf "%A" target)
+    Directory.CreateDirectory targetBuildDir |> ignore
 
-    let files = Directory.GetDirectories(srcDir)
+    let output = Path.Combine(targetBuildDir, projectName + ".dll")
+    let xml = Path.Combine(targetBuildDir, projectName + ".xml")
+
+    let files = Directory.GetDirectories(targetDir)
                     |> Seq.collect (fun d -> Directory.GetFiles(d,"*.fsx"))
                     |> Seq.toList
-      
-    let compilerOpts = 
-          ["-o"; output; "--doc:"+ xml; "--debug:pdbonly" ; "-a"; Path.Combine(srcDir, "AssemblyInfo.fsx")]
+
+    let compilerOpts =
+          ["-o"; output; "--doc:"+ xml; "--debug:pdbonly" ; "-a"; Path.Combine(targetDir, "AssemblyInfo.fsx")]
           @ files
 
-    fscTargeting (systemTargetInfo projectTarget projectFSharpVersion) compilerOpts
+    fscTargeting (systemTargetInfo target projectFSharpVersion) compilerOpts
 )
 
 Target "Docs" (fun _ ->
@@ -130,7 +149,7 @@ Target "BuildTest" (fun _ ->
     let files = Directory.GetFiles(testDir,"*.fsx") |> Seq.toList
 
     let refdlls =
-        [ "./build/ComposableExtensions.dll"
+        [ "./build/NET45/ComposableExtensions.dll"
           "./tools/packages/xunit/lib/net20/xunit.dll"
           "./tools/packages/FsUnit.xUnit/Lib/net40/NHamcrest.dll"
           "./tools/packages/FsUnit.xUnit/Lib/net40/FsUnit.CustomMatchers.dll"
@@ -143,12 +162,12 @@ Target "BuildTest" (fun _ ->
 
     File.Copy("./tools/fsharp-redirect.config",testDll+".config")
 
-    let compilerOpts = 
+    let compilerOpts =
         ["-o";  testDll; "-a"]
         @ files
 
     fscTargeting (systemTargetInfo projectTarget projectFSharpVersion) compilerOpts
-) 
+)
 
 Target "Test" (fun _ ->
 

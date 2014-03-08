@@ -1,5 +1,5 @@
 #I "../"
-#r "build/ComposableExtensions.dll"
+#r "build/NET45/ComposableExtensions.dll"
 #r "tools/packages/xunit/lib/net20/xunit.dll"
 #r "tools/packages/FsUnit.xUnit/Lib/net40/NHamcrest.dll"
 #r "tools/packages/FsUnit.xUnit/Lib/net40/FsUnit.CustomMatchers.dll"

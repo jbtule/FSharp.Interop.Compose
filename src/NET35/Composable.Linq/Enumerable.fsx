@@ -1,4 +1,4 @@
-// Generated with ComposableExtensions (0.10.4) http://jbtule.github.io/ComposableExtensions
+// Generated with ComposableExtensions (0.11.0) http://jbtule.github.io/ComposableExtensions
 
 namespace Composable.Linq
 /// Corresponding static methods as functions for [`System.Linq.Enumerable`](http://msdn.microsoft.com/en-us/library/system.linq.enumerable)
@@ -132,9 +132,6 @@ module Enumerable =
 
     /// Calls [`Where(source, System.Func<'TSource, System.Boolean>(predicate))`](http://msdn.microsoft.com/en-us/library/system.linq.enumerable.where)
     let inline where (predicate:'TSource->System.Boolean) (source:System.Collections.Generic.IEnumerable<'TSource>) = System.Linq.Enumerable.Where(source, System.Func<'TSource, System.Boolean>(predicate))
-
-    /// Calls [`Zip(first, second, System.Func<'TFirst, 'TSecond, 'TResult>(resultSelector))`](http://msdn.microsoft.com/en-us/library/system.linq.enumerable.zip)
-    let inline zip (resultSelector:'TFirst->'TSecond->'TResult) first second = System.Linq.Enumerable.Zip(first, second, System.Func<'TFirst, 'TSecond, 'TResult>(resultSelector))
 
     /// Longer parameter versions of `System.Linq.Enumerable` methods
     module Full =

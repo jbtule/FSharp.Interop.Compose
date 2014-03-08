@@ -1,6 +1,6 @@
-// Generated with ComposableExtensions (0.10.4) http://jbtule.github.io/ComposableExtensions
+// Generated with ComposableExtensions (0.11.0) http://jbtule.github.io/ComposableExtensions
 
-#load "../../helpers/Quotations.fsx"
+#load "../../../helpers/Quotations.fsx"
 
 namespace Composable.Linq
 /// Corresponding static methods as functions for [`System.Linq.Queryable`](http://msdn.microsoft.com/en-us/library/system.linq.queryable)

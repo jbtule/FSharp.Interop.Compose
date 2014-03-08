@@ -1,3 +1,18 @@
+// Copyright 2014 Jay Tuley <jay+code@tuley.name>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+
 [<AutoOpen>]
 module CompilerHelper
 
@@ -26,14 +41,14 @@ exception CompilerError of string
 
 let defaultSystemDlls (target:TargetFramework) =
     match target with
-        | NET45 | NET40 -> 
+        | NET45 | NET40 ->
             [
                 "mscorlib.dll"
                 "System.dll"
                 "System.Core.dll"
                 "System.Numerics.dll"
             ]
-        | PORTABLE_47 -> 
+        | PORTABLE_47 ->
             [
                 "mscorlib.dll"
                 "System.dll"
@@ -41,13 +56,13 @@ let defaultSystemDlls (target:TargetFramework) =
                 "System.Numerics.dll"
                 "System.Net.dll"
             ]
-        | NET35 -> 
+        | NET35 ->
             [
                 "mscorlib.dll"
                 "System.dll"
                 "System.Core.dll"
             ]
-        | PORTABLE_7 -> 
+        | PORTABLE_7 ->
             [
                 "mscorlib.dll"
                 "System.dll"
@@ -89,7 +104,6 @@ let systemDllsResolver (systemDlls:string list,target:TargetFramework,version:FS
              |> Path.GetFullPath
 
     let monoFSharpSDK = Path.Combine (sysDotNetLibPath, "Reference Assemblies","Microsoft","FSharp");
-
     let allStdPaths =
         match target with
             | NET45 ->
@@ -112,12 +126,12 @@ let systemDllsResolver (systemDlls:string list,target:TargetFramework,version:FS
             | PORTABLE_47 ->
                 [
                     Path.Combine(msSDK, ".NETPortable", "v4.0", "Profile", "Profile47") //Windows
-                    Path.Combine(sysDotNetLibPath,"xbuild-framework", ".NETPortable", "v4.0", "Profile", "Profile47") //Mono
+                    Path.Combine(sysDotNetLibPath,"xbuild-frameworks", ".NETPortable", "v4.0", "Profile", "Profile47") //Mono
                 ]
             | PORTABLE_7 ->
                 [
                     Path.Combine(msSDK, ".NETPortable", "v4.5", "Profile", "Profile7") //Windows
-                    Path.Combine(sysDotNetLibPath,"xbuild-framework", ".NETPortable", "v4.5", "Profile", "Profile7") //Mono
+                    Path.Combine(sysDotNetLibPath,"xbuild-frameworks", ".NETPortable", "v4.5", "Profile", "Profile7") //Mono
                 ]
         |> List.map Path.GetFullPath
 
@@ -200,7 +214,7 @@ let systemDllsResolver (systemDlls:string list,target:TargetFramework,version:FS
 let private fscTargetingHelper (systemDlls:string list) (target:TargetFramework option) (version:FSharpVersion option) (args:string list) =
 
     let extraArgs (t:TargetFramework) =
-        ["--noframework"; sprintf "--define:%A" t] 
+        ["--noframework"; sprintf "--define:%A" t]
             @ match t with
                 | PORTABLE_7 -> ["--targetprofile:netcore"]
                 | __________ -> List.empty

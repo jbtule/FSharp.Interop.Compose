@@ -1,4 +1,4 @@
-// Generated with ComposableExtensions (0.10.4) http://jbtule.github.io/ComposableExtensions
+// Generated with ComposableExtensions (0.11.0) http://jbtule.github.io/ComposableExtensions
 
 namespace Composable.System
 /// Corresponding static methods as functions for [`System.String`](http://msdn.microsoft.com/en-us/library/system.string)
