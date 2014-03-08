@@ -156,7 +156,7 @@ Target "BuildTest" (fun _ ->
     let targetTestBuildDir = Path.Combine(testBuildDir, sprintf "%A" target)
     Directory.CreateDirectory targetTestBuildDir |> ignore
 
-    let testDll = Path.Combine(targetTestBuildDir,"Test.dll")
+    let testDll = Path.Combine(targetTestBuildDir,sprintf "Test-%A.dll" target)
     let files = Directory.GetFiles(testDir,"*.fsx") |> Seq.toList
 
     let refdlls =
@@ -197,7 +197,7 @@ Target "Test" (fun _ ->
   for target in projectTargets do
     tracefn "Running Tests targeting %A" target
     let targetTestBuildDir = Path.Combine(testBuildDir, sprintf "%A" target)
-    let testDll = Path.Combine(targetTestBuildDir,"Test.dll")
+    let testDll = Path.Combine(targetTestBuildDir,sprintf "Test-%A.dll" target)
 
     let runner =
       match target with
