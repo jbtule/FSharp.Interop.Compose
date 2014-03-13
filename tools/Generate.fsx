@@ -217,7 +217,8 @@ module Reformat =
             || (x.DeclaringType.Methods
                  |> Seq.filter (fun m-> m.IsPublic && m.Name = x.Name && (m.Parameters |> Seq.length) = paramCnt)
                  |> Seq.length) > 1
-        let fsharpName = explictGenericParameterName x.DeclaringType.GenericParameters camelCase x
+        let fsharpChange = camelCase >> wrapKeywords
+        let fsharpName = explictGenericParameterName x.DeclaringType.GenericParameters fsharpChange x
         let csharpName = explictGenericParameterName [] (fun n->n) x
         let csharpType = csharpTypeNameFixer x.DeclaringType
         let parameterFix = parameterFixer specifyAllTypes
