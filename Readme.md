@@ -50,6 +50,6 @@ To build on Mono [![Build Status](https://travis-ci.org/jbtule/ComposableExtensi
 
     ./build.fsx
 
-or on Windows [![Build status](https://ci-beta.appveyor.com/api/projects/status/gy56e6su3e02e20i/branch/master)](https://ci-beta.appveyor.com/project/jbtule/composableextensions)
+or on Windows [![Build status](https://ci.appveyor.com/api/projects/status/6lv8sy1d21xwajwc/branch/master)](https://ci.appveyor.com/project/jbtule/composableextensions)
 
     fsi --exec build.fsx
