@@ -97,6 +97,18 @@ module String =
            |> Seq.toList
            |> should equal ["Two";"Three"]
 
+    [<Fact>]
+    let substring () =
+        "one two three"
+           |> String.substring 4
+           |> should equal "two three"
+
+    [<Fact>]
+    let substringFull () =
+        "one two three"
+           |> String.Full.substring 4 3
+           |> should equal "two"
+
 #if TEST_PORTABLE_47
     [<Fact>]
     let startsWithFull () =
