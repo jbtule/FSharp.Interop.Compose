@@ -13,8 +13,8 @@ inlined composable fsharp functions around BCL static methods. Supports F# 3.0 o
     Seq.empty<int> |> Enumerable.defaultIfEmpty // seq [0]
 
     [("Rust", "Cohle"); ("Marty", "Hart"); ("Maggie", "Hart")]
-        |> Enumerable.orderBy (fun (_, lastname) -> lastname)
-        |> Enumerable.thenBy (fun (firstname, _) -> firstname)
+        |> Enumerable.orderBy snd
+        |> Enumerable.thenBy fst
       //seq [("Rust", "Cohle"); ("Maggie", "Hart"); ("Marty", "Hart")]
 
 `Composable.System.String`
