@@ -13,8 +13,8 @@ inlined composable fsharp functions around BCL static methods. Supports F# 3.0 o
     Seq.empty<int> |> Enumerable.defaultIfEmpty // seq [0]
 
     [("Rust", "Cohle"); ("Marty", "Hart"); ("Maggie", "Hart")]
-        |> Enumerable.orderBy (fun (_, lastname) -> lastname)
-        |> Enumerable.thenBy (fun (firstname, _) -> firstname)
+        |> Enumerable.orderBy snd
+        |> Enumerable.thenBy fst
       //seq [("Rust", "Cohle"); ("Maggie", "Hart"); ("Marty", "Hart")]
 
 `Composable.System.String`
@@ -50,6 +50,6 @@ To build on Mono [![Build Status](https://travis-ci.org/jbtule/ComposableExtensi
 
     ./build.fsx
 
-or on Windows [![Build status](https://ci-beta.appveyor.com/api/projects/status/gy56e6su3e02e20i/branch/master)](https://ci-beta.appveyor.com/project/jbtule/composableextensions)
+or on Windows [![Build status](https://ci.appveyor.com/api/projects/status/6lv8sy1d21xwajwc/branch/master)](https://ci.appveyor.com/project/jbtule/composableextensions)
 
     fsi --exec build.fsx

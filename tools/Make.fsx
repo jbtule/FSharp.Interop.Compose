@@ -77,11 +77,11 @@ Target "Generate" (fun _ ->
                                 IdentifyMethods.matchesSignature Instance "Replace" ["System.String";"System.String"]
                                 IdentifyMethods.matchesSignature Instance "Split" ["System.Char"]
                                 IdentifyMethods.matchesSignature Instance "Split" ["System.Char[]"]
-                                IdentifyMethods.matchesNames Instance ["StartsWith";"Contains";"EndsWith"; "Trim"; "TrimStart"; "TrimEnd" ; "ToLower" ; "ToUpper"; "PadRight";"PadLeft"]
+                                IdentifyMethods.matchesNames Instance ["StartsWith"; "Substring"; "Contains"; "EndsWith"; "Trim"; "TrimStart"; "TrimEnd"; "ToLower"; "ToUpper"; "PadRight"; "PadLeft"]
                                 ]
 
     generateWrapper "System" "String" Reorder.noChange stringMethodFilters
-
+    
     let fileMethodFilters = [
                               IdentifyMethods.matchesSignature Static "WriteAllLines" ["System.String";"System.Collections.Generic.IEnumerable`1<System.String>"]
                               IdentifyMethods.matchesSignature Static "WriteAllLines" ["System.String";"System.Collections.Generic.IEnumerable`1<System.String>";"System.Text.Encoding"]
