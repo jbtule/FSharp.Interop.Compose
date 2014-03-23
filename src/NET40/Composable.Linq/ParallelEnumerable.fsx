@@ -58,8 +58,8 @@ module ParallelEnumerable =
     /// Calls [`FirstOrDefault(source)`](http://msdn.microsoft.com/en-us/library/system.linq.parallelenumerable.firstordefault)
     let inline firstOrDefault source = System.Linq.ParallelEnumerable.FirstOrDefault(source)
 
-    /// Calls [`ForAll(source, action)`](http://msdn.microsoft.com/en-us/library/system.linq.parallelenumerable.forall)
-    let inline forAll action source = System.Linq.ParallelEnumerable.ForAll(source, action)
+    /// Calls [`ForAll(source, System.Action<'TSource>(action))`](http://msdn.microsoft.com/en-us/library/system.linq.parallelenumerable.forall)
+    let inline forAll (action:'TSource->Microsoft.FSharp.Core.unit) source = System.Linq.ParallelEnumerable.ForAll(source, System.Action<'TSource>(action))
 
     /// Calls [`GroupBy(source, System.Func<'TSource, 'TKey>(keySelector))`](http://msdn.microsoft.com/en-us/library/system.linq.parallelenumerable.groupby)
     let inline groupBy (keySelector:'TSource->'TKey) source = System.Linq.ParallelEnumerable.GroupBy(source, System.Func<'TSource, 'TKey>(keySelector))

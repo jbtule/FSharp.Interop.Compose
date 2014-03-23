@@ -80,11 +80,14 @@ module Reformat =
             ((slimGenericName m.DeclaringType.FullName).ToLower())
             ((slimGenericName m.Name).ToLower())
 
-    let (|CSharpFunc|CSharpExpr|CSharpComparison|CSharpOther|) (x:TypeReference) =
-        if x.FullName |> Helpers.hasNamePrefix "System.Func" then
+    let (|CSharpFunc|CSharpExpr|CSharpOther|) (x:TypeReference) =
+        let rType = x.Resolve()
+        if rType <> null
+              && rType.BaseType <> null
+              && rType.BaseType.FullName |> Helpers.hasNamePrefix "System.MulticastDelegate"  then
             CSharpFunc
-        elif x.FullName |> Helpers.hasNamePrefix "System.Comparison" then
-            CSharpComparison
+        elif x.FullName |> Helpers.hasNamePrefix "System.Func" then //PCL_47
+            CSharpFunc
         elif x.FullName |> Helpers.hasNamePrefix "System.Linq.Expressions.Expression" then
             CSharpExpr
         else
@@ -93,24 +96,54 @@ module Reformat =
     let private getGenericParameters (x:TypeReference) =
         (x :?> GenericInstanceType).GenericArguments
 
+    let private getFuncParameters (x:TypeReference) =
+        let rType = x.Resolve()
+        if rType = null then //PCL_47
+          (x :?> GenericInstanceType).GenericArguments |> Seq.toList
+        else
+          let pList = if x.IsGenericInstance then
+                          (rType.GenericParameters |> Seq.map (fun g->g.Name), (x :?> GenericInstanceType).GenericArguments)
+                              ||> Seq.zip
+                              |> Seq.toList
+                      else
+                          List.empty
+          let fullList = List.append pList ["Void", TypeReference("Microsoft.FSharp.Core","unit", null, null)]
+          let fullMap = fullList |> Map.ofList
+
+          let resolveParamType (p:TypeReference) =
+              match fullMap |> Map.tryFind p.Name with
+                | Some(mType) -> mType
+                | None        -> p
+
+          let invoke = x.Resolve().Methods |> Seq.find (fun m -> m.Name = "Invoke")
+          (invoke.Parameters |> Seq.map (fun p->p.ParameterType) |> Seq.map resolveParamType |> Seq.cast<TypeReference> |> Seq.toList)
+              @ [resolveParamType invoke.ReturnType]
+
     let rec typeNameFixer forFSharp (x:TypeReference) =
         let appendUnitWhenSingle (argNames:string seq) =
             if argNames |> Seq.length = 1 then Seq.append ["unit"] argNames else argNames
         let typeNameFix = typeNameFixer forFSharp
-        let (|GenericType|FSharpFunc|FSharpComparison|FSharpQuote|ParameterName|PlainType|) (tr:TypeReference) =
+        let (|GenericType|FSharpFunc|FSharpQuote|ParameterName|PlainType|) (tr:TypeReference) =
             if tr.IsGenericInstance then
                 if not forFSharp then
                     GenericType
                 else
                     match tr with
-                        | CSharpComparison -> FSharpComparison
                         | CSharpFunc -> FSharpFunc
                         | CSharpExpr -> FSharpQuote
                         | __________ -> GenericType
             elif tr.IsGenericParameter then
                 ParameterName
             else
-                PlainType
+                let baseType (t:TypeReference) = (t :?> TypeDefinition).BaseType
+                if forFSharp
+                      && tr.IsDefinition
+                      && baseType tr <> null
+                      && (baseType tr).FullName |> Helpers.hasNamePrefix "System.MulticastDelegate"  then
+                    FSharpFunc
+                else
+                    PlainType
+
         match x with
             | GenericType   ->
                 sprintf "%s.%s<%s>"
@@ -126,16 +159,10 @@ module Reformat =
                                 |> String.concat "->"
                                 |> sprintf "Quotations.Expr<%s>"
             | FSharpFunc    -> x
-                                |> getGenericParameters
+                                |> getFuncParameters
                                 |> Seq.map typeNameFix
                                 |> appendUnitWhenSingle
                                 |> String.concat "->"
-            | FSharpComparison -> x
-                                    |> getGenericParameters
-                                    |> Seq.head
-                                    |> typeNameFix
-                                    |> (fun y->(y,y))
-                                    ||> sprintf "%s -> %s -> int"
             | ParameterName -> sprintf "'%s" x.Name
             | PlainType     -> sprintf "%s.%s" x.Namespace x.Name
 
@@ -144,20 +171,18 @@ module Reformat =
         let fullDef = sprintf "(%s:%s)" justName (typeNameFixer true x.ParameterType)
         match x.ParameterType with
             | CSharpFunc
-            | CSharpExpr
-            | CSharpComparison -> fullDef
-            | ________________ -> if specifyAllTypes then fullDef else justName
+            | CSharpExpr -> fullDef
+            | __________ -> if specifyAllTypes then fullDef else justName
 
     let private unwrapExpressionType (x:ParameterDefinition) =
         x.ParameterType |> getGenericParameters |> Seq.head
 
     let csharpCastFunc (x:ParameterDefinition) =
         match x.ParameterType with
-            | CSharpFunc
-            | CSharpComparison -> sprintf "%s(%s)" (typeNameFixer false x.ParameterType) x.Name
-            | CSharpExpr       -> sprintf "ComposableExtensions.Quotations.toExpression<%s>(%s)"
+            | CSharpFunc -> sprintf "%s(%s)" (typeNameFixer false x.ParameterType) x.Name
+            | CSharpExpr -> sprintf "ComposableExtensions.Quotations.toExpression<%s>(%s)"
                                             (typeNameFixer false (unwrapExpressionType x)) x.Name
-            | ________________ -> x.Name
+            | __________ -> x.Name
 
     let namespaceComposable (x:string) =
         if x.StartsWith("System") && x <> "System" then
@@ -286,7 +311,7 @@ module Generate =
         if asmPath |> Seq.isEmpty then
             ()
         else
-        
+
             let notObsolete = not << IdentifyMethods.isObsoleteMethod
 
             let methods = asmPath
@@ -295,7 +320,7 @@ module Generate =
                             |> Seq.filter (fun t -> t.IsPublic)
                             |> Seq.filter (fun t -> t.Namespace |> Helpers.hasNamePrefix namesp)
                             |> Seq.filter (fun t -> t.Name |> Helpers.hasNamePrefix typeName)
-                            |> Seq.collect (fun t -> t.Methods 
+                            |> Seq.collect (fun t -> t.Methods
                                                         |> Seq.filter (fun m -> m.IsPublic && (notObsolete m)))
 
             let chosenMethods =

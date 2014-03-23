@@ -13,8 +13,8 @@ module Regex =
     /// Calls [`Matches(input, pattern)`](http://msdn.microsoft.com/en-us/library/system.text.regularexpressions.regex.matches)
     let inline matches (pattern:System.String) (input:System.String) = System.Text.RegularExpressions.Regex.Matches(input, pattern)
 
-    /// Calls [`Replace(input, pattern, evaluator)`](http://msdn.microsoft.com/en-us/library/system.text.regularexpressions.regex.replace)
-    let inline replace (pattern:System.String) (evaluator:System.Text.RegularExpressions.MatchEvaluator) (input:System.String) = System.Text.RegularExpressions.Regex.Replace(input, pattern, evaluator)
+    /// Calls [`Replace(input, pattern, System.Text.RegularExpressions.MatchEvaluator(evaluator))`](http://msdn.microsoft.com/en-us/library/system.text.regularexpressions.regex.replace)
+    let inline replace (pattern:System.String) (evaluator:System.Text.RegularExpressions.Match->System.String) (input:System.String) = System.Text.RegularExpressions.Regex.Replace(input, pattern, System.Text.RegularExpressions.MatchEvaluator(evaluator))
 
     /// Calls [`Split(input, pattern)`](http://msdn.microsoft.com/en-us/library/system.text.regularexpressions.regex.split)
     let inline split (pattern:System.String) (input:System.String) = System.Text.RegularExpressions.Regex.Split(input, pattern)
