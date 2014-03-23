@@ -96,6 +96,24 @@ Target "Generate" (fun _ ->
     generateWrapper "System.Collections.Generic" "EqualityComparer" Reorder.noChange [IdentifyMethods.matchesName Static "Default"]
 
 
+    let regexReorder (m:Mono.Cecil.MethodDefinition) =
+        let ps = m.Parameters
+        if (ps |> Seq.length) > 1 && (ps |> Seq.head).Name = "input" then
+            Seq.append (ps |> Seq.skip 1) (ps |> Seq.take 1)
+        else
+            upcast ps
+
+    let regexMethodFilter = 
+      [
+        IdentifyMethods.matchesName Static "IsMatch"
+        IdentifyMethods.matchesName Static "Match"
+        IdentifyMethods.matchesName Static "Matches"
+        IdentifyMethods.matchesName Static "Replace"
+        IdentifyMethods.matchesName Static "Split"
+      ]
+
+    generateWrapper "System.Text.RegularExpressions" "Regex" regexReorder regexMethodFilter
+
     CreateFSharpAssemblyInfo (Path.Combine(targetDir, "AssemblyInfo.fsx"))
           [Attribute.Title title
            Attribute.Description (sprintf "%A: %s" target description)

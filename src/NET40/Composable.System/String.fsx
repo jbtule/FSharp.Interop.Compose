@@ -34,6 +34,9 @@ module String =
     /// Calls [`StartsWith(value)`](http://msdn.microsoft.com/en-us/library/system.string.startswith)
     let inline startsWith value (``{instance}``:System.String) = ``{instance}``.StartsWith(value)
 
+    /// Calls [`Substring(startIndex)`](http://msdn.microsoft.com/en-us/library/system.string.substring)
+    let inline substring startIndex (``{instance}``:System.String) = ``{instance}``.Substring(startIndex)
+
     /// Calls [`ToLower()`](http://msdn.microsoft.com/en-us/library/system.string.tolower)
     let inline toLower  (``{instance}``:System.String) = ``{instance}``.ToLower()
 
@@ -66,6 +69,9 @@ module String =
 
         /// Calls [`StartsWith(value, ignoreCase, culture)`](http://msdn.microsoft.com/en-us/library/system.string.startswith)
         let inline startsWith value ignoreCase culture (``{instance}``:System.String) = ``{instance}``.StartsWith(value, ignoreCase, culture)
+
+        /// Calls [`Substring(startIndex, length)`](http://msdn.microsoft.com/en-us/library/system.string.substring)
+        let inline substring startIndex length (``{instance}``:System.String) = ``{instance}``.Substring(startIndex, length)
 
         /// Calls [`ToLower(culture)`](http://msdn.microsoft.com/en-us/library/system.string.tolower)
         let inline toLower culture (``{instance}``:System.String) = ``{instance}``.ToLower(culture)
