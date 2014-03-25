@@ -1,4 +1,4 @@
-// Generated with ComposableExtensions (0.11.0) http://jbtule.github.io/ComposableExtensions
+// Generated with ComposableExtensions (0.12.1) http://jbtule.github.io/ComposableExtensions
 
 namespace Composable.Collections.Generic
 /// Corresponding static methods as functions for [`System.Collections.Generic.Comparer`](http://msdn.microsoft.com/en-us/library/system.collections.generic.comparer)
