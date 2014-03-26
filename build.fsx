@@ -58,7 +58,7 @@ let downloadNugetTo path =
         printf "Downloading NuGet..."
         use webClient = new System.Net.WebClient()
         fullPath |> Path.GetDirectoryName |> Directory.CreateDirectory |> ignore
-        webClient.DownloadFile("https://nuget.org/nuget.exe", path |> Path.GetFullPath)
+        webClient.DownloadFile("http://nuget.org/nuget.exe", path |> Path.GetFullPath)
         printfn "Done."
 
 let passedArgs = fsi.CommandLineArgs.[1..] |> Array.toList
