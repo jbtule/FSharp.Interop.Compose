@@ -12,12 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+module DocHelper
+
 #I "packages/FSharp.Compiler.Service/lib/net40/"
 #r "FSharp.Compiler.Service.dll"
 #I "packages/RazorEngine/lib/net40/"
+#r "RazorEngine.dll"
 #I "packages/FSharp.Formatting/lib/net40/"
 #r "FSharp.MetadataFormat.dll"
 #r "FSharp.Literate.dll"
+
 
 open System.IO
 open FSharp.MetadataFormat
@@ -25,57 +29,67 @@ open FSharp.Literate
 
 #load "Vars.fsx"
 
-let testRoot = Path.Combine(root, "docs", "build", "output")
+let generateDocs () =
+  let testRoot = Path.Combine(root, "docs", "build", "output")
 
-let projInfo =
-  [ "project-author",  authors |> String.concat ", "
-    "project-summary", description
-    "project-github",  gitHubProjectUrl
-    "project-nuget", nugetUrl
-    "project-name", projectName
-    "root" , projectUrl ]
+  let projInfo =
+    [ "project-author",  authors |> String.concat ", "
+      "project-summary", description
+      "project-github",  gitHubProjectUrl
+      "project-nuget", nugetUrl
+      "project-name", projectName
+      "root" , projectUrl ]
 
-let dll = Path.Combine(root, buildDir, "NET45", projectName + ".dll")
+  let dll = Path.Combine(root, buildDir, "NET45", projectName + ".dll")
 
-let outputDir = Path.Combine(docsBuildDir, "output")
+  let outputDir = Path.Combine(docsBuildDir, "output")
 
-Directory.CreateDirectory(outputDir)
+  Directory.CreateDirectory(outputDir) |> ignore
 
-let content = Directory.GetFiles(Path.Combine(docsDir, "content"))
-let outputContentDir = Path.Combine(outputDir, "content")
+  let content = Directory.GetFiles(Path.Combine(docsDir, "content"))
+  let outputContentDir = Path.Combine(outputDir, "content")
 
-Directory.CreateDirectory(outputContentDir)
+  Directory.CreateDirectory(outputContentDir)  |> ignore
 
-for file in content do
-    File.Copy(file, Path.Combine(outputContentDir, Path.GetFileName(file)))
-
-
-let options = "--reference:\"" + dll + "\""
+  for file in content do
+      File.Copy(file, Path.Combine(outputContentDir, Path.GetFileName(file)))
 
 
-let template =Path.Combine(docsDir, "templates", "docpage.cshtml")
-let templateDirs = [ Path.Combine(docsDir, "templates");
-        Path.Combine(docsDir, "templates", "reference") ]
-
-Literate.ProcessMarkdown(
-    Path.Combine(root,"Readme.md"),
-    templateFile = template,
-    output = Path.Combine(outputDir, "index.html"),
-    replacements = projInfo,
-    compilerOptions = options,
-    layoutRoots = templateDirs,
-    includeSource = true )
+  let options = "--reference:\"" + dll + "\""
 
 
+  let template =Path.Combine(docsDir, "templates", "docpage.cshtml")
+  let templateDirs = [ Path.Combine(docsDir, "templates");
+          Path.Combine(docsDir, "templates", "reference") ]
 
-//Api-docs
+  Literate.ProcessMarkdown(
+      Path.Combine(root,"Readme.md"),
+      templateFile = template,
+      output = Path.Combine(outputDir, "index.html"),
+      replacements = projInfo,
+      compilerOptions = options,
+      layoutRoots = templateDirs,
+      includeSource = true )
 
-let refDir = Path.Combine(outputDir, "reference")
+  Literate.ProcessMarkdown(
+      Path.Combine(root, "docs", "why.md"),
+      templateFile = template,
+      output = Path.Combine(outputDir, "why.html"),
+      replacements = projInfo,
+      compilerOptions = options,
+      layoutRoots = templateDirs,
+      includeSource = true )
 
-Directory.CreateDirectory(refDir)
-MetadataFormat.Generate(dll, refDir,
-    [ Path.Combine(docsDir, "templates");
-        Path.Combine(docsDir, "templates", "reference") ],
-        parameters = projInfo,
-        sourceRepo = githubSourceUrl,
-        sourceFolder = root)
+
+
+  //Api-docs
+  let refDir = Path.Combine(outputDir, "reference")
+
+  Directory.CreateDirectory(refDir) |> ignore
+  MetadataFormat.Generate(dll, refDir,
+      [ Path.Combine(docsDir, "templates");
+          Path.Combine(docsDir, "templates", "reference") ],
+          parameters = projInfo,
+          sourceRepo = githubSourceUrl,
+          sourceFolder = root)
+  ()

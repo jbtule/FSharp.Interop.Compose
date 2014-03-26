@@ -1,6 +1,8 @@
 [<AutoOpen>]
 module Vars
 
+open System.IO
+
 #load "CompilerHelper.fsx"
 
 // Properties

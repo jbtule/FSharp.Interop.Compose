@@ -15,6 +15,7 @@
 
 #load "Generate.fsx"
 #load "CompilerHelper.fsx"
+#load "Docs.fsx"
 
 #I "packages/FAKE/tools"
 #r "FakeLib.dll"
@@ -81,7 +82,7 @@ Target "Generate" (fun _ ->
                                 ]
 
     generateWrapper "System" "String" Reorder.noChange stringMethodFilters
-    
+
     let fileMethodFilters = [
                               IdentifyMethods.matchesSignature Static "WriteAllLines" ["System.String";"System.Collections.Generic.IEnumerable`1<System.String>"]
                               IdentifyMethods.matchesSignature Static "WriteAllLines" ["System.String";"System.Collections.Generic.IEnumerable`1<System.String>";"System.Text.Encoding"]
@@ -103,7 +104,7 @@ Target "Generate" (fun _ ->
         else
             upcast ps
 
-    let regexMethodFilter = 
+    let regexMethodFilter =
       [
         IdentifyMethods.matchesName Static "IsMatch"
         IdentifyMethods.matchesName Static "Match"
@@ -149,7 +150,7 @@ Target "Build" (fun _ ->
 
 Target "Docs" (fun _ ->
   //run doc script
-  FSIHelper.runBuildScriptAt root true "tools/Docs.fsx" [] [] |> ignore
+  DocHelper.generateDocs()
 
   let docOutput = Path.Combine(docsBuildDir, "output")
   let localRepo = Path.Combine(docsBuildDir,"gh-pages");
