@@ -2,9 +2,9 @@ language: objective-c
 
 env:
  global:
-  - EnableNuGetPackageRestore=true 
+  - EnableNuGetPackageRestore=true
  matrix:
-  - MONO_VERSION="3.2.6"
+  - MONO_VERSION="3.8.0"
 
 before_install:
  - wget "http://download.xamarin.com/MonoFrameworkMDK/Macx86/MonoFramework-MDK-${MONO_VERSION}.macos10.xamarin.x86.pkg"

@@ -143,27 +143,27 @@ let systemDllsResolver (systemDlls:string list,target:TargetFramework,version:FS
                     Path.Combine(fsharpSDK, ".NETPortable", "2.3.5.0") //Windows F# 3.0
                     Path.Combine(fsharpSDK30, "Runtime", ".NETPortable") //Windows F#3.0
                     Path.Combine(monoFSharpSDK, ".NETPortable", "2.3.5.0") //Mono F# 3.0
-                    "./tools/packages/FSharp.Core.Open.FS30/lib/portable-net45+sl5+win8/"  //Fallback
+                    "./tools/packages/FSharp.Core.4.3.0.0.Microsoft.Signed/lib/portable-net45+sl5+netcore45+MonoAndroid1+MonoTouch1/"  //Fallback
                 ]
             | PORTABLE_47,FS31 ->
                 [
                     Path.Combine(fsharpSDK, ".NETPortable", "2.3.5.1") //Windows F# 3.1
                     Path.Combine(monoFSharpSDK, ".NETPortable", "2.3.5.1") //Mono F# 3.1
-                    "./tools/packages/FSharp.Core.Open.FS31/lib/portable-net45+sl5+win8/"  //Fallback
+                    "./tools/packages/FSharp.Core.Microsoft.Signed/lib/portable-net45+sl5+netcore45+MonoAndroid1+MonoTouch1/"  //Fallback
                 ]
             | PORTABLE_7,FS30 -> raise (CompilerError "Portable Profile 7 and F# 3.0 not supported")
             | PORTABLE_7,FS31 ->
                 [
                     Path.Combine(fsharpSDK, ".NETCore", "3.3.1.0") //Windows F# 3.1
                     Path.Combine(monoFSharpSDK, ".NETCore", "3.3.1.0") //Mono F# 3.1
-                    "./tools/packages/FSharp.Core.Open.FS31/lib/portable-net45+win8/"  //Fallback
+                    "./tools/packages/FSharp.Core.Microsoft.Signed/lib/portable-net45+netcore45+MonoAndroid1+MonoTouch1/"  //Fallback
                 ]
             | NET35,FS30 ->
                 [
                     Path.Combine(fsharpSDK, ".NETFramework","v2.0", "2.3.0.0") //Windows F# 3.0 new loc
                     Path.Combine(fsharpSDK30, "Runtime", "v2.0") //Windows F# 3.0
                     //Path.Combine(sysDotNetLibPath, "2.0") //Mono what version though?
-                    "./tools/packages/FSharp.Core.Open.FS30/lib/net20/"  //Fallback
+                    "./tools/packages/FSharp.Core.4.3.0.0.Microsoft.Signed/lib/net35/"  //Fallback
                 ]
             | NET35,FS31 -> raise (CompilerError ".Net runtime v2.0 and F# 3.1 not supported")
             | NET40,FS30 ->
@@ -171,24 +171,24 @@ let systemDllsResolver (systemDlls:string list,target:TargetFramework,version:FS
                     Path.Combine(fsharpSDK, ".NETFramework","v4.0", "4.3.0.0") //Windows F# 3.0 new loc
                     Path.Combine(fsharpSDK30, "Runtime", "v4.0") //Windows F# 3.0
                     //Path.Combine(sysDotNetLibPath, "4.0") //Mono what version though?
-                    "./tools/packages/FSharp.Core.Open.FS30/lib/net40/"  //Fallback
+                    "./tools/packages/FSharp.Core.4.3.0.0.Microsoft.Signed/lib/net40/"  //Fallback
                 ]
             | NET40,FS31 ->
                 [
                     Path.Combine(fsharpSDK, ".NETFramework","v4.0", "4.3.1.0") //Windows F# 3.1
-                    "./tools/packages/FSharp.Core.Open.FS31/lib/net40/" //Fallback
+                    "./tools/packages/FSharp.Core.Microsoft.Signed/lib/net40/" //Fallback
                 ]
             | NET45,FS30 ->
                 [
                     Path.Combine(fsharpSDK, ".NETFramework","v4.0", "4.3.0.0") //Windows F# 3.0 new loc
                     Path.Combine(fsharpSDK30, "Runtime", "v4.0") //Windows F# 3.0
                     //Path.Combine(sysDotNetLibPath, "4.5") //Mono what version though?
-                    "./tools/packages/FSharp.Core.Open.FS30/lib/net40/" //Fallback
+                    "./tools/packages/FSharp.Core.4.3.0.0.Microsoft.Signed/lib/net45/" //Fallback
                 ]
             | NET45,FS31 ->
                 [
                     Path.Combine(fsharpSDK, ".NETFramework","v4.0", "4.3.1.0") //Windows F# 3.1
-                    "./tools/packages/FSharp.Core.Open.FS31/lib/net40/" //Fallback
+                    "./tools/packages/FSharp.Core.Microsoft.Signed/lib/net45/" //Fallback
                 ]
         |> List.map Path.GetFullPath
 
