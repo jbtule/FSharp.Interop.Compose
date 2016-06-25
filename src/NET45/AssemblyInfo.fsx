@@ -4,9 +4,9 @@ open System.Reflection
 [<assembly: AssemblyTitleAttribute("FSharp Composable Extension Functions")>]
 [<assembly: AssemblyDescriptionAttribute("NET45: Inline composable fsharp functions around BCL static methods. Supports F# 3.0 and later with .NET runtimes v2.0,v4.0, Sliverlight 5.0 and WinRT")>]
 [<assembly: AssemblyProductAttribute("ComposableExtensions")>]
-[<assembly: AssemblyVersionAttribute("0.12.1")>]
-[<assembly: AssemblyFileVersionAttribute("0.12.1")>]
+[<assembly: AssemblyVersionAttribute("0.13.0")>]
+[<assembly: AssemblyFileVersionAttribute("0.13.0")>]
 do ()
 
 module internal AssemblyVersionInformation =
-    let [<Literal>] Version = "0.12.1"
+    let [<Literal>] Version = "0.13.0"

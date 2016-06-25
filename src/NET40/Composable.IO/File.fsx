@@ -1,4 +1,4 @@
-// Generated with ComposableExtensions (0.12.1) http://jbtule.github.io/ComposableExtensions
+// Generated with ComposableExtensions (0.13.0) http://jbtule.github.io/ComposableExtensions
 
 namespace Composable.IO
 /// Corresponding static methods as functions for [`System.IO.File`](http://msdn.microsoft.com/en-us/library/system.io.file)
