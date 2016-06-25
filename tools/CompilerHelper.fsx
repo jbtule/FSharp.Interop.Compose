@@ -31,11 +31,7 @@ type TargetFramework =
     | NET40
     | NET35
     | PORTABLE_47
-    | PORTABLE_7
-
-type FSharpVersion =
-    | FS30
-    | FS31
+    | PORTABLE_259
 
 exception CompilerError of string
 
@@ -47,6 +43,27 @@ let defaultSystemDlls (target:TargetFramework) =
                 "System.dll"
                 "System.Core.dll"
                 "System.Numerics.dll"
+
+                "System.Collections.dll"
+                "System.Diagnostics.Debug.dll"
+                "System.Globalization.dll"
+                "System.IO.dll"
+                "System.Linq.dll"
+                "System.Linq.Expressions.dll"
+                "System.Linq.Queryable.dll"
+                "System.Net.dll"
+                "System.Net.Requests.dll"
+                "System.Reflection.dll"
+                "System.Reflection.Extensions.dll"
+                "System.Resources.ResourceManager.dll"
+                "System.Runtime.dll"
+                "System.Runtime.Extensions.dll"
+                "System.Runtime.Numerics.dll"
+                "System.Text.RegularExpressions.dll"
+                "System.Text.Encoding.dll"
+                "System.Threading.dll"
+                "System.Threading.Tasks.dll"
+                "System.Threading.Tasks.Parallel.dll"
             ]
         | PORTABLE_47 ->
             [
@@ -62,19 +79,19 @@ let defaultSystemDlls (target:TargetFramework) =
                 "System.dll"
                 "System.Core.dll"
             ]
-        | PORTABLE_7 ->
-            [
+        | PORTABLE_259 ->
+            [   
                 "mscorlib.dll"
                 "System.dll"
                 "System.Core.dll"
                 "System.Collections.dll"
-                "System.Collections.Concurrent.dll"
                 "System.Diagnostics.Debug.dll"
                 "System.Globalization.dll"
                 "System.IO.dll"
                 "System.Linq.dll"
                 "System.Linq.Expressions.dll"
                 "System.Linq.Queryable.dll"
+                "System.Net.dll"
                 "System.Net.Requests.dll"
                 "System.Reflection.dll"
                 "System.Reflection.Extensions.dll"
@@ -82,16 +99,17 @@ let defaultSystemDlls (target:TargetFramework) =
                 "System.Runtime.dll"
                 "System.Runtime.Extensions.dll"
                 "System.Runtime.Numerics.dll"
+                "System.Text.RegularExpressions.dll"
                 "System.Text.Encoding.dll"
                 "System.Threading.dll"
                 "System.Threading.Tasks.dll"
                 "System.Threading.Tasks.Parallel.dll"
             ]
 
-let systemTargetInfo (target:TargetFramework) ( version:FSharpVersion) =
-    (defaultSystemDlls target, target, version)
+let systemTargetInfo (target:TargetFramework) =
+    (defaultSystemDlls target, target)
 
-let systemDllsResolver (systemDlls:string list,target:TargetFramework,version:FSharpVersion) =
+let systemDllsResolver (systemDlls:string list,target:TargetFramework) =
     let programFiles = System.Environment.GetFolderPath(System.Environment.SpecialFolder.ProgramFilesX86)
     let msSDK = Path.Combine (programFiles, "Reference Assemblies","Microsoft","Framework");
     let fsharpSDK = Path.Combine (programFiles, "Reference Assemblies","Microsoft","FSharp");
@@ -108,6 +126,7 @@ let systemDllsResolver (systemDlls:string list,target:TargetFramework,version:FS
         match target with
             | NET45 ->
                 [
+                  Path.Combine(msSDK,".NETFramework", "v4.5.1", "Facades") 
                   Path.Combine(msSDK,".NETFramework", "v4.5.1") //Windows
                   Path.Combine(msSDK,".NETFramework", "v4.5") //Windows
                   Path.Combine(sysDotNetLibPath,"4.5") //Mono
@@ -123,72 +142,57 @@ let systemDllsResolver (systemDlls:string list,target:TargetFramework,version:FS
                   Path.Combine(sysDotNetLibPath,"3.5") //Mono
                   Path.Combine(sysDotNetLibPath,"2.0") //Mono
                 ]
+            | PORTABLE_259 ->
+                [
+                    Path.Combine(msSDK, ".NETPortable", "v4.5", "Profile", "Profile259") //Windows
+                    Path.Combine(sysDotNetLibPath,"xbuild-frameworks", ".NETPortable", "v4.5", "Profile", "Profile259") //Mono
+                ]
             | PORTABLE_47 ->
                 [
                     Path.Combine(msSDK, ".NETPortable", "v4.0", "Profile", "Profile47") //Windows
                     Path.Combine(sysDotNetLibPath,"xbuild-frameworks", ".NETPortable", "v4.0", "Profile", "Profile47") //Mono
                 ]
-            | PORTABLE_7 ->
-                [
-                    Path.Combine(msSDK, ".NETPortable", "v4.5", "Profile", "Profile7") //Windows
-                    Path.Combine(sysDotNetLibPath,"xbuild-frameworks", ".NETPortable", "v4.5", "Profile", "Profile7") //Mono
-                ]
         |> List.map Path.GetFullPath
 
 
     let fsharpPaths =
-        match target,version with
-            | PORTABLE_47,FS30 ->
-                [
+        match target with
+            | PORTABLE_47 ->
+                [   Path.Combine(fsharpSDK, ".NETPortable", "2.3.5.1") //Windows F# 3.1
+                    Path.Combine(monoFSharpSDK, ".NETPortable", "2.3.5.1") //Mono F# 3.1
                     Path.Combine(fsharpSDK, ".NETPortable", "2.3.5.0") //Windows F# 3.0
                     Path.Combine(fsharpSDK30, "Runtime", ".NETPortable") //Windows F#3.0
                     Path.Combine(monoFSharpSDK, ".NETPortable", "2.3.5.0") //Mono F# 3.0
+                    "./tools/packages/FSharp.Core.Microsoft.Signed/lib/portable-net45+sl5+netcore45+MonoAndroid1+MonoTouch1/"  //Fallback
                     "./tools/packages/FSharp.Core.4.3.0.0.Microsoft.Signed/lib/portable-net45+sl5+netcore45+MonoAndroid1+MonoTouch1/"  //Fallback
                 ]
-            | PORTABLE_47,FS31 ->
+            | PORTABLE_259 ->
                 [
-                    Path.Combine(fsharpSDK, ".NETPortable", "2.3.5.1") //Windows F# 3.1
-                    Path.Combine(monoFSharpSDK, ".NETPortable", "2.3.5.1") //Mono F# 3.1
-                    "./tools/packages/FSharp.Core.Microsoft.Signed/lib/portable-net45+sl5+netcore45+MonoAndroid1+MonoTouch1/"  //Fallback
+                    Path.Combine(fsharpSDK, ".NETPortable", "3.47.4.0") // F# 4.0
+                    "./tools/packages/FSharp.Core.Microsoft.Signed/lib/portable-net45+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1/"  //Fallback
                 ]
-            | PORTABLE_7,FS30 -> raise (CompilerError "Portable Profile 7 and F# 3.0 not supported")
-            | PORTABLE_7,FS31 ->
-                [
-                    Path.Combine(fsharpSDK, ".NETCore", "3.3.1.0") //Windows F# 3.1
-                    Path.Combine(monoFSharpSDK, ".NETCore", "3.3.1.0") //Mono F# 3.1
-                    "./tools/packages/FSharp.Core.Microsoft.Signed/lib/portable-net45+netcore45+MonoAndroid1+MonoTouch1/"  //Fallback
-                ]
-            | NET35,FS30 ->
+            | NET35 ->
                 [
                     Path.Combine(fsharpSDK, ".NETFramework","v2.0", "2.3.0.0") //Windows F# 3.0 new loc
                     Path.Combine(fsharpSDK30, "Runtime", "v2.0") //Windows F# 3.0
                     //Path.Combine(sysDotNetLibPath, "2.0") //Mono what version though?
                     "./tools/packages/FSharp.Core.4.3.0.0.Microsoft.Signed/lib/net35/"  //Fallback
                 ]
-            | NET35,FS31 -> raise (CompilerError ".Net runtime v2.0 and F# 3.1 not supported")
-            | NET40,FS30 ->
+            | NET40 ->
                 [
                     Path.Combine(fsharpSDK, ".NETFramework","v4.0", "4.3.0.0") //Windows F# 3.0 new loc
                     Path.Combine(fsharpSDK30, "Runtime", "v4.0") //Windows F# 3.0
                     //Path.Combine(sysDotNetLibPath, "4.0") //Mono what version though?
                     "./tools/packages/FSharp.Core.4.3.0.0.Microsoft.Signed/lib/net40/"  //Fallback
                 ]
-            | NET40,FS31 ->
+            | NET45 ->
                 [
                     Path.Combine(fsharpSDK, ".NETFramework","v4.0", "4.3.1.0") //Windows F# 3.1
-                    "./tools/packages/FSharp.Core.Microsoft.Signed/lib/net40/" //Fallback
-                ]
-            | NET45,FS30 ->
-                [
                     Path.Combine(fsharpSDK, ".NETFramework","v4.0", "4.3.0.0") //Windows F# 3.0 new loc
                     Path.Combine(fsharpSDK30, "Runtime", "v4.0") //Windows F# 3.0
                     //Path.Combine(sysDotNetLibPath, "4.5") //Mono what version though?
-                    "./tools/packages/FSharp.Core.4.3.0.0.Microsoft.Signed/lib/net45/" //Fallback
-                ]
-            | NET45,FS31 ->
-                [
-                    Path.Combine(fsharpSDK, ".NETFramework","v4.0", "4.3.1.0") //Windows F# 3.1
                     "./tools/packages/FSharp.Core.Microsoft.Signed/lib/net45/" //Fallback
+                    "./tools/packages/FSharp.Core.4.3.0.0.Microsoft.Signed/lib/net45/" //Fallback
                 ]
         |> List.map Path.GetFullPath
 
@@ -211,17 +215,17 @@ let systemDllsResolver (systemDlls:string list,target:TargetFramework,version:FS
         |> List.choose dllPath
         |> List.append [fsharpCore]
 
-let private fscTargetingHelper (systemDlls:string list) (target:TargetFramework option) (version:FSharpVersion option) (args:string list) =
+let private fscTargetingHelper (systemDlls:string list) (target:TargetFramework option)  (args:string list) =
 
     let extraArgs (t:TargetFramework) =
         ["--noframework"; sprintf "--define:%A" t]
             @ match t with
-                | PORTABLE_7 -> ["--targetprofile:netcore"]
+                | PORTABLE_259 -> ["--targetprofile:netcore"]
                 | __________ -> List.empty
 
     let moreArgs =
-        match target,version with
-        | Some(t),Some(v) -> systemDllsResolver (systemDlls, t, v)
+        match target with
+        | Some(t) -> systemDllsResolver (systemDlls, t)
                                 |> List.map (fun p-> sprintf "--reference:%s" p)
                                 |> List.append (extraArgs t)
         | _______________ -> List.empty
@@ -241,5 +245,6 @@ let private fscTargetingHelper (systemDlls:string list) (target:TargetFramework 
         raise (CompilerError "Compile Failed")
     ()
 
-let fsc = fscTargetingHelper [] None None
-let fscTargeting (systemDlls, target, version) = fscTargetingHelper systemDlls (Some(target)) (Some(version))
+let fsc = fscTargetingHelper [] None
+let fscTargeting (systemDlls, target) = 
+    fscTargetingHelper systemDlls (Some(target))

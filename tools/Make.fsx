@@ -54,7 +54,7 @@ Target "Generate" (fun _ ->
   for target in projectTargets do
     tracefn "Generating Source for %A" target
 
-    let sysfull = systemTargetInfo target projectFSharpVersion
+    let sysfull = systemTargetInfo target
                       |> systemDllsResolver
 
     let targetDir = Path.Combine(srcDir, sprintf "%A" target)
@@ -145,7 +145,7 @@ Target "Build" (fun _ ->
           ["-o"; output; "--doc:"+ xml; "--debug:pdbonly" ; "-a"; Path.Combine(targetDir, "AssemblyInfo.fsx")]
           @ files
 
-    fscTargeting (systemTargetInfo target projectFSharpVersion) compilerOpts
+    fscTargeting (systemTargetInfo target) compilerOpts
 )
 
 Target "Docs" (fun _ ->
@@ -182,7 +182,7 @@ Target "BuildTest" (fun _ ->
       [
         Path.Combine(targetBuildDir, "ComposableExtensions.dll")
         "./tools/packages/xunit/lib/net20/xunit.dll"
-        systemDllsResolver ([], runningTarget, projectFSharpVersion) |> Seq.head
+        systemDllsResolver ([], runningTarget) |> Seq.head
       ]
       @ match target with
           | NET35 ->
@@ -208,7 +208,7 @@ Target "BuildTest" (fun _ ->
         @ [sprintf "--define:TEST_%A" target;"-o";  testDll; "-a"]
         @ files
 
-    fscTargeting (systemTargetInfo runningTarget projectFSharpVersion) compilerOpts
+    fscTargeting (systemTargetInfo runningTarget) compilerOpts
 )
 
 Target "Test" (fun _ ->

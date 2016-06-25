@@ -14,7 +14,7 @@
 
 namespace Tools
 #r "packages/Mono.Cecil/lib/net40/Mono.Cecil.dll"
-#r "packages/FSharp.Compiler.Service/lib/net40/FSharp.Compiler.Service.dll"
+#r "packages/FSharp.Compiler.Service/lib/net45/FSharp.Compiler.Service.dll"
 
 open System.Reflection
 open System.IO
@@ -67,7 +67,24 @@ module IdentifyMethods =
 
 module Reformat =
 
-    let private keywordSet = Set(Microsoft.FSharp.Compiler.Lexhelp.Keywords.keywordNames)
+    let private keywordSet = 
+        Set([
+            "abstract";"and";"as";"assert";"asr"
+            "base";"begin";"class"; "const" ;"default"
+            "delegate"; "do"; "done" ;"downcast"
+            "downto"     ;  "elif"       ;  "else"       ;  "end"        ;  "exception"  ;  "extern"     ;  "false"      ;  "finally"    ;
+            "for"        ;  "fun"        ;  "function"   ;  "global"     ;  "if"         ;  "in"         ;  "inherit"    ;  "inline"     ;
+            "interface"  ;  "internal"   ;  "land"       ;  "lazy"       ;  "let"        ;  "lor"        ;  "lsl"        ;  "lsr"        ;  "lxor"       ;  "match"      ;
+            "member"     ;  "mod"        ;  "module"     ;  "mutable"    ;  "namespace"  ;  "new"        ;  "null"       ;  "of"         ;
+            "open"       ;  "or"         ;  "override"   ;  "private"    ;  "public"     ;  "rec"        ;  "return"     ;  "sig"        ;  "static"     ;  "struct"     ;
+            "then"       ;  "to"         ;  "true"       ;  "try"        ;  "type"       ;  "upcast"     ;  "use"        ;  "val"        ;
+            "void"       ;  "when"       ;  "while"      ;  "with"       ;  "yield"
+            "_" ;      "atomic"; "break";"checked" ;"component"; "constraint"; "constructor"; "continue"; 
+            "eager";"fixed"; "fori"; "functor";"include";            
+            "measure"; "method"; "mixin";       "object"; 
+            "parallel"; "params";  "process"; "protected"; "pure"; 
+            "recursive";"sealed"; "trait";  "tailcall"; "virtual"; "volatile"
+        ])
 
     let camelCase (x:string) = System.String.Join("", System.Char.ToLower(x.[0])::(x |> Seq.skip 1 |> Seq.toList))
 
