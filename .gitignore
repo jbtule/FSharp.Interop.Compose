@@ -2,3 +2,4 @@ build/
 packages/
 tools/NuGet/
 .DS_Store
+.fake/

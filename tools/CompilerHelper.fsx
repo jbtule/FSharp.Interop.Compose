@@ -237,8 +237,8 @@ let private fscTargetingHelper (systemDlls:string list) (target:TargetFramework 
     for e in errors do
         let errMsg = e.ToString()
         match e.Severity with
-            | Microsoft.FSharp.Compiler.Warning -> traceImportant errMsg
-            | Microsoft.FSharp.Compiler.Error -> traceError errMsg
+            | Microsoft.FSharp.Compiler.FSharpErrorSeverity.Warning -> traceImportant errMsg
+            | Microsoft.FSharp.Compiler.FSharpErrorSeverity.Error -> traceError errMsg
     if errorCode = 0 then
         trace "Compile Success"
     else

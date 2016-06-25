@@ -293,8 +293,8 @@ module Reorder =
 
 
     let private identifyReorder2 (ps:ParameterDefinition seq) =
-        let p1 = (ps |> Seq.nth 0)
-        let p2 = (ps |> Seq.nth 1)
+        let p1 = (ps |> Seq.item 0)
+        let p2 = (ps |> Seq.item 1)
 
         equivalentTypes p1.ParameterType p2.ParameterType
             || endsWithNumber.IsMatch(p1.Name) && endsWithNumber.IsMatch(p2.Name)

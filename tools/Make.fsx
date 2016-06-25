@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-#load "Generate.fsx"
 #load "CompilerHelper.fsx"
+#load "Vars.fsx"
+#load "Generate.fsx"
 #load "Docs.fsx"
 
 #I "packages/FAKE/tools"
@@ -25,7 +25,7 @@ open Fake.AssemblyInfoFile
 open System.IO
 open Tools
 
-#load "Vars.fsx"
+
 
 // Targets
 Target "CleanSrc" (fun _ ->
