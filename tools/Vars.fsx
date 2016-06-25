@@ -12,6 +12,7 @@ let docsDir = "docs"
 let docsBuildDir = Path.Combine(docsDir, "build")
 let testDir = "test"
 let testBuildDir = Path.Combine(testDir, "build")
+let nugetToolPath = Path.Combine("tools", "packages", "NuGet.CommandLine", "tools" , "NuGet.exe")
 let version = "0.13.0"
 let projectName = "ComposableExtensions"
 let projectUrl = "http://jbtule.github.io/ComposableExtensions"

@@ -26,7 +26,7 @@
   <file src="NET35/ComposableExtensions.xml" target="lib/net35" />
   <file src="PORTABLE_47/ComposableExtensions.dll" target="lib/portable-net45+sl5+win8" />
   <file src="PORTABLE_47/ComposableExtensions.xml" target="lib/portable-net45+sl5+win8" />
-  <file src="PORTABLE_259/ComposableExtensions.xml" target="lib/netstandard1.0" />
+  <file src="PORTABLE_259/ComposableExtensions.dll" target="lib/netstandard1.0" />
   <file src="PORTABLE_259/ComposableExtensions.xml" target="lib/netstandard1.0" />
  </files>
 </package>

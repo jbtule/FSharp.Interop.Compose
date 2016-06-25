@@ -326,7 +326,7 @@ module Generate =
             (methodSelectors:(MethodDefinition->bool) list) =
 
         if asmPath |> Seq.isEmpty then
-            ()
+            System.Collections.Generic.HashSet<AssemblyDefinition>()
         else
 
             let notObsolete = not << IdentifyMethods.isObsoleteMethod
@@ -375,6 +375,7 @@ module Generate =
 
 
             let list = [true,main;false,full]
+            let assemblyList = System.Collections.Generic.HashSet<AssemblyDefinition>()
             let nsp = Reformat.namespaceComposable namesp
             for (isMain, mlist) in list do
                 if not (Seq.isEmpty mlist) then
@@ -408,3 +409,5 @@ module Generate =
                         if not isMain then
                             writer.Write(String.replicate 4 " ")
                         writer.WriteLine(Reformat.methodWrapper orderedParameters m)
+                        assemblyList.Add(m.Module.Assembly) |> ignore
+            assemblyList
