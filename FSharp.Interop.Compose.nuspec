@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <id>@project@</id>
+    <version>@build.number@</version>
+    <title>FSharp.Interop.Compose</title>
+    <authors>@authors@</authors>
+    <owners>@authors@</owners>
+    <summary>@summary@</summary>
+    <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0.html</licenseUrl>
+    <projectUrl>https://github.com/jbtule/FSharp.Interop.Compose</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>@description@</description>
+    <releaseNotes>@releaseNotes@</releaseNotes>
+    <copyright>Copyright Jay Tuley 2014</copyright>
+    <tags>FSharp linq functional composition</tags>
+    @dependencies@
+    @references@
+  </metadata>
+ <files>
+  <file src="NET40/FSharp.Interop.Compose.dll" target="lib/net40" />
+  <file src="NET40/FSharp.Interop.Compose.xml" target="lib/net40" />
+  <file src="NET45/FSharp.Interop.Compose.dll" target="lib/net45" />
+  <file src="NET45/FSharp.Interop.Compose.xml" target="lib/net45" />
+  <file src="NET35/FSharp.Interop.Compose.dll" target="lib/net35" />
+  <file src="NET35/FSharp.Interop.Compose.xml" target="lib/net35" />
+  <file src="PORTABLE_47/FSharp.Interop.Compose.dll" target="lib/portable-net45+sl5+win8" />
+  <file src="PORTABLE_47/FSharp.Interop.Compose.xml" target="lib/portable-net45+sl5+win8" />
+  <file src="PORTABLE_259/FSharp.Interop.Compose.dll" target="lib/netstandard1.0" />
+  <file src="PORTABLE_259/FSharp.Interop.Compose.xml" target="lib/netstandard1.0" />
+ </files>
+</package>

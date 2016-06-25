@@ -197,15 +197,15 @@ module Reformat =
     let csharpCastFunc (x:ParameterDefinition) =
         match x.ParameterType with
             | CSharpFunc -> sprintf "%s(%s)" (typeNameFixer false x.ParameterType) x.Name
-            | CSharpExpr -> sprintf "ComposableExtensions.Quotations.toExpression<%s>(%s)"
+            | CSharpExpr -> sprintf "FSharp.Interop.Compose.Quotations.toExpression<%s>(%s)"
                                             (typeNameFixer false (unwrapExpressionType x)) x.Name
             | __________ -> x.Name
 
     let namespaceComposable (x:string) =
         if x.StartsWith("System") && x <> "System" then
-            x.Replace("System", "Composable")
+            x.Replace("System", "FSharp.Interop.Compose")
         else
-            sprintf "Composable.%s" x
+            sprintf "FSharp.Interop.Compose.%s" x
 
     let rec private matchesGenericParameter (matcher:GenericParameter) (t:TypeReference) =
         if t.IsGenericParameter then

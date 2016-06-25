@@ -190,7 +190,7 @@ Target "BuildTest" (fun _ ->
 
     let refdlls =
       [
-        Path.Combine(targetBuildDir, "ComposableExtensions.dll")
+        Path.Combine(targetBuildDir, "FSharp.Interop.Compose.dll")
         "./tools/packages/xunit/lib/net20/xunit.dll"
         systemDllsResolver ([], runningTarget) |> Seq.head
       ]

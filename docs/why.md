@@ -168,7 +168,7 @@ Examples
     let inline orderByDescending (keySelector:'TSource->'TKey) source = System.Linq.Enumerable.OrderByDescending(source, System.Func<'TSource, 'TKey>(keySelector))
     let inline thenBy (keySelector:'TSource->'TKey) source = System.Linq.Enumerable.ThenBy(source, System.Func<'TSource, 'TKey>(keySelector))
 
-And this is the basis for ComposableExtensions we can make .NET BCL api's
+And this is the basis for FSharp.Interop.Compose we can make .NET BCL api's
 that have idiomatic F# behavior look, read, write like idiomatic F# api's.
 
     open Composable.Linq
