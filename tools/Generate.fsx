@@ -13,7 +13,7 @@
 // limitations under the License.
 
 namespace Tools
-#r "packages/Mono.Cecil/lib/net40/Mono.Cecil.dll"
+#r "packages/Mono.Cecil/lib/net45/Mono.Cecil.dll"
 #r "packages/FSharp.Compiler.Service/lib/net45/FSharp.Compiler.Service.dll"
 
 open System.Reflection
@@ -98,7 +98,10 @@ module Reformat =
             ((slimGenericName m.Name).ToLower())
 
     let (|CSharpFunc|CSharpExpr|CSharpOther|) (x:TypeReference) =
-        let rType = x.Resolve()
+        let rType =
+                try 
+                    x.Resolve()
+                with _ -> null
         if rType <> null
               && rType.BaseType <> null
               && rType.BaseType.FullName |> Helpers.hasNamePrefix "System.MulticastDelegate"  then
@@ -114,7 +117,10 @@ module Reformat =
         (x :?> GenericInstanceType).GenericArguments
 
     let private getFuncParameters (x:TypeReference) =
-        let rType = x.Resolve()
+        let rType =
+            try 
+                x.Resolve()
+            with _ -> null
         if rType = null then //PCL_47
           (x :?> GenericInstanceType).GenericArguments |> Seq.toList
         else
