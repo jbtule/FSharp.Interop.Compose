@@ -49,6 +49,7 @@ To build on Mono [![Build Status](https://travis-ci.org/jbtule/FSharp.Interop.Co
 
     ./build.fsx
 
-or on Windows [![Build status](https://ci.appveyor.com/api/projects/status/6lv8sy1d21xwajwc/branch/master)](https://ci.appveyor.com/project/jbtule/FSharp.Interop.Compose)
+or on Windows [![Build status](https://ci.appveyor.com/api/projects/status/15onhtma28is6dr5?svg=true)](https://ci.appveyor.com/project/jbtule/fsharp-interop-compose)
+
 
     fsi --exec build.fsx
