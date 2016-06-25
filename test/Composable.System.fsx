@@ -19,7 +19,7 @@ module String =
         "hello" |> String.endsWith "lo" |> should be True
         "hello" |> String.endsWith "he" |> should be False
 
-#if TEST_PORTABLE_47
+#if TEST_PORTABLE_47 || TEST_PORTABLE_259
     [<Fact>]
     let endsWithFull () =
         "HELLO"
@@ -109,7 +109,7 @@ module String =
            |> String.Full.substring 4 3
            |> should equal "two"
 
-#if TEST_PORTABLE_47
+#if TEST_PORTABLE_47 || TEST_PORTABLE_259
     [<Fact>]
     let startsWithFull () =
         ["One";"Two";"Three"]
