@@ -1,4 +1,4 @@
-#!/usr/bin/env fsharpi --exec
+#!/usr/bin/env fsharpi --define:mono_posix --exec
 (*
  * CrossPlatform FSharp Makefile bootstraper - jay+code@tuley.name
  *
