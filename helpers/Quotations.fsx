@@ -13,7 +13,7 @@
 // limitations under the License.
 
 ///Quotations Helpers
-module ComposableExtensions.Quotations
+module FSharp.Interop.Compose.Quotations
 
 ///Convert a Quotation to a C# expression
 let toExpression<'TDel> (expr:Quotations.Expr) =

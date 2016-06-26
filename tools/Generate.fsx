@@ -13,8 +13,8 @@
 // limitations under the License.
 
 namespace Tools
-#r "packages/Mono.Cecil/lib/net40/Mono.Cecil.dll"
-#r "packages/FSharp.Compiler.Service/lib/net40/FSharp.Compiler.Service.dll"
+#r "packages/Mono.Cecil/lib/net45/Mono.Cecil.dll"
+#r "packages/FSharp.Compiler.Service/lib/net45/FSharp.Compiler.Service.dll"
 
 open System.Reflection
 open System.IO
@@ -67,7 +67,24 @@ module IdentifyMethods =
 
 module Reformat =
 
-    let private keywordSet = Set(Microsoft.FSharp.Compiler.Lexhelp.Keywords.keywordNames)
+    let private keywordSet = 
+        Set([
+            "abstract";"and";"as";"assert";"asr"
+            "base";"begin";"class"; "const" ;"default"
+            "delegate"; "do"; "done" ;"downcast"
+            "downto"     ;  "elif"       ;  "else"       ;  "end"        ;  "exception"  ;  "extern"     ;  "false"      ;  "finally"    ;
+            "for"        ;  "fun"        ;  "function"   ;  "global"     ;  "if"         ;  "in"         ;  "inherit"    ;  "inline"     ;
+            "interface"  ;  "internal"   ;  "land"       ;  "lazy"       ;  "let"        ;  "lor"        ;  "lsl"        ;  "lsr"        ;  "lxor"       ;  "match"      ;
+            "member"     ;  "mod"        ;  "module"     ;  "mutable"    ;  "namespace"  ;  "new"        ;  "null"       ;  "of"         ;
+            "open"       ;  "or"         ;  "override"   ;  "private"    ;  "public"     ;  "rec"        ;  "return"     ;  "sig"        ;  "static"     ;  "struct"     ;
+            "then"       ;  "to"         ;  "true"       ;  "try"        ;  "type"       ;  "upcast"     ;  "use"        ;  "val"        ;
+            "void"       ;  "when"       ;  "while"      ;  "with"       ;  "yield"
+            "_" ;      "atomic"; "break";"checked" ;"component"; "constraint"; "constructor"; "continue"; 
+            "eager";"fixed"; "fori"; "functor";"include";            
+            "measure"; "method"; "mixin";       "object"; 
+            "parallel"; "params";  "process"; "protected"; "pure"; 
+            "recursive";"sealed"; "trait";  "tailcall"; "virtual"; "volatile"
+        ])
 
     let camelCase (x:string) = System.String.Join("", System.Char.ToLower(x.[0])::(x |> Seq.skip 1 |> Seq.toList))
 
@@ -81,7 +98,10 @@ module Reformat =
             ((slimGenericName m.Name).ToLower())
 
     let (|CSharpFunc|CSharpExpr|CSharpOther|) (x:TypeReference) =
-        let rType = x.Resolve()
+        let rType =
+                try 
+                    x.Resolve()
+                with _ -> null
         if rType <> null
               && rType.BaseType <> null
               && rType.BaseType.FullName |> Helpers.hasNamePrefix "System.MulticastDelegate"  then
@@ -97,7 +117,10 @@ module Reformat =
         (x :?> GenericInstanceType).GenericArguments
 
     let private getFuncParameters (x:TypeReference) =
-        let rType = x.Resolve()
+        let rType =
+            try 
+                x.Resolve()
+            with _ -> null
         if rType = null then //PCL_47
           (x :?> GenericInstanceType).GenericArguments |> Seq.toList
         else
@@ -180,15 +203,15 @@ module Reformat =
     let csharpCastFunc (x:ParameterDefinition) =
         match x.ParameterType with
             | CSharpFunc -> sprintf "%s(%s)" (typeNameFixer false x.ParameterType) x.Name
-            | CSharpExpr -> sprintf "ComposableExtensions.Quotations.toExpression<%s>(%s)"
+            | CSharpExpr -> sprintf "FSharp.Interop.Compose.Quotations.toExpression<%s>(%s)"
                                             (typeNameFixer false (unwrapExpressionType x)) x.Name
             | __________ -> x.Name
 
     let namespaceComposable (x:string) =
         if x.StartsWith("System") && x <> "System" then
-            x.Replace("System", "Composable")
+            x.Replace("System", "FSharp.Interop.Compose")
         else
-            sprintf "Composable.%s" x
+            sprintf "FSharp.Interop.Compose.%s" x
 
     let rec private matchesGenericParameter (matcher:GenericParameter) (t:TypeReference) =
         if t.IsGenericParameter then
@@ -276,8 +299,8 @@ module Reorder =
 
 
     let private identifyReorder2 (ps:ParameterDefinition seq) =
-        let p1 = (ps |> Seq.nth 0)
-        let p2 = (ps |> Seq.nth 1)
+        let p1 = (ps |> Seq.item 0)
+        let p2 = (ps |> Seq.item 1)
 
         equivalentTypes p1.ParameterType p2.ParameterType
             || endsWithNumber.IsMatch(p1.Name) && endsWithNumber.IsMatch(p2.Name)
@@ -309,7 +332,7 @@ module Generate =
             (methodSelectors:(MethodDefinition->bool) list) =
 
         if asmPath |> Seq.isEmpty then
-            ()
+            System.Collections.Generic.HashSet<AssemblyDefinition>()
         else
 
             let notObsolete = not << IdentifyMethods.isObsoleteMethod
@@ -358,6 +381,7 @@ module Generate =
 
 
             let list = [true,main;false,full]
+            let assemblyList = System.Collections.Generic.HashSet<AssemblyDefinition>()
             let nsp = Reformat.namespaceComposable namesp
             for (isMain, mlist) in list do
                 if not (Seq.isEmpty mlist) then
@@ -391,3 +415,5 @@ module Generate =
                         if not isMain then
                             writer.Write(String.replicate 4 " ")
                         writer.WriteLine(Reformat.methodWrapper orderedParameters m)
+                        assemblyList.Add(m.Module.Assembly) |> ignore
+            assemblyList

@@ -16,12 +16,13 @@ module DocHelper
 
 #I "packages/FSharp.Compiler.Service/lib/net40/"
 #r "FSharp.Compiler.Service.dll"
-#I "packages/RazorEngine/lib/net40/"
-#r "RazorEngine.dll"
+#I "packages/FSharpVSPowerTools.Core/lib/net45"
+#r "FSharpVSPowerTools.Core.dll"
 #I "packages/FSharp.Formatting/lib/net40/"
+#r "RazorEngine.dll"
 #r "FSharp.MetadataFormat.dll"
 #r "FSharp.Literate.dll"
-
+#r "FSharp.CodeFormat.dll"
 
 open System.IO
 open FSharp.MetadataFormat
@@ -58,7 +59,7 @@ let generateDocs () =
   let options = "--reference:\"" + dll + "\""
 
 
-  let template =Path.Combine(docsDir, "templates", "docpage.cshtml")
+  let template = "docpage.cshtml"
   let templateDirs = [ Path.Combine(docsDir, "templates");
           Path.Combine(docsDir, "templates", "reference") ]
 

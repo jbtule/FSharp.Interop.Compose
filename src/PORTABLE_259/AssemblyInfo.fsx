@@ -2,7 +2,7 @@
 open System.Reflection
 
 [<assembly: AssemblyTitleAttribute("FSharp.Interop.Compose Extension Functions")>]
-[<assembly: AssemblyDescriptionAttribute("PORTABLE_47: Inline composable fsharp functions around BCL static methods. Supports .net 3.5 through .net Standard")>]
+[<assembly: AssemblyDescriptionAttribute("PORTABLE_259: Inline composable fsharp functions around BCL static methods. Supports .net 3.5 through .net Standard")>]
 [<assembly: AssemblyProductAttribute("FSharp.Interop.Compose")>]
 [<assembly: AssemblyVersionAttribute("1.14.0")>]
 [<assembly: AssemblyFileVersionAttribute("1.14.0")>]

@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-#load "Generate.fsx"
 #load "CompilerHelper.fsx"
+#load "Vars.fsx"
+#load "Generate.fsx"
 #load "Docs.fsx"
 
 #I "packages/FAKE/tools"
@@ -23,9 +23,10 @@
 open Fake
 open Fake.AssemblyInfoFile
 open System.IO
+open System.Collections.Generic
 open Tools
 
-#load "Vars.fsx"
+let assemblyRefsByPlatform = Dictionary<TargetFramework,HashSet<string*string>>()
 
 // Targets
 Target "CleanSrc" (fun _ ->
@@ -54,15 +55,21 @@ Target "Generate" (fun _ ->
   for target in projectTargets do
     tracefn "Generating Source for %A" target
 
-    let sysfull = systemTargetInfo target projectFSharpVersion
+    let sysfull = systemTargetInfo target
                       |> systemDllsResolver
 
     let targetDir = Path.Combine(srcDir, sprintf "%A" target)
 
     Directory.CreateDirectory targetDir |> ignore
-
-    let generateWrapper  = Generate.writeWrappers header targetDir sysfull
-    let generateQueryWrapper = Generate.writeWrappers queryHeader targetDir sysfull
+    let assemblyRef = HashSet<string * string>()
+    let generateWrapper nsp nm refunc idfun =
+            let results = Generate.writeWrappers header targetDir sysfull nsp nm refunc idfun
+            for r in results do
+                assemblyRef.Add(r.Name.Name, r.Name.Version.ToString()) |> ignore
+    let generateQueryWrapper nsp nm refunc idfun = 
+            let results = Generate.writeWrappers queryHeader targetDir sysfull nsp nm refunc idfun
+            for r in results do
+                assemblyRef.Add(r.Name.Name, r.Name.Version.ToString()) |> ignore
 
     generateWrapper "System.Linq" "Enumerable" Reorder.extensionMethodReorder [IdentifyMethods.isExtensionMethod]
     generateWrapper "System.Linq" "ParallelEnumerable" Reorder.extensionMethodReorder [IdentifyMethods.isExtensionMethod]
@@ -115,6 +122,9 @@ Target "Generate" (fun _ ->
 
     generateWrapper "System.Text.RegularExpressions" "Regex" regexReorder regexMethodFilter
 
+
+    assemblyRefsByPlatform.Add(target, assemblyRef)
+
     CreateFSharpAssemblyInfo (Path.Combine(targetDir, "AssemblyInfo.fsx"))
           [Attribute.Title title
            Attribute.Description (sprintf "%A: %s" target description)
@@ -145,7 +155,7 @@ Target "Build" (fun _ ->
           ["-o"; output; "--doc:"+ xml; "--debug:pdbonly" ; "-a"; Path.Combine(targetDir, "AssemblyInfo.fsx")]
           @ files
 
-    fscTargeting (systemTargetInfo target projectFSharpVersion) compilerOpts
+    fscTargeting (systemTargetInfo target) compilerOpts
 )
 
 Target "Docs" (fun _ ->
@@ -180,9 +190,9 @@ Target "BuildTest" (fun _ ->
 
     let refdlls =
       [
-        Path.Combine(targetBuildDir, "ComposableExtensions.dll")
+        Path.Combine(targetBuildDir, "FSharp.Interop.Compose.dll")
         "./tools/packages/xunit/lib/net20/xunit.dll"
-        systemDllsResolver ([], runningTarget, projectFSharpVersion) |> Seq.head
+        systemDllsResolver ([], runningTarget) |> Seq.head
       ]
       @ match target with
           | NET35 ->
@@ -208,7 +218,7 @@ Target "BuildTest" (fun _ ->
         @ [sprintf "--define:TEST_%A" target;"-o";  testDll; "-a"]
         @ files
 
-    fscTargeting (systemTargetInfo runningTarget projectFSharpVersion) compilerOpts
+    fscTargeting (systemTargetInfo runningTarget) compilerOpts
 )
 
 Target "Test" (fun _ ->
@@ -235,13 +245,29 @@ Target "Deploy" (fun _ ->
 
     NuGet (fun p ->
         {p with
+            ToolPath = nugetToolPath
             Authors = authors
             Project = projectName
             OutputPath = buildDir
             WorkingDir = buildDir
             Description = description
             Version = version
-            Publish = false })
+            Publish = false 
+            Dependencies = []
+            DependenciesByFramework = 
+               [
+                   { FrameworkVersion="net35"; Dependencies=[]}
+                   { FrameworkVersion="net40"; Dependencies=[]}
+                   { FrameworkVersion="net45"; Dependencies=[]}
+                   { FrameworkVersion="portable-net45+sl5+win8"; Dependencies=[]}
+
+                   {
+                        FrameworkVersion ="netstandard1.0"
+                        Dependencies = assemblyRefsByPlatform.[PORTABLE_259]
+                            |> Seq.toList
+                   }
+                ]
+            })
             (projectName + ".nuspec")
 )
 
