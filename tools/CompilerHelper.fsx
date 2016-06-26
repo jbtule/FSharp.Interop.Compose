@@ -129,17 +129,22 @@ let systemDllsResolver (systemDlls:string list,target:TargetFramework) =
                   Path.Combine(msSDK,".NETFramework", "v4.5.1", "Facades") 
                   Path.Combine(msSDK,".NETFramework", "v4.5.1") //Windows
                   Path.Combine(msSDK,".NETFramework", "v4.5") //Windows
+                  Path.Combine(sysDotNetLibPath,"4.5-api", "Facades") 
+                  Path.Combine(sysDotNetLibPath,"4.5-api") //Mono
                   Path.Combine(sysDotNetLibPath,"4.5", "Facades") 
                   Path.Combine(sysDotNetLibPath,"4.5") //Mono
                 ]
             | NET40 ->
                 [
                   Path.Combine(msSDK,".NETFramework","v4.0") //Windows
+                  Path.Combine(sysDotNetLibPath,"4.0-api") //Mono
                   Path.Combine(sysDotNetLibPath,"4.0") //Mono
                 ]
             | NET35 ->
                 [
                   Path.Combine(msSDK,".NETFramework","v3.5", "Profile", "Client") //Windows
+                  Path.Combine(sysDotNetLibPath,"3.5-api") //Mono
+                  Path.Combine(sysDotNetLibPath,"2.0-api") //Mono
                   Path.Combine(sysDotNetLibPath,"3.5") //Mono
                   Path.Combine(sysDotNetLibPath,"2.0") //Mono
                 ]
