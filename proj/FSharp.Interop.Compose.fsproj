@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
   <PropertyGroup>
-    <TargetFrameworks>net35;net40;net45;portable-net45+sl5+win8;portable-net45+win8+wpa81+wp8;netstandard1.6;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>net35;net40;net45;portable-net45+sl5+win8;portable-net45+win8+wpa81+wp8;netstandard2.0</TargetFrameworks>
     <Description>Inline composable fsharp functions around BCL static methods. Supports .net 3.5 through .net Standard</Description>
     <Authors>Jay Tuley</Authors>
     <Copyright>Copyright 2014-2018 Jay Tuley</Copyright>
@@ -48,13 +48,8 @@
     <PackageReference Include="FSharp.Core" Version="4.1.*" PrivateAssets="all"  />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)'=='netstandard1.6'">
-    <Compile Include="../src/netstandard1.6/**/*.fs" />
-    <PackageReference Include="FSharp.Core" Version="4.*" PrivateAssets="all"  />
-  </ItemGroup>
-  
   <ItemGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
-    <Compile Include="../src/netstandard1.6/**/*.fs" />
+    <Compile Include="../src/netstd_2_0/**/*.fs" />
     <PackageReference Include="FSharp.Core" Version="4.*" PrivateAssets="all"  />
   </ItemGroup>
  

@@ -25,4 +25,4 @@ let description = "Inline composable fsharp functions around BCL static methods.
 let authors = ["Jay Tuley"]
 //let guid = "68ebe4ce-c63b-478d-a084-c5e36b3e8091"
 let root = System.Environment.CurrentDirectory
-let projectTargets = [ NET45; NET40; NET35; PORTABLE_47; PORTABLE_259 ]
+let projectTargets = [ NET45; NET40; NET35; PORTABLE_47; PORTABLE_259; NETSTD_2_0 ]

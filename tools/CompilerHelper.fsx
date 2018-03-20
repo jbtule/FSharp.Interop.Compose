@@ -21,8 +21,6 @@ module CompilerHelper
 #I "packages/FAKE/tools"
 #r "FakeLib.dll"
 
-open Microsoft.FSharp.Compiler.SimpleSourceCodeServices
-open Fake.TraceHelper
 open System.IO
 open System.Reflection
 
@@ -32,6 +30,7 @@ type TargetFramework =
     | NET35
     | PORTABLE_47
     | PORTABLE_259
+    | NETSTD_2_0
 
 exception CompilerError of string
 
@@ -105,6 +104,10 @@ let defaultSystemDlls (target:TargetFramework) =
                 "System.Threading.Tasks.dll"
                 "System.Threading.Tasks.Parallel.dll"
             ]
+        | NETSTD_2_0 ->
+            [   
+                "netstandard.dll"
+            ]
 
 let systemTargetInfo (target:TargetFramework) =
     (defaultSystemDlls target, target)
@@ -124,6 +127,10 @@ let systemDllsResolver (systemDlls:string list,target:TargetFramework) =
     let monoFSharpSDK = Path.Combine (sysDotNetLibPath, "Reference Assemblies","Microsoft","FSharp");
     let allStdPaths =
         match target with
+            | NETSTD_2_0 ->
+                [
+                    "./tools/std20/packages/NETStandard.Library/build/netstandard2.0/ref/"
+                ]
             | NET45 ->
                 [
                   Path.Combine(msSDK,".NETFramework", "v4.5.1", "Facades") 
@@ -163,6 +170,10 @@ let systemDllsResolver (systemDlls:string list,target:TargetFramework) =
 
     let fsharpPaths =
         match target with
+            | NETSTD_2_0 ->
+                [
+                   "./tools/std20/packages/FSharp.Core/lib/netstandard1.6/"
+                ]
             | PORTABLE_47 ->
                 [   Path.Combine(fsharpSDK, ".NETPortable", "2.3.5.1") //Windows F# 3.1
                     Path.Combine(monoFSharpSDK, ".NETPortable", "2.3.5.1") //Mono F# 3.1
@@ -221,36 +232,3 @@ let systemDllsResolver (systemDlls:string list,target:TargetFramework) =
         |> List.choose dllPath
         |> List.append [fsharpCore]
 
-let private fscTargetingHelper (systemDlls:string list) (target:TargetFramework option)  (args:string list) =
-
-    let extraArgs (t:TargetFramework) =
-        ["--noframework"; sprintf "--define:%A" t]
-            @ match t with
-                | PORTABLE_259 -> ["--targetprofile:netcore"]
-                | __________ -> List.empty
-
-    let moreArgs =
-        match target with
-        | Some(t) -> systemDllsResolver (systemDlls, t)
-                                |> List.map (fun p-> sprintf "--reference:%s" p)
-                                |> List.append (extraArgs t)
-        | _______________ -> List.empty
-
-    let compilerOpts = ["fsc.exe"] @ moreArgs @ args
-    log (compilerOpts|> String.concat " ")
-    let scs = SimpleSourceCodeServices()
-    let errors,errorCode = scs.Compile(compilerOpts |> List.toArray)
-    for e in errors do
-        let errMsg = e.ToString()
-        match e.Severity with
-            | Microsoft.FSharp.Compiler.FSharpErrorSeverity.Warning -> traceImportant errMsg
-            | Microsoft.FSharp.Compiler.FSharpErrorSeverity.Error -> traceError errMsg
-    if errorCode = 0 then
-        trace "Compile Success"
-    else
-        raise (CompilerError "Compile Failed")
-    ()
-
-let fsc = fscTargetingHelper [] None
-let fscTargeting (systemDlls, target) = 
-    fscTargetingHelper systemDlls (Some(target))

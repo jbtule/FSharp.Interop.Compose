@@ -57,7 +57,7 @@ let downloadNugetTo path =
         printf "Downloading NuGet..."
         use webClient = new System.Net.WebClient()
         fullPath |> Path.GetDirectoryName |> Directory.CreateDirectory |> ignore
-        webClient.DownloadFile("http://nuget.org/nuget.exe", path |> Path.GetFullPath)
+        webClient.DownloadFile("https://dist.nuget.org/win-x86-commandline/latest/nuget.exe", path |> Path.GetFullPath)
         printfn "Done."
 
 let passedArgs = fsi.CommandLineArgs.[1..] |> Array.toList
@@ -69,6 +69,11 @@ downloadNugetTo "tools/NuGet/NuGet.exe"
 execAt
     "tools/"
     "tools/NuGet/NuGet.exe"
-    ["install"; "packages.config"; "-OutputDirectory packages"; "-ExcludeVersion"]
+    ["install"; "-OutputDirectory packages"; "-ExcludeVersion"]
+
+execAt
+    "tools/std20"
+    "tools/NuGet/NuGet.exe"
+    ["install"; "-OutputDirectory packages"; "-ExcludeVersion"]
 
 #load "tools/SimpleMake.fsx"
