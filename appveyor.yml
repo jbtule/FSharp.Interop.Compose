@@ -1,15 +1,21 @@
-os: Windows Server 2012
+image: Visual Studio 2017
+
+configuration: Debug
 
 environment:
-  EnableNuGetPackageRestore: true
+  vsuffix: alpha$(APPVEYOR_BUILD_NUMBER)
+  githubdeploy: false
+
+install:
+  - ps: nuget install FSharp.Compiler.Tools -ExcludeVersion -OutputDirectory extra
+
+build: off
 
 build_script:
-  - "set PATH=%PATH%;C:\\Program Files (x86)\\Microsoft SDKs\\F#\\4.0\\Framework\\v4.0\\"
-  - fsi --exec build.fsx BuildTest
+  - cmd: set PATH=%PATH%;%APPVEYOR_BUILD_FOLDER%\extra\FSharp.Compiler.Tools\tools\
+  - cmd: fsi --exec ./build.fsx
 
-test:
-  assemblies:
-    - test\build\NET45\Test-NET45.dll
-    - test\build\NET40\Test-NET40.dll
-    - test\build\NET35\Test-NET35.dll
-    - test\build\PORTABLE_47\Test-PORTABLE_47.dll
+test: off
+
+artifacts:
+  - path: '**\bin\*\*.nupkg'
