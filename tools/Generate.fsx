@@ -420,7 +420,7 @@ module Generate =
                         writer.Write(String.replicate 4 " ")
                         if not isMain then
                             writer.Write(String.replicate 4 " ")
-                        writer.WriteLine(sprintf "/// Calls [`%s(%s)`](http://msdn.microsoft.com/en-us/library/%s)"
+                        writer.WriteLine(sprintf "/// Calls [`%s(%s)`](https://docs.microsoft.com/en-us/dotnet/api/%s)"
                                             (Reformat.explictGenericParameterName [] (fun x->x) m)
                                             csharpParams
                                             (Reformat.docNameMethod m))
