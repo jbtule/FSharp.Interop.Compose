@@ -10,6 +10,19 @@ open Tools
 let assemblyRefsByPlatform = Dictionary<TargetFramework,HashSet<string*string>>()
 
 
+let clean path =
+  printfn "Cleaning %s." path
+
+  path 
+   |> Directory.GetFiles
+   |> Array.map (fun x -> printfn "Delete file %s." x; x)
+   |> Array.iter File.Delete
+
+  path 
+   |> Directory.GetDirectories
+   |> Array.map (fun x -> printfn "Delete Dir %s." x; x)
+   |> Array.iter (fun x->Directory.Delete(x, recursive = true))
+
 let generate () = 
   let br = System.Environment.NewLine
   let header  = sprintf "// Generated with %s (%s) %s" projectName version projectUrl
@@ -91,4 +104,4 @@ let generate () =
     assemblyRefsByPlatform.Add(target, assemblyRef)
 
 
-generate ()
+  

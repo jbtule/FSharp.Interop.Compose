@@ -9,7 +9,7 @@ open System.IO
 let buildDir = "build"
 let srcDir = "src"
 let docsDir = "docs"
-let docsBuildDir = Path.Combine(docsDir, "build")
+let docsBuildDir = Path.Combine(docsDir, "www")
 let testDir = "test"
 let testBuildDir = Path.Combine(testDir, "build")
 let nugetToolPath = Path.Combine("tools", "packages", "NuGet.CommandLine", "tools" , "NuGet.exe")

@@ -60,7 +60,7 @@ let downloadNugetTo path =
         webClient.DownloadFile("https://dist.nuget.org/win-x86-commandline/latest/nuget.exe", path |> Path.GetFullPath)
         printfn "Done."
 
-let passedArgs = fsi.CommandLineArgs.[1..] |> Array.toList
+let passedArg = fsi.CommandLineArgs.[1..] |> Array.tryHead
 
 (* execution script customize below *)
 
@@ -77,3 +77,31 @@ execAt
     ["install"; "-OutputDirectory packages"; "-ExcludeVersion"]
 
 #load "tools/SimpleMake.fsx"
+
+type actions = { gen:bool; docs:bool; build:bool; clean:bool; test:bool }
+
+let choice =
+    match passedArg with 
+        | Some(x) when x.Equals("Generate", StringComparison.InvariantCultureIgnoreCase) ->
+            printfn "Generate target";
+            { gen= true; docs=false; build =false; clean = true; test= false}
+        | Some(x) when x.Equals("Clean", StringComparison.InvariantCultureIgnoreCase) ->
+            printfn "Clean target";
+            { gen= false; docs=false; build =false; clean = true; test= false}
+        | _ -> 
+            printfn "Default target";
+            { gen= true; docs=false; build = true; clean = true; test= true}
+
+
+if choice.clean then
+    SimpleMake.clean srcDir
+    SimpleMake.clean docsBuildDir
+    SimpleMake.clean testBuildDir
+
+if choice.gen then
+    SimpleMake.generate ()
+
+if choice.build then
+    let msbuild = CompilerHelper.findMSBuild();
+    execAt "proj/" msbuild ["/t:restore"]
+    execAt "proj/" msbuild []

@@ -15,11 +15,10 @@
 
 [<AutoOpen>]
 module CompilerHelper
+open System
 
 #I "packages/FSharp.Compiler.Service/lib/net45/"
 #r "FSharp.Compiler.Service.dll"
-#I "packages/FAKE/tools"
-#r "FakeLib.dll"
 
 open System.IO
 open System.Reflection
@@ -32,7 +31,23 @@ type TargetFramework =
     | PORTABLE_259
     | NETSTD_2_0
 
-exception CompilerError of string
+let msbuildPaths = [
+                    Path.Combine("Microsoft Visual Studio", "2017","Enterprise", "MSBuild", "15.0", "Bin" )
+                    Path.Combine("Microsoft Visual Studio", "2017","Professional", "MSBuild", "15.0", "Bin" )
+                    Path.Combine("Microsoft Visual Studio", "2017","Community", "MSBuild", "15.0", "Bin" )
+                    Path.Combine("MSBuild","15.0", "Bin" )
+                    Path.Combine("Microsoft Visual Studio", "2017","BuildTools", "MSBuild", "15.0", "Bin" )
+                   ] 
+                   |> Seq.map (fun x-> Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), x))
+
+let findMSBuild () =
+        msbuildPaths
+            |> Seq.map Path.GetFullPath
+            |> Seq.filter Directory.Exists
+            |> Seq.collect (fun p -> [Path.Combine(p, "msbuild"); Path.Combine(p, "msbuild.exe")])
+            |> Seq.tryFind File.Exists
+            |> Option.defaultValue "msbuild"
+
 
 let defaultSystemDlls (target:TargetFramework) =
     match target with
@@ -215,13 +230,15 @@ let systemDllsResolver (systemDlls:string list,target:TargetFramework) =
 
     let searchPaths (paths:string list) =
         paths
-            |> Seq.map (fun p-> Path.GetFullPath p)
-            |> Seq.filter (fun p -> Directory.Exists p)
+            |> Seq.map Path.GetFullPath
+            |> Seq.filter Directory.Exists
 
     let fsharpCore =
         searchPaths fsharpPaths
             |> Seq.map (fun p -> Path.Combine(p, "FSharp.Core.dll"))
             |> Seq.find File.Exists
+
+    
 
     let dllPath dll =
         searchPaths allStdPaths
