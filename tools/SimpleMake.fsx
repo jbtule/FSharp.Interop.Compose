@@ -6,6 +6,7 @@
 open System.IO
 open System.Collections.Generic
 open Tools
+open Mono.Cecil
 
 let assemblyRefsByPlatform = Dictionary<TargetFramework,HashSet<string*string>>()
 
@@ -60,13 +61,30 @@ let generate () =
                                 IdentifyMethods.matchesSignature Static "Join" ["System.String";"System.Collections.Generic.IEnumerable`1<System.String>"]
                                 IdentifyMethods.matchesName Static "IsNullOrWhiteSpace"
                                 IdentifyMethods.matchesName Static "IsNullOrEmpty"
+                                IdentifyMethods.matchesName Static "Equals"
                                 IdentifyMethods.matchesSignature Instance "Replace" ["System.String";"System.String"]
                                 IdentifyMethods.matchesSignature Instance "Split" ["System.Char"]
                                 IdentifyMethods.matchesSignature Instance "Split" ["System.Char[]"]
                                 IdentifyMethods.matchesNames Instance ["StartsWith"; "Substring"; "Contains"; "EndsWith"; "Trim"; "TrimStart"; "TrimEnd"; "ToLower"; "ToUpper"; "PadRight"; "PadLeft"]
                                 ]
 
-    generateWrapper "System" "String" Reorder.noChange stringMethodFilters
+    let stringReorder (m:MethodDefinition)  =
+      if m.Name = "Equals" then
+        Reorder.moveOneParamToEnd m
+      else
+        Reorder.noChange m
+
+    generateWrapper "System" "String" stringReorder stringMethodFilters
+
+
+    let dateTimeMethodFilters = [
+                                IdentifyMethods.matchesNames Instance ["Add"; "AddDays"; "AddHours"; 
+                                    "AddMilliSeconds"; "AddMinutes"; "AddMonths"; "AddSeconds"; "AddTicks"; 
+                                    "ToShortDateString"; "ToShortTimeString"; "ToUniversalTime"]
+                                ]
+
+    generateWrapper "System" "DateTime" Reorder.noChange dateTimeMethodFilters
+
 
     let fileMethodFilters = [
                               IdentifyMethods.matchesSignature Static "WriteAllLines" ["System.String";"System.Collections.Generic.IEnumerable`1<System.String>"]
@@ -77,6 +95,21 @@ let generate () =
     let reorderForFile = Reorder.moveTypeToTheEnd "System.Collections.Generic.IEnumerable`1<System.String>"
     generateWrapper "System.IO" "File" reorderForFile fileMethodFilters
 
+
+
+    let reorderForPath (m:MethodDefinition) = 
+                            if m.Name = "Combine" then
+                                m.Parameters |> Seq.rev
+                            else
+                                Reorder.moveNameToTheEnd "path" m
+
+    generateWrapper "System.IO" "Path" reorderForPath [
+           IdentifyMethods.matchesSignature Static "Combine" ["System.String";"System.String"]
+           IdentifyMethods.matchesNames Static ["ChangeExtension";"GetDirectoryName";"GetExtension";
+                                                  "GetFileName"; "GetDirectoryName"; "GetRelativePath";
+                                                  "HasExtension"
+                                                   ]
+        ]
 
     generateWrapper "System.Collections.Generic" "Comparer" Reorder.noChange [IdentifyMethods.matchesName Static "Create"]
     generateWrapper "System.Collections.Generic" "EqualityComparer" Reorder.noChange [IdentifyMethods.matchesName Static "Default"]

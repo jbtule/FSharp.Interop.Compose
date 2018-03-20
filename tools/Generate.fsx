@@ -287,6 +287,12 @@ module Reorder =
             |> Seq.sortBy (fun (i,p)-> i + if p.ParameterType.FullName |> Helpers.hasNamePrefix typeName then 100 else 0)
             |> Seq.map (fun (_,p)-> p)
 
+    let moveNameToTheEnd (paramName:string) (m:MethodDefinition) : seq<ParameterDefinition> =
+        m.Parameters
+            |> Seq.mapi (fun i p -> (i,p))
+            |> Seq.sortBy (fun (i,p)-> i + if p.Name = paramName then 100 else 0)
+            |> Seq.map (fun (_,p)-> p)
+
     let private equivalentTypes (t1:TypeReference) (t2:TypeReference) =
         let replaceName (t:GenericInstanceType) =
              t.GenericArguments |> Seq.fold (fun (acc:string) gp -> acc.Replace(gp.Name,"_")) t.FullName
@@ -310,15 +316,22 @@ module Reorder =
     let private fullmethodname (m:MethodDefinition) =
         sprintf "%s.%s.%s" m.DeclaringType.Namespace m.DeclaringType.Name m.Name
 
+    let moveOneParamToEnd (m:MethodDefinition) =
+        let ps = m.Parameters
+        Seq.append (ps |> Seq.skip 1) (ps |> Seq.take 1)
+    let moveTwoParamToEnd (m:MethodDefinition) =
+        let ps = m.Parameters
+        Seq.append (ps |> Seq.skip 2) (ps |> Seq.take 2)
+
     let extensionMethodReorder (m:MethodDefinition) =
         let ps = m.Parameters
         let exceptions = ["System.Linq.Enumerable.Except";"System.Linq.Queryable.Except"]
         if (ps |> Seq.length) > 1
             && identifyReorder2 ps
             && exceptions |> Seq.exists (fun n-> (fullmethodname m) |> Helpers.hasNamePrefix n) |> not then
-             Seq.append (ps |> Seq.skip 2) (ps |> Seq.take 2)
+             m |> moveTwoParamToEnd
         else
-             Seq.append (ps |> Seq.skip 1) (ps |> Seq.take 1)
+             m |> moveOneParamToEnd
 
 module Generate =
 
@@ -392,7 +405,7 @@ module Generate =
                         writer.WriteLine(header)
                         writer.WriteLine()
                         writer.WriteLine(sprintf "namespace %s" nsp)
-                        writer.WriteLine(sprintf "/// Corresponding static methods as functions for [`%s.%s`](http://msdn.microsoft.com/en-us/library/%s.%s)"
+                        writer.WriteLine(sprintf "/// Corresponding static methods as functions for [`%s.%s`](https://docs.microsoft.com/en-us/dotnet/api/%s.%s)"
                                             namesp typeName (namesp.ToLower()) (typeName.ToLower()))
                         writer.WriteLine(sprintf "module %s =" typeName)
                     else

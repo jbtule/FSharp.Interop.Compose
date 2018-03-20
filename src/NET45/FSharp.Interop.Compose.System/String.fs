@@ -10,6 +10,9 @@ module String =
     /// Calls [`EndsWith(value)`](http://msdn.microsoft.com/en-us/library/system.string.endswith)
     let inline endsWith value (``{instance}``:System.String) = ``{instance}``.EndsWith(value)
 
+    /// Calls [`Equals(a, b)`](http://msdn.microsoft.com/en-us/library/system.string.equals)
+    let inline equals (b:System.String) (a:System.String) = System.String.Equals(a, b)
+
     /// Calls [`IsNullOrEmpty(value)`](http://msdn.microsoft.com/en-us/library/system.string.isnullorempty)
     let inline isNullOrEmpty value = System.String.IsNullOrEmpty(value)
 
@@ -57,6 +60,9 @@ module String =
 
         /// Calls [`EndsWith(value, ignoreCase, culture)`](http://msdn.microsoft.com/en-us/library/system.string.endswith)
         let inline endsWith value ignoreCase culture (``{instance}``:System.String) = ``{instance}``.EndsWith(value, ignoreCase, culture)
+
+        /// Calls [`Equals(a, b, comparisonType)`](http://msdn.microsoft.com/en-us/library/system.string.equals)
+        let inline equals b comparisonType a = System.String.Equals(a, b, comparisonType)
 
         /// Calls [`PadLeft(totalWidth, paddingChar)`](http://msdn.microsoft.com/en-us/library/system.string.padleft)
         let inline padLeft totalWidth paddingChar (``{instance}``:System.String) = ``{instance}``.PadLeft(totalWidth, paddingChar)
