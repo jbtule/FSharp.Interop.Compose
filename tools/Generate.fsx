@@ -13,7 +13,7 @@
 // limitations under the License.
 
 namespace Tools
-#r "packages/Mono.Cecil/lib/net45/Mono.Cecil.dll"
+#r "packages/Mono.Cecil/lib/netstandard1.3/Mono.Cecil.dll"
 #r "packages/FSharp.Compiler.Service/lib/net45/FSharp.Compiler.Service.dll"
 
 open System.Reflection
