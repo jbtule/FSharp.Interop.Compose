@@ -1,4 +1,8 @@
-#!/usr/bin/env fsharpi --define:mono_posix --exec
+#!/bin/sh
+#if bin_sh
+  # Doing this because arguments can't be used with /usr/bin/env on linux, just mac
+  exec fsharpi --define:mono_posix --exec $0 $*
+#endif
 (*
  * CrossPlatform FSharp Makefile bootstraper - jay+code@tuley.name
  *
@@ -46,7 +50,6 @@ let execAt (workingDir:string) (exePath:string) (args:string seq) =
         exit exitCode
     ()
 
-let exec = execAt Environment.CurrentDirectory
 
 let downloadNugetTo path =
     let fullPath = path |> Path.GetFullPath;
@@ -68,4 +71,4 @@ execAt
     "tools/NuGet/NuGet.exe"
     ["install"; "packages.config"; "-OutputDirectory packages"; "-ExcludeVersion"]
 
-exec "tools/packages/FAKE/tools/FAKE.exe" ("tools/Make.fsx"::passedArgs)
+#load "tools/SimpleMake.fsx"

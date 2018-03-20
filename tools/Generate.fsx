@@ -387,7 +387,7 @@ module Generate =
                 if not (Seq.isEmpty mlist) then
                     let path = Path.Combine(srcDir, nsp)
                     Directory.CreateDirectory(path) |> ignore
-                    use writer = System.IO.File.AppendText(Path.Combine(path, typeName+".fsx"))
+                    use writer = System.IO.File.AppendText(Path.Combine(path, typeName+".fs"))
                     if isMain then
                         writer.WriteLine(header)
                         writer.WriteLine()

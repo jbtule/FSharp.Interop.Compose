@@ -16,7 +16,7 @@
 [<AutoOpen>]
 module CompilerHelper
 
-#I "packages/FSharp.Compiler.Service/lib/net40/"
+#I "packages/FSharp.Compiler.Service/lib/net45/"
 #r "FSharp.Compiler.Service.dll"
 #I "packages/FAKE/tools"
 #r "FakeLib.dll"

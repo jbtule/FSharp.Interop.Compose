@@ -14,7 +14,7 @@
 
 module DocHelper
 
-#I "packages/FSharp.Compiler.Service/lib/net40/"
+#I "packages/FSharp.Compiler.Service/lib/net45/"
 #r "FSharp.Compiler.Service.dll"
 #I "packages/FSharpVSPowerTools.Core/lib/net45"
 #r "FSharpVSPowerTools.Core.dll"

@@ -1,6 +1,6 @@
 // Generated with FSharp.Interop.Compose (1.14.0) http://jbtule.github.io/FSharp.Interop.Compose
 
-#load "../../../helpers/Quotations.fsx"
+
 
 namespace FSharp.Interop.Compose.Linq
 /// Corresponding static methods as functions for [`System.Linq.Queryable`](http://msdn.microsoft.com/en-us/library/system.linq.queryable)

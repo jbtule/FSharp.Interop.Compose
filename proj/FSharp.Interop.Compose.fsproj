@@ -1,0 +1,66 @@
+<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
+  <PropertyGroup>
+    <TargetFrameworks>net35;net40;net45;portable-net45+sl5+win8;portable-net45+win8+wpa81+wp8;netstandard1.6;netstandard2.0</TargetFrameworks>
+    <Description>Inline composable fsharp functions around BCL static methods. Supports .net 3.5 through .net Standard</Description>
+    <Authors>Jay Tuley</Authors>
+    <Copyright>Copyright 2014-2018 Jay Tuley</Copyright>
+    <PackageProjectUrl>http://jbtule.github.io/FSharp.Interop.Compose</PackageProjectUrl>
+    <PackageLicenseUrl>http://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
+    <PackageTags>fsharp dynamic dlr</PackageTags>
+    <IncludeSymbols Condition="'$(OS)' == 'Windows_NT'">True</IncludeSymbols>
+    <IncludeSource Condition="'$(OS)' == 'Windows_NT'">True</IncludeSource>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+    <Version>2.0.0</Version>
+    <DebugSymbols Condition="'$(OS)' != 'Windows_NT'">false</DebugSymbols>
+    <DebugType Condition="'$(OS)' != 'Windows_NT'">None</DebugType>
+  </PropertyGroup>
+
+
+
+  <ItemGroup Condition="'$(TargetFramework)'!='net35'">
+    <Compile Include="../helpers/Quotations.fs" />
+  </ItemGroup>
+
+ <ItemGroup Condition="'$(TargetFramework)'=='net35'">
+    <Compile Include="../src/NET35/**/*.fs" />
+    <PackageReference Include="FSharp.Core" Version="4.1.*" PrivateAssets="all"  />
+
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)'=='net40'">
+    <Compile Include="../src/NET40/**/*.fs" />
+    <PackageReference Include="FSharp.Core" Version="4.1.*" PrivateAssets="all"  />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)'=='net45'">
+    <Compile Include="../src/NET45/**/*.fs" />
+    <PackageReference Include="FSharp.Core" Version="4.*" PrivateAssets="all"  />
+  </ItemGroup>
+ 
+  <ItemGroup Condition="'$(TargetFramework)'=='portable-net45+sl5+win8'">
+    <Compile Include="../src/PORTABLE_47/**/*.fs" />
+    <PackageReference Include="FSharp.Core" Version="4.1.*" PrivateAssets="all"  />
+  </ItemGroup>
+
+    <ItemGroup Condition="'$(TargetFramework)'=='portable-net45+win8+wpa81+wp8'">
+    <Compile Include="../src/PORTABLE_259/**/*.fs" />
+    <PackageReference Include="FSharp.Core" Version="4.1.*" PrivateAssets="all"  />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)'=='netstandard1.6'">
+    <Compile Include="../src/netstandard1.6/**/*.fs" />
+    <PackageReference Include="FSharp.Core" Version="4.*" PrivateAssets="all"  />
+  </ItemGroup>
+  
+  <ItemGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
+    <Compile Include="../src/netstandard1.6/**/*.fs" />
+    <PackageReference Include="FSharp.Core" Version="4.*" PrivateAssets="all"  />
+  </ItemGroup>
+ 
+  <ItemGroup>
+      <PackageReference Include="MSBuild.Sdk.Extras" Version="1.1.0" PrivateAssets="All" />
+  </ItemGroup>
+  <Import Project="$(MSBuildSDKExtrasTargets)" Condition="Exists('$(MSBuildSDKExtrasTargets)')" />
+
+</Project>
