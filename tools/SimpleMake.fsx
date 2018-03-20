@@ -1,4 +1,5 @@
 #load "CompilerHelper.fsx"
+open System.Linq
 #load "Vars.fsx"
 #load "Generate.fsx"
 #load "Docs.fsx"
@@ -13,16 +14,16 @@ let assemblyRefsByPlatform = Dictionary<TargetFramework,HashSet<string*string>>(
 
 let clean path =
   printfn "Cleaning %s." path
+  if path |> Directory.Exists then
+      path 
+       |> Directory.GetFiles
+       |> Array.map (fun x -> printfn "Delete file %s." x; x)
+       |> Array.iter File.Delete
 
-  path 
-   |> Directory.GetFiles
-   |> Array.map (fun x -> printfn "Delete file %s." x; x)
-   |> Array.iter File.Delete
-
-  path 
-   |> Directory.GetDirectories
-   |> Array.map (fun x -> printfn "Delete Dir %s." x; x)
-   |> Array.iter (fun x->Directory.Delete(x, recursive = true))
+      path 
+       |> Directory.GetDirectories
+       |> Array.map (fun x -> printfn "Delete Dir %s." x; x)
+       |> Array.iter (fun x->Directory.Delete(x, recursive = true))
 
 let generate () = 
   let br = System.Environment.NewLine
