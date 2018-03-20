@@ -1,7 +1,5 @@
 namespace Test.FSharp.Interop.Compose.System
 
-#load "includes.fsx"
-
 open Xunit
 open FsUnit.Xunit
 open FSharp.Interop.Compose.System

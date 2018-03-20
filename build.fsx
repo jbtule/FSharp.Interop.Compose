@@ -90,13 +90,17 @@ let choice =
             { gen= false; docs=false; build =false; clean = true; test= false}
         | _ -> 
             printfn "Default target";
-            { gen= true; docs=false; build = true; clean = true; test= true}
-
+            { gen= true; docs=true; build = true; clean = true; test= true}
+ 
+let msbuild = CompilerHelper.findMSBuild();
 
 if choice.clean then
     SimpleMake.clean srcDir
     SimpleMake.clean docsBuildDir
-    SimpleMake.clean testBuildDir
+    SimpleMake.clean "proj/bin/"
+    SimpleMake.clean "proj/obj/"
+    SimpleMake.clean "test/bin/"
+    SimpleMake.clean "test/obj/"
 
 if choice.gen then
     SimpleMake.generate ()
@@ -105,3 +109,14 @@ if choice.build then
     let msbuild = CompilerHelper.findMSBuild();
     execAt "proj/" msbuild ["/t:restore"]
     execAt "proj/" msbuild []
+
+if choice.test then
+    execAt "test/" msbuild ["/t:restore"]
+    execAt "test/" msbuild []
+    let dotnet = Path.Combine(@"C:\Program Files", "dotnet", "dotnet.exe")
+    execAt "test/" dotnet   [
+                                @"..\tools\packages\xunit.runner.console\tools\netcoreapp2.0\xunit.console.dll"
+                                @"bin\Debug\netcoreapp2.0\Test.dll"
+                            ]
+    let xunitRunner = @"tools\packages\xunit.runner.console\tools\net452\xunit.console.exe" |> Path.GetFullPath
+    execAt "test/" xunitRunner [ @"bin\Debug\net47\Test.exe" ]

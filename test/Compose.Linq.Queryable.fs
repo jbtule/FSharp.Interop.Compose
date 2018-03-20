@@ -1,14 +1,14 @@
-#if NET35
-#else
 namespace Test.FSharp.Interop.Compose.Linq
 
-#load "includes.fsx"
-
+#if NET35
+#else
 open Xunit
 open FsUnit.Xunit
 open FSharp.Interop.Compose.Linq
 
 module ``Queryable Basic Tests`` =
+
+
 
     [<Fact>]
     let where () =
