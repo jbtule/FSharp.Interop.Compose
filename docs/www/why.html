@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Why Composable: From C# to F#
+</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Inline composable fsharp functions around BCL static methods. Supports .net 3.5 through .net Standard">
+    <meta name="author" content="Jay Tuley">
+
+    <script src="http://code.jquery.com/jquery-1.8.0.js"></script>
+    <script src="http://code.jquery.com/ui/1.8.23/jquery-ui.js"></script>
+    <script src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/css/bootstrap-combined.min.css" rel="stylesheet">
+
+    <link type="text/css" rel="stylesheet" href="http://jbtule.github.io/FSharp.Interop.Compose/content/style.css" />
+    <script type="text/javascript" src="http://jbtule.github.io/FSharp.Interop.Compose/content/tips.js"></script>
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="container">
+      <div class="masthead">
+        <ul class="nav nav-pills pull-right">
+          <li><a href="http://fsharp.org">fsharp.org</a></li>
+          <li><a href="https://github.com/jbtule/FSharp.Interop.Compose">github page</a></li>
+        </ul>
+        <h3 class="muted">FSharp.Interop.Compose</h3>
+      </div>
+      <hr />
+      <div class="row">
+        <div class="span9" id="main">
+          
+<h1>Why Composable: From C# to F#</h1>
+<p>In C# we define static functions:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+<span class="l">5: </span>
+<span class="l">6: </span>
+<span class="l">7: </span>
+<span class="l">8: </span>
+<span class="l">9: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="csharp"><span class="k">public</span> <span class="k">static</span> <span class="k">int</span> Add(<span class="k">int</span> y, <span class="k">int</span> x){
+  <span class="k">return</span> x <span class="o">+</span> y;
+}
+<span class="k">public</span> <span class="k">static</span> <span class="k">int</span> AddOne(<span class="k">int</span> x){
+  <span class="k">return</span> Add(x, <span class="n">1</span>);
+}
+<span class="k">public</span> <span class="k">static</span> <span class="k">int</span> AddTwo(<span class="k">int</span> x){
+  <span class="k">return</span> Add(x, <span class="n">2</span>);
+}
+</code></pre></td></tr></table>
+<p>When combining these functions it looks like this:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="csharp">AddTwo(AddOne(<span class="n">4</span>)); <span class="c">// 7</span>
+</code></pre></td></tr></table>
+<p>Not very readable.</p>
+<blockquote>
+<p>We cram functions into objects so that
+code reads from left to right. Method chaining in F#
+and Clojure accomplishes this more flexibly.
+–Jessica Kerr (@jessitron) <a href="https://twitter.com/jessitron/statuses/440276780520177664">March 3, 2014</a></p>
+</blockquote>
+<p>So when we do this in F#</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span class="i">add</span> <span class="i">y</span> <span class="i">x</span> <span class="o">=</span> <span class="i">x</span> <span class="o">+</span> <span class="i">y</span>
+<span class="k">let</span> <span class="i">addOne</span> <span class="o">=</span> <span class="i">add</span> <span class="n">1</span>
+<span class="k">let</span> <span class="i">addTwo</span> <span class="o">=</span> <span class="i">add</span> <span class="n">2</span>
+<span class="n">4</span> <span class="o">|&gt;</span> <span class="i">addOne</span> <span class="o">|&gt;</span> <span class="i">addTwo</span>
+</code></pre></td>
+</tr>
+</table>
+<p><em>output:</em></p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">val</span> <span class="i">it</span> <span class="o">:</span> <span class="i">int</span> <span class="o">=</span> <span class="n">7</span>
+</code></pre></td>
+</tr>
+</table>
+<p>it works very cleanly, because the functions are in curried form.
+<code>Add</code> doesn't take two arguments, it takes one argument
+and returns a function that takes takes 1 argument and returns a
+result.</p>
+<p>You can see manually do curried form in C# but the
+final invocation is still clunky.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+<span class="l">5: </span>
+<span class="l">6: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="csharp"><span class="k">public</span> <span class="k">static</span> Func&lt;<span class="k">int</span>,<span class="k">int</span>&gt; Add(<span class="k">int</span> y){
+  <span class="k">return</span> x <span class="o">=</span><span class="o">&gt;</span> x <span class="o">+</span> y;
+}
+<span class="k">var</span> addOne <span class="o">=</span> Add(<span class="n">1</span>);
+<span class="k">var</span> addTwo <span class="o">=</span> Add(<span class="n">2</span>);
+addTwo(addOne(<span class="n">4</span>)); <span class="c">// 7</span>
+</code></pre></td></tr></table>
+<p>However there is a way to do left to right in C#
+without resorting  to objects...Extension Methods:</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+<span class="l">5: </span>
+<span class="l">6: </span>
+<span class="l">7: </span>
+<span class="l">8: </span>
+<span class="l">9: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="csharp"><span class="k">public</span> <span class="k">static</span> <span class="k">int</span> Add(<span class="k">this</span> <span class="k">int</span> x, <span class="k">int</span> y){
+  <span class="k">return</span> x <span class="o">+</span> y;
+}
+<span class="k">public</span> <span class="k">static</span> <span class="k">int</span> AddOne(<span class="k">this</span> <span class="k">int</span> x){
+    <span class="k">return</span> x.Add(<span class="n">1</span>);
+}
+<span class="k">public</span> <span class="k">static</span> <span class="k">int</span> AddTwo(<span class="k">this</span> <span class="k">int</span> x){
+    <span class="k">return</span> x.Add(<span class="n">2</span>);
+}
+</code></pre></td></tr></table>
+<p>Giving us left to right</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="csharp"><span class="n">4</span>.AddOne().AddTwo(); <span class="c">// 7</span>
+</code></pre></td></tr></table>
+<p>And thusly is the basis for the method chaining api of LINQ.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="csharp">Enumerable.Range(<span class="n">1</span>,<span class="n">5</span>).Where(x <span class="o">=</span><span class="o">&gt;</span> x <span class="o">&lt;</span> <span class="n">3</span>); <span class="c">// 1,2</span>
+</code></pre></td></tr></table>
+<p>In F# we already can do the equivalent</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="i">seq</span> { <span class="n">1..</span><span class="n">5</span> }
+  <span class="o">|&gt;</span> <span class="i">Seq</span><span class="o">.</span><span class="i">filter</span> (<span class="k">fun</span> <span class="i">x</span> <span class="k">-&gt;</span> <span class="i">x</span> <span class="o">&lt;</span> <span class="n">3</span>)
+</code></pre></td>
+</tr>
+</table>
+<p><em>output:</em></p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">val</span> <span class="i">it</span> <span class="o">:</span> <span class="i">mkSeq</span><span class="o">@</span><span class="n">543</span><span class="o">&lt;</span><span class="i">int</span><span class="o">&gt;</span> <span class="o">=</span> <span class="i">seq</span> [<span class="n">1</span>; <span class="n">2</span>]
+</code></pre></td>
+</tr>
+</table>
+<p>However, if we add a little bit more complexity to the C# LINQ</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+<span class="l">5: </span>
+<span class="l">6: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="csharp"><span class="k">new</span> [] {
+  <span class="k">new</span> {FirstName <span class="o">=</span> <span class="s">"Stella"</span>, LastName <span class="o">=</span> <span class="s">"Gibson"</span>},
+  <span class="k">new</span> {FirstName <span class="o">=</span> <span class="s">"Paul"</span>, LastName <span class="o">=</span> <span class="s">"Spector"</span>},
+  <span class="k">new</span> {FirstName <span class="o">=</span> <span class="s">"Danielle"</span>, LastName <span class="o">=</span> <span class="s">"Ferrington"</span>},
+  <span class="k">new</span> {FirstName <span class="o">=</span> <span class="s">"Olivia"</span>, LastName <span class="o">=</span> <span class="s">"Spector"</span>},
+}.OrderByDescending(x=&gt;x.LastName).ThenBy(x=&gt;x.FirstName);
+</code></pre></td></tr></table>
+<p>The F# idomatic built-in list comprehension is not as robust</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l"> 1: </span>
+<span class="l"> 2: </span>
+<span class="l"> 3: </span>
+<span class="l"> 4: </span>
+<span class="l"> 5: </span>
+<span class="l"> 6: </span>
+<span class="l"> 7: </span>
+<span class="l"> 8: </span>
+<span class="l"> 9: </span>
+<span class="l">10: </span>
+<span class="l">11: </span>
+<span class="l">12: </span>
+<span class="l">13: </span>
+<span class="l">14: </span>
+<span class="l">15: </span>
+<span class="l">16: </span>
+<span class="l">17: </span>
+<span class="l">18: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">open</span> <span class="i">System</span>
+
+<span class="k">type</span> <span class="i">Person</span> <span class="o">=</span> { <span class="i">FirstName</span> <span class="o">:</span> <span class="i">string</span>; <span class="i">LastName</span><span class="o">:</span> <span class="i">string</span>; }
+
+<span class="k">let</span> <span class="i">lastThenFirst</span> (<span class="i">x</span><span class="o">:</span><span class="i">Person</span>) (<span class="i">y</span><span class="o">:</span><span class="i">Person</span>) <span class="o">=</span>
+  <span class="k">let</span> <span class="i">cmp</span> <span class="o">=</span> <span class="o">-</span><span class="i">String</span><span class="o">.</span><span class="i">Compare</span>(<span class="i">x</span><span class="o">.</span><span class="i">LastName</span>, <span class="i">y</span><span class="o">.</span><span class="i">LastName</span>)
+  <span class="k">if</span> <span class="i">cmp</span> <span class="o">=</span> <span class="n">0</span> <span class="k">then</span>
+    <span class="i">String</span><span class="o">.</span><span class="i">Compare</span>(<span class="i">x</span><span class="o">.</span><span class="i">FirstName</span>, <span class="i">y</span><span class="o">.</span><span class="i">FirstName</span>)
+  <span class="k">else</span>
+    <span class="i">cmp</span>
+
+[
+  {<span class="i">FirstName</span><span class="o">=</span><span class="s">&quot;Stella&quot;</span>; <span class="i">LastName</span><span class="o">=</span><span class="s">&quot;Gibson&quot;</span>}
+  {<span class="i">FirstName</span> <span class="o">=</span> <span class="s">&quot;Paul&quot;</span>; <span class="i">LastName</span> <span class="o">=</span> <span class="s">&quot;Spector&quot;</span>}
+  {<span class="i">FirstName</span> <span class="o">=</span> <span class="s">&quot;Danielle&quot;</span>; <span class="i">LastName</span> <span class="o">=</span> <span class="s">&quot;Ferrington&quot;</span>}
+  {<span class="i">FirstName</span> <span class="o">=</span> <span class="s">&quot;Olivia&quot;</span>; <span class="i">LastName</span> <span class="o">=</span> <span class="s">&quot;Spector&quot;</span>}
+]
+  <span class="o">|&gt;</span> <span class="i">List</span><span class="o">.</span><span class="i">sortWith</span> <span class="i">lastThenFirst</span>
+</code></pre></td>
+</tr>
+</table>
+<p><em>output:</em></p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+<span class="l">5: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">val</span> <span class="i">it</span> <span class="o">:</span> <span class="i">list</span><span class="o">&lt;</span><span class="i">Person</span><span class="o">&gt;</span> <span class="o">=</span>
+     [{<span class="i">FirstName</span> <span class="o">=</span> <span class="s">&quot;Olivia&quot;</span>;<span class="i">LastName</span> <span class="o">=</span> <span class="s">&quot;Spector&quot;</span>;};
+      {<span class="i">FirstName</span> <span class="o">=</span> <span class="s">&quot;Paul&quot;</span>; <span class="i">LastName</span> <span class="o">=</span> <span class="s">&quot;Spector&quot;</span>;};
+      {<span class="i">FirstName</span> <span class="o">=</span> <span class="s">&quot;Stella&quot;</span>;<span class="i">LastName</span> <span class="o">=</span> <span class="s">&quot;Gibson&quot;</span>;};
+      {<span class="i">FirstName</span> <span class="o">=</span> <span class="s">&quot;Danielle&quot;</span>; <span class="i">LastName</span> <span class="o">=</span> <span class="s">&quot;Ferrington&quot;</span>;}]
+</code></pre></td>
+</tr>
+</table>
+<p>You can use LINQ directly, Extension Methods are supported
+in F# 3.0 along with Type Directed Conversions
+at Member Invocations.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l"> 1: </span>
+<span class="l"> 2: </span>
+<span class="l"> 3: </span>
+<span class="l"> 4: </span>
+<span class="l"> 5: </span>
+<span class="l"> 6: </span>
+<span class="l"> 7: </span>
+<span class="l"> 8: </span>
+<span class="l"> 9: </span>
+<span class="l">10: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">open</span> <span class="i">System</span><span class="o">.</span><span class="i">Linq</span>
+
+<span class="k">type</span> <span class="i">Person</span> <span class="o">=</span> { <span class="i">FirstName</span> <span class="o">:</span> <span class="i">string</span>; <span class="i">LastName</span><span class="o">:</span> <span class="i">string</span>; }
+
+[
+  {<span class="i">FirstName</span><span class="o">=</span><span class="s">&quot;Stella&quot;</span>; <span class="i">LastName</span><span class="o">=</span><span class="s">&quot;Gibson&quot;</span>}
+  {<span class="i">FirstName</span> <span class="o">=</span> <span class="s">&quot;Paul&quot;</span>; <span class="i">LastName</span> <span class="o">=</span> <span class="s">&quot;Spector&quot;</span>}
+  {<span class="i">FirstName</span> <span class="o">=</span> <span class="s">&quot;Danielle&quot;</span>; <span class="i">LastName</span> <span class="o">=</span> <span class="s">&quot;Ferrington&quot;</span>}
+  {<span class="i">FirstName</span> <span class="o">=</span> <span class="s">&quot;Olivia&quot;</span>; <span class="i">LastName</span> <span class="o">=</span> <span class="s">&quot;Spector&quot;</span>}
+]<span class="o">.</span><span class="i">OrderByDescending</span>(<span class="k">fun</span> <span class="i">x</span> <span class="k">-&gt;</span> <span class="i">x</span><span class="o">.</span><span class="i">LastName</span>)<span class="o">.</span><span class="i">ThenBy</span>(<span class="k">fun</span> <span class="i">x</span> <span class="k">-&gt;</span> <span class="i">x</span><span class="o">.</span><span class="i">FirstName</span>)
+</code></pre></td>
+</tr>
+</table>
+<p><em>output:</em></p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+<span class="l">5: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">val</span> <span class="i">it</span> <span class="o">:</span> <span class="i">OrderedEnumerable</span><span class="o">&lt;</span><span class="i">Person</span>, <span class="i">string</span><span class="o">&gt;</span> <span class="o">=</span> <span class="i">seq</span>
+  [{<span class="i">FirstName</span> <span class="o">=</span> <span class="s">&quot;Olivia&quot;</span>; <span class="i">LastName</span> <span class="o">=</span> <span class="s">&quot;Spector&quot;</span>;};
+   {<span class="i">FirstName</span> <span class="o">=</span> <span class="s">&quot;Paul&quot;</span>; <span class="i">LastName</span> <span class="o">=</span> <span class="s">&quot;Spector&quot;</span>;};
+   {<span class="i">FirstName</span> <span class="o">=</span> <span class="s">&quot;Stella&quot;</span>; <span class="i">LastName</span> <span class="o">=</span> <span class="s">&quot;Gibson&quot;</span>;};
+   {<span class="i">FirstName</span> <span class="o">=</span> <span class="s">&quot;Danielle&quot;</span>; <span class="i">LastName</span> <span class="o">=</span> <span class="s">&quot;Ferrington&quot;</span>;}]
+</code></pre></td>
+</tr>
+</table>
+<p>It's not idiomatic F# syntax. It looks like C# (just with more "fun")</p>
+<p>But it is static, immutable and lazy.</p>
+<p>So we have a pattern with left to right with both
+C# extension methods and curried form F#.</p>
+<p>So given an extension method <code>(this, arg) -&gt; value</code> it could be reformed
+into <code>arg -&gt; this -&gt; value</code> and it would syntactically look like an F# API.</p>
+<p>Examples</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span class="k">inline</span> <span class="i">orderByDescending</span> (<span class="i">keySelector</span><span class="o">:</span><span class="o">&#39;</span><span class="i">TSource</span><span class="k">-&gt;</span><span class="o">&#39;</span><span class="i">TKey</span>) <span class="i">source</span> <span class="o">=</span> <span class="i">System</span><span class="o">.</span><span class="i">Linq</span><span class="o">.</span><span class="i">Enumerable</span><span class="o">.</span><span class="i">OrderByDescending</span>(<span class="i">source</span>, <span class="i">System</span><span class="o">.</span><span class="i">Func</span><span class="o">&lt;</span><span class="o">&#39;</span><span class="i">TSource</span>, <span class="o">&#39;</span><span class="i">TKey</span><span class="o">&gt;</span>(<span class="i">keySelector</span>))
+<span class="k">let</span> <span class="k">inline</span> <span class="i">thenBy</span> (<span class="i">keySelector</span><span class="o">:</span><span class="o">&#39;</span><span class="i">TSource</span><span class="k">-&gt;</span><span class="o">&#39;</span><span class="i">TKey</span>) <span class="i">source</span> <span class="o">=</span> <span class="i">System</span><span class="o">.</span><span class="i">Linq</span><span class="o">.</span><span class="i">Enumerable</span><span class="o">.</span><span class="i">ThenBy</span>(<span class="i">source</span>, <span class="i">System</span><span class="o">.</span><span class="i">Func</span><span class="o">&lt;</span><span class="o">&#39;</span><span class="i">TSource</span>, <span class="o">&#39;</span><span class="i">TKey</span><span class="o">&gt;</span>(<span class="i">keySelector</span>))
+</code></pre></td>
+</tr>
+</table>
+<p>And this is the basis for FSharp.Interop.Compose we can make .NET BCL api's
+that have idiomatic F# behavior look, read, write like idiomatic F# api's.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l"> 1: </span>
+<span class="l"> 2: </span>
+<span class="l"> 3: </span>
+<span class="l"> 4: </span>
+<span class="l"> 5: </span>
+<span class="l"> 6: </span>
+<span class="l"> 7: </span>
+<span class="l"> 8: </span>
+<span class="l"> 9: </span>
+<span class="l">10: </span>
+<span class="l">11: </span>
+<span class="l">12: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">open</span> <span class="i">Composable</span><span class="o">.</span><span class="i">Linq</span>
+
+<span class="k">type</span> <span class="i">Person</span> <span class="o">=</span> { <span class="i">FirstName</span> <span class="o">:</span> <span class="i">string</span>; <span class="i">LastName</span><span class="o">:</span> <span class="i">string</span>; }
+
+[
+  {<span class="i">FirstName</span><span class="o">=</span><span class="s">&quot;Stella&quot;</span>; <span class="i">LastName</span><span class="o">=</span><span class="s">&quot;Gibson&quot;</span>}
+  {<span class="i">FirstName</span> <span class="o">=</span> <span class="s">&quot;Paul&quot;</span>; <span class="i">LastName</span> <span class="o">=</span> <span class="s">&quot;Spector&quot;</span>}
+  {<span class="i">FirstName</span> <span class="o">=</span> <span class="s">&quot;Danielle&quot;</span>; <span class="i">LastName</span> <span class="o">=</span> <span class="s">&quot;Ferrington&quot;</span>}
+  {<span class="i">FirstName</span> <span class="o">=</span> <span class="s">&quot;Olivia&quot;</span>; <span class="i">LastName</span> <span class="o">=</span> <span class="s">&quot;Spector&quot;</span>}
+]
+  <span class="o">|&gt;</span> <span class="i">Enumerable</span><span class="o">.</span><span class="i">orderByDescending</span> (<span class="k">fun</span> <span class="i">x</span> <span class="k">-&gt;</span> <span class="i">x</span><span class="o">.</span><span class="i">LastName</span>)
+  <span class="o">|&gt;</span> <span class="i">Enumerable</span><span class="o">.</span><span class="i">thenBy</span> (<span class="k">fun</span> <span class="i">x</span> <span class="k">-&gt;</span> <span class="i">x</span><span class="o">.</span><span class="i">FirstName</span>)
+</code></pre></td>
+</tr>
+</table>
+<p><em>output:</em></p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+<span class="l">5: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">val</span> <span class="i">it</span> <span class="o">:</span> <span class="i">OrderedEnumerable</span><span class="o">&lt;</span><span class="i">Person</span>, <span class="i">string</span><span class="o">&gt;</span> <span class="o">=</span>
+    <span class="i">seq</span> [{<span class="i">FirstName</span> <span class="o">=</span> <span class="s">&quot;Olivia&quot;</span>; <span class="i">LastName</span> <span class="o">=</span> <span class="s">&quot;Spector&quot;</span>;};
+         {<span class="i">FirstName</span> <span class="o">=</span> <span class="s">&quot;Paul&quot;</span>; <span class="i">LastName</span> <span class="o">=</span> <span class="s">&quot;Spector&quot;</span>;};
+         {<span class="i">FirstName</span> <span class="o">=</span> <span class="s">&quot;Stella&quot;</span>; <span class="i">LastName</span> <span class="o">=</span> <span class="s">&quot;Gibson&quot;</span>;};
+         {<span class="i">FirstName</span> <span class="o">=</span> <span class="s">&quot;Danielle&quot;</span>; <span class="i">LastName</span> <span class="o">=</span> <span class="s">&quot;Ferrington&quot;</span>;}]
+</code></pre></td>
+</tr>
+</table>
+<p>See also these StackOverflow questions</p>
+<ul>
+<li><a href="http://stackoverflow.com/a/21558989/637783">Is there an F# equivalent of Enumerable.DefaultIfEmpty?</a></li>
+<li><a href="http://stackoverflow.com/q/22178238/637783">efficient way to create map of lists in functional style</a></li>
+</ul>
+
+
+        </div>
+        <div class="span3">
+          <ul class="nav nav-list" id="menu">
+            <li class="nav-header">FSharp.Interop.Compose</li>
+            <li><a href="http://jbtule.github.io/FSharp.Interop.Compose/index.html">Home page</a></li>
+            <li class="divider"></li>
+            <li><a href="http://nuget.org/packages/FSharp.Interop.Compose">Get Library via NuGet</a></li>
+            <li><a href="https://github.com/jbtule/FSharp.Interop.Compose">Source Code on GitHub</a></li>
+            <li><a href="https://github.com/jbtule/FSharp.Interop.Compose/blob/master/LICENSE.txt">License</a></li>
+            <li><a href="https://github.com/jbtule/FSharp.Interop.Compose/releases">Release Notes</a></li>
+
+            <li class="nav-header">Getting started</li>
+            <li><a href="http://jbtule.github.io/FSharp.Interop.Compose/index.html">Home page</a></li>
+            <li><a href="http://jbtule.github.io/FSharp.Interop.Compose/why.html">Why Composable</a></li>
+
+            <li class="nav-header">Documentation</li>
+            <li><a href="http://jbtule.github.io/FSharp.Interop.Compose/reference/index.html">API Reference</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <a href="https://github.com/jbtule/FSharp.Interop.Compose"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a>
+  </body>
+  </html>

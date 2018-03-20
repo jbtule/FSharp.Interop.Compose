@@ -120,3 +120,6 @@ if choice.test then
                             ]
     let xunitRunner = @"tools\packages\xunit.runner.console\tools\net452\xunit.console.exe" |> Path.GetFullPath
     execAt "test/" xunitRunner [ @"bin\Debug\net47\Test.exe" ]
+
+if choice.docs then
+    DocHelper.generateDocs ()

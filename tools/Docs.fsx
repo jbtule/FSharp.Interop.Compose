@@ -31,7 +31,6 @@ open FSharp.Literate
 #load "Vars.fsx"
 
 let generateDocs () =
-  let testRoot = Path.Combine(root, "docs", "build", "output")
 
   let projInfo =
     [ "project-author",  authors |> String.concat ", "
@@ -41,9 +40,9 @@ let generateDocs () =
       "project-name", projectName
       "root" , projectUrl ]
 
-  let dll = Path.Combine(root, buildDir, "NET45", projectName + ".dll")
+  let dll = Path.Combine(root, buildDir, "Debug", "netstandard2.0", projectName + ".dll")
 
-  let outputDir = Path.Combine(docsBuildDir, "output")
+  let outputDir = docsBuildDir
 
   Directory.CreateDirectory(outputDir) |> ignore
 

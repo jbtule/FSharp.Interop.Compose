@@ -7,6 +7,7 @@
     <PackageProjectUrl>http://jbtule.github.io/FSharp.Interop.Compose</PackageProjectUrl>
     <PackageLicenseUrl>http://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
     <PackageTags>fsharp dynamic dlr</PackageTags>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile> 
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <Version>2.0.0</Version>

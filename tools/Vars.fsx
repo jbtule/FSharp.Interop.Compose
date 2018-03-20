@@ -6,12 +6,12 @@ open System.IO
 #load "CompilerHelper.fsx"
 
 // Properties
-let buildDir = "build"
+let buildDir = Path.Combine("proj", "bin")
 let srcDir = "src"
 let docsDir = "docs"
 let docsBuildDir = Path.Combine(docsDir, "www")
 let testDir = "test"
-let testBuildDir = Path.Combine(testDir, "build")
+let testBuildDir = Path.Combine(testDir, "bin")
 let nugetToolPath = Path.Combine("tools", "packages", "NuGet.CommandLine", "tools" , "NuGet.exe")
 let version = "1.14.0"
 let projectName = "FSharp.Interop.Compose"
