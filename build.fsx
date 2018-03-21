@@ -96,7 +96,9 @@ let msbuild = CompilerHelper.findMSBuild();
 
 if choice.clean then
     SimpleMake.clean srcDir
+#if !mono_posix
     SimpleMake.clean docsBuildDir
+#endif
     SimpleMake.clean "proj/bin/"
     SimpleMake.clean "proj/obj/"
     SimpleMake.clean "test/bin/"
@@ -122,5 +124,7 @@ if choice.test then
     let xunitRunner =  Path.Combine(xunitTools, "net452","xunit.console.exe") |> Path.GetFullPath
     execAt "test/" xunitRunner [  Path.Combine("bin", configuration, "net47", "Test.exe" ) ]
 
+#if !mono_posix
 if choice.docs then
     DocHelper.generateDocs ()
+#endif
