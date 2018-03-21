@@ -1,4 +1,4 @@
-// Generated with FSharp.Interop.Compose (1.14.0) http://jbtule.github.io/FSharp.Interop.Compose
+// Generated with FSharp.Interop.Compose (2.0.1) http://jbtule.github.io/FSharp.Interop.Compose
 
 namespace FSharp.Interop.Compose.IO
 /// Corresponding static methods as functions for [`System.IO.Path`](https://docs.microsoft.com/en-us/dotnet/api/system.io.path)

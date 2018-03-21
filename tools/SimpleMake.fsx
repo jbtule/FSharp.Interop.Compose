@@ -27,7 +27,7 @@ let clean path =
 
 let generate () = 
   let br = System.Environment.NewLine
-  let header  = sprintf "// Generated with %s (%s) %s" projectName version projectUrl
+  let header  = sprintf "// Generated with %s (%s) %s" projectName versionPrefix projectUrl
 
 
   let queryHeader = header + br + br

@@ -10,12 +10,11 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile> 
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-    <Version>2.0.0</Version>
     <DebugSymbols>false</DebugSymbols>
     <DebugType>None</DebugType>
   </PropertyGroup>
 
-
+  <Import Project="..\Version.props" />
 
   <ItemGroup Condition="'$(TargetFramework)'!='net35'">
     <Compile Include="../helpers/Quotations.fs" />

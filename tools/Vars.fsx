@@ -1,8 +1,13 @@
 [<AutoOpen>]
 module Vars
 
+
+#r "System.Xml.Linq"
+
 open System.IO
 open System
+open System.Xml.Linq
+open System.Xml.XPath
 
 #load "CompilerHelper.fsx"
 
@@ -17,7 +22,14 @@ let docsBuildDir = "docs"
 let testDir = "test"
 let testBuildDir = Path.Combine(testDir, "bin")
 let nugetToolPath = Path.Combine("tools", "packages", "NuGet.CommandLine", "tools" , "NuGet.exe")
-let version = "1.14.0"
+let versionPrefix = "Version.props" 
+                        |> File.ReadAllText 
+                        |> XDocument.Parse
+                        |> (fun x -> x.XPathEvaluate("//VersionPrefix/text()"))
+                        |> (fun x-> x :?> seq<obj>)
+                        |> Seq.exactlyOne
+                        |> sprintf "%A"
+
 let projectName = "FSharp.Interop.Compose"
 let projectUrl = "http://jbtule.github.io/FSharp.Interop.Compose"
 let gitHubProjectUrl = "https://github.com/jbtule/FSharp.Interop.Compose"
