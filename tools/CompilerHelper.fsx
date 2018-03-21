@@ -55,6 +55,8 @@ let msbuildPaths = [
                                       Path.Combine(sysDotNetLibPath,"msbuild", "15.0", "bin")
                                     ]
 
+printfn "%A" msbuildPaths
+
 let findMSBuild () =
         msbuildPaths
             |> Seq.map Path.GetFullPath

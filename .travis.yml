@@ -14,6 +14,7 @@ mono: beta
 dotnet: 2.0.3
 
 install:
+  - which msbuild
   - msbuild /ver
 
 script:
