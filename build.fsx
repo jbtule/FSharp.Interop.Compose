@@ -111,10 +111,10 @@ if choice.build then
     let msbuild = CompilerHelper.findMSBuild();
     execAt "proj/" msbuild [
                               "/t:restore" 
-                              sprintf "/p:VersionSuffix=%s" versionSuffix
+                              msbuildProp "VersionSuffix" versionSuffix
                            ]
     execAt "proj/" msbuild [
-                             sprintf "/p:VersionSuffix=%s" versionSuffix
+                              msbuildProp "VersionSuffix" versionSuffix
                            ]
 
 if choice.test then

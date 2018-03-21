@@ -31,6 +31,11 @@ type TargetFramework =
     | PORTABLE_259
     | NETSTD_2_0
 
+let msbuildProp arg v = if String.IsNullOrWhiteSpace(v) then
+                             String.Empty
+                          else
+                             sprintf "/p:%s=%s" arg v
+
 let sysDotNetLibPath =
         Assembly.GetAssembly(typeof<System.Object>).Location
              |> Path.GetDirectoryName
