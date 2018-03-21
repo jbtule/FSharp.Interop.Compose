@@ -7,7 +7,8 @@ matrix:
       sudo: required
     - os: osx
       osx_image: xcode8.3
-      
+  allow_failures:
+    - os: linux
 solution: FSharp.Interop.Compose.sln
     
 mono: beta
