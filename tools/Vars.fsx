@@ -12,8 +12,8 @@ let configuration = Environment.GetEnvironmentVariable("configuration")
 // Properties
 let buildDir = Path.Combine("proj", "bin")
 let srcDir = "src"
-let docsDir = "docs"
-let docsBuildDir = Path.Combine(docsDir, "www")
+let docsDir = "docs-src"
+let docsBuildDir = "docs"
 let testDir = "test"
 let testBuildDir = Path.Combine(testDir, "bin")
 let nugetToolPath = Path.Combine("tools", "packages", "NuGet.CommandLine", "tools" , "NuGet.exe")
