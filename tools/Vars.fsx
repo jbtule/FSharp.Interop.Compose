@@ -30,6 +30,10 @@ let versionPrefix = "Version.props"
                         |> Seq.exactlyOne
                         |> sprintf "%A"
 
+let versionSuffix = Environment.GetEnvironmentVariable("vsuffix")
+                    |> Option.ofObj
+                    |> Option.defaultValue ""
+
 let projectName = "FSharp.Interop.Compose"
 let projectUrl = "http://jbtule.github.io/FSharp.Interop.Compose"
 let gitHubProjectUrl = "https://github.com/jbtule/FSharp.Interop.Compose"

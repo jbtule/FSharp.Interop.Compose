@@ -109,8 +109,13 @@ if choice.gen then
 
 if choice.build then
     let msbuild = CompilerHelper.findMSBuild();
-    execAt "proj/" msbuild ["/t:restore"]
-    execAt "proj/" msbuild []
+    execAt "proj/" msbuild [
+                              "/t:restore" 
+                              sprintf "/p:VersionSuffix=%s" versionSuffix
+                           ]
+    execAt "proj/" msbuild [
+                             sprintf "/p:VersionSuffix=%s" versionSuffix
+                           ]
 
 if choice.test then
     execAt "test/" msbuild ["/t:restore"]
