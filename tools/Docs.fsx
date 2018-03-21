@@ -72,7 +72,7 @@ let generateDocs () =
       includeSource = true )
 
   Literate.ProcessMarkdown(
-      Path.Combine(root, "docs", "why.md"),
+      Path.Combine(root, docsDir, "why.md"),
       templateFile = template,
       output = Path.Combine(outputDir, "why.html"),
       replacements = projInfo,
