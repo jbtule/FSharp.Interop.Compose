@@ -31,6 +31,12 @@ type TargetFramework =
     | PORTABLE_259
     | NETSTD_2_0
 
+let sysDotNetLibPath =
+        Assembly.GetAssembly(typeof<System.Object>).Location
+             |> Path.GetDirectoryName
+             |> (fun x -> Path.Combine(x, ".."))
+             |> Path.GetFullPath
+
 let msbuildPaths = [
                     Path.Combine("Microsoft Visual Studio", "2017","Enterprise", "MSBuild", "15.0", "Bin" )
                     Path.Combine("Microsoft Visual Studio", "2017","Professional", "MSBuild", "15.0", "Bin" )
@@ -38,7 +44,11 @@ let msbuildPaths = [
                     Path.Combine("MSBuild","15.0", "Bin" )
                     Path.Combine("Microsoft Visual Studio", "2017","BuildTools", "MSBuild", "15.0", "Bin" )
                    ] 
-                   |> Seq.map (fun x-> Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), x))
+                     |> List.map (fun x-> Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), x))
+                     |> List.append [
+                                      Path.Combine("/Library","Frameworks","Mono.framework","Versions","Current","Commands")
+                                      Path.Combine(sysDotNetLibPath,"..","msbuild", "15.0", "bin")
+                                    ]
 
 let findMSBuild () =
         msbuildPaths
@@ -47,6 +57,20 @@ let findMSBuild () =
             |> Seq.collect (fun p -> [Path.Combine(p, "msbuild"); Path.Combine(p, "msbuild.exe")])
             |> Seq.tryFind File.Exists
             |> Option.defaultValue "msbuild"
+
+let dotnetExePath = [
+                        Path.Combine(@"C:\Program Files", "dotnet")
+                        Path.Combine("/usr","local","share","dotnet")
+                        Path.Combine("/usr","share","dotnet")
+                    ]
+let findDotNet () =
+        dotnetExePath
+            |> Seq.map Path.GetFullPath
+            |> Seq.filter Directory.Exists
+            |> Seq.collect (fun p -> [Path.Combine(p, "dotnet"); Path.Combine(p, "dotnet.exe")])
+            |> Seq.tryFind File.Exists
+            |> Option.defaultValue "dotnet"
+
 
 
 let defaultSystemDlls (target:TargetFramework) =
@@ -133,11 +157,7 @@ let systemDllsResolver (systemDlls:string list,target:TargetFramework) =
     let fsharpSDK = Path.Combine (programFiles, "Reference Assemblies","Microsoft","FSharp");
     let fsharpSDK30 = Path.Combine (fsharpSDK,"3.0");
 
-    let sysDotNetLibPath =
-        Assembly.GetAssembly(typeof<System.Object>).Location
-             |> Path.GetDirectoryName
-             |> (fun x -> Path.Combine(x, ".."))
-             |> Path.GetFullPath
+
 
     let monoFSharpSDK = Path.Combine (sysDotNetLibPath, "Reference Assemblies","Microsoft","FSharp");
     let allStdPaths =

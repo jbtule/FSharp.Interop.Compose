@@ -113,13 +113,14 @@ if choice.build then
 if choice.test then
     execAt "test/" msbuild ["/t:restore"]
     execAt "test/" msbuild []
-    let dotnet = Path.Combine(@"C:\Program Files", "dotnet", "dotnet.exe")
+    let xunitTools = Path.Combine("tools","packages", "xunit.runner.console","tools")
+    let dotnet = findDotNet ()
     execAt "test/" dotnet   [
-                                @"..\tools\packages\xunit.runner.console\tools\netcoreapp2.0\xunit.console.dll"
-                                @"bin\Debug\netcoreapp2.0\Test.dll"
+                                Path.Combine("..", xunitTools, "netcoreapp2.0","xunit.console.dll")
+                                Path.Combine("bin", configuration, "netcoreapp2.0", "Test.dll" )
                             ]
-    let xunitRunner = @"tools\packages\xunit.runner.console\tools\net452\xunit.console.exe" |> Path.GetFullPath
-    execAt "test/" xunitRunner [ @"bin\Debug\net47\Test.exe" ]
+    let xunitRunner =  Path.Combine(xunitTools, "net452","xunit.console.exe") |> Path.GetFullPath
+    execAt "test/" xunitRunner [  Path.Combine("bin", configuration, "net47", "Test.exe" ) ]
 
 if choice.docs then
     DocHelper.generateDocs ()

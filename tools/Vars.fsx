@@ -2,9 +2,13 @@
 module Vars
 
 open System.IO
+open System
 
 #load "CompilerHelper.fsx"
 
+let configuration = Environment.GetEnvironmentVariable("configuration")
+                    |> Option.ofObj
+                    |> Option.defaultValue "Debug"
 // Properties
 let buildDir = Path.Combine("proj", "bin")
 let srcDir = "src"
