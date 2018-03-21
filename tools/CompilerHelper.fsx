@@ -52,7 +52,7 @@ let msbuildPaths = [
                      |> List.map (fun x-> Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), x))
                      |> List.append [
                                       Path.Combine("/Library","Frameworks","Mono.framework","Versions","Current","Commands")
-                                      Path.Combine(sysDotNetLibPath,"..","msbuild", "15.0", "bin")
+                                      Path.Combine(sysDotNetLibPath,"msbuild", "15.0", "bin")
                                     ]
 
 let findMSBuild () =
