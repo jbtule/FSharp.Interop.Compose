@@ -1,7 +1,7 @@
-#FSharp.Interop.Compose Extensions
+# FSharp.Interop.Compose Extensions
 
 inlined composable fsharp functions around BCL static methods. Supports .net 3.5 through .net Standard
-##Examples
+## Examples
 
 `FSharp.Interop.Compose.Linq.Enumerable`
 
@@ -23,17 +23,17 @@ inlined composable fsharp functions around BCL static methods. Supports .net 3.5
     ["One";"Two";"Three"]
        |> Seq.filter (String.startsWith "T") // seq ["Two";"Three"]
 
-##API
+## API
 
 See [api-docs](http://jbtule.github.io/FSharp.Interop.Compose/reference/index.html) for wrapper functions
 
-##Use
+## Use
 To use precompiled dll, add with [nuget](https://www.nuget.org/packages/FSharp.Interop.Compose/)
 
     PM> Install-Package FSharp.Interop.Compose
 
 
-##Contribute
+## Contribute
 
 The `generate` target of the F# make file [Make.fsx](https://github.com/jbtule/FSharp.Interop.Compose/blob/master/tools/Make.fsx) provides a mechansim to identify static base class libraries and alter their parameter order and write out the module on a per class basis.
 
@@ -44,7 +44,7 @@ The [tool/Generate.fsx](https://github.com/jbtule/FSharp.Interop.Compose/blob/ma
 FSUnit xUnit tests can be added in `.fsx` files in the [test](https://github.com/jbtule/FSharp.Interop.Compose/tree/master/test) directory.
 
 
-##Build
+## Build
 To build on Mono [![Build Status](https://travis-ci.org/jbtule/FSharp.Interop.Compose.png?branch=master)](https://travis-ci.org/jbtule/FSharp.Interop.Compose)
 
     ./build.fsx

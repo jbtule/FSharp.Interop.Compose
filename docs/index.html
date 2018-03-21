@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>FSharp.Interop.Compose Extensions
+</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Inline composable fsharp functions around BCL static methods. Supports .net 3.5 through .net Standard">
+    <meta name="author" content="Jay Tuley">
+
+    <script src="http://code.jquery.com/jquery-1.8.0.js"></script>
+    <script src="http://code.jquery.com/ui/1.8.23/jquery-ui.js"></script>
+    <script src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/css/bootstrap-combined.min.css" rel="stylesheet">
+
+    <link type="text/css" rel="stylesheet" href="http://jbtule.github.io/FSharp.Interop.Compose/content/style.css" />
+    <script type="text/javascript" src="http://jbtule.github.io/FSharp.Interop.Compose/content/tips.js"></script>
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="container">
+      <div class="masthead">
+        <ul class="nav nav-pills pull-right">
+          <li><a href="http://fsharp.org">fsharp.org</a></li>
+          <li><a href="https://github.com/jbtule/FSharp.Interop.Compose">github page</a></li>
+        </ul>
+        <h3 class="muted">FSharp.Interop.Compose</h3>
+      </div>
+      <hr />
+      <div class="row">
+        <div class="span9" id="main">
+          
+<h1>FSharp.Interop.Compose Extensions</h1>
+<p>inlined composable fsharp functions around BCL static methods. Supports .net 3.5 through .net Standard</p>
+<h2>Examples</h2>
+<p><code>FSharp.Interop.Compose.Linq.Enumerable</code></p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l"> 1: </span>
+<span class="l"> 2: </span>
+<span class="l"> 3: </span>
+<span class="l"> 4: </span>
+<span class="l"> 5: </span>
+<span class="l"> 6: </span>
+<span class="l"> 7: </span>
+<span class="l"> 8: </span>
+<span class="l"> 9: </span>
+<span class="l">10: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">open</span> <span class="i">FSharp</span><span class="o">.</span><span class="i">Interop</span><span class="o">.</span><span class="i">Compose</span><span class="o">.</span><span class="i">Linq</span>
+
+<span class="i">seq</span> { <span class="n">1</span> <span class="o">..</span> <span class="n">5</span> } <span class="o">|&gt;</span> <span class="i">Enumerable</span><span class="o">.</span><span class="i">reverse</span> <span class="c">// seq [5; 4; 3; 2; ...]</span>
+
+<span class="i">Seq</span><span class="o">.</span><span class="i">empty</span><span class="o">&lt;</span><span class="i">int</span><span class="o">&gt;</span> <span class="o">|&gt;</span> <span class="i">Enumerable</span><span class="o">.</span><span class="i">defaultIfEmpty</span> <span class="c">// seq [0]</span>
+
+[(<span class="s">&quot;Rust&quot;</span>, <span class="s">&quot;Cohle&quot;</span>); (<span class="s">&quot;Marty&quot;</span>, <span class="s">&quot;Hart&quot;</span>); (<span class="s">&quot;Maggie&quot;</span>, <span class="s">&quot;Hart&quot;</span>)]
+    <span class="o">|&gt;</span> <span class="i">Enumerable</span><span class="o">.</span><span class="i">orderBy</span> <span class="i">snd</span>
+    <span class="o">|&gt;</span> <span class="i">Enumerable</span><span class="o">.</span><span class="i">thenBy</span> <span class="i">fst</span>
+  <span class="c">//seq [(&quot;Rust&quot;, &quot;Cohle&quot;); (&quot;Maggie&quot;, &quot;Hart&quot;); (&quot;Marty&quot;, &quot;Hart&quot;)]</span>
+</code></pre></td>
+</tr>
+</table>
+<p><code>FSharp.Interop.Compose.System.String</code></p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">open</span> <span class="i">FSharp</span><span class="o">.</span><span class="i">Interop</span><span class="o">.</span><span class="i">Compose</span><span class="o">.</span><span class="i">System</span>
+
+[<span class="s">&quot;One&quot;</span>;<span class="s">&quot;Two&quot;</span>;<span class="s">&quot;Three&quot;</span>]
+   <span class="o">|&gt;</span> <span class="i">Seq</span><span class="o">.</span><span class="i">filter</span> (<span class="i">String</span><span class="o">.</span><span class="i">startsWith</span> <span class="s">&quot;T&quot;</span>) <span class="c">// seq [&quot;Two&quot;;&quot;Three&quot;]</span>
+</code></pre></td>
+</tr>
+</table>
+<h2>API</h2>
+<p>See <a href="http://jbtule.github.io/FSharp.Interop.Compose/reference/index.html">api-docs</a> for wrapper functions</p>
+<h2>Use</h2>
+<p>To use precompiled dll, add with <a href="https://www.nuget.org/packages/FSharp.Interop.Compose/">nuget</a></p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="i">PM</span><span class="o">&gt;</span> <span class="i">Install</span><span class="o">-</span><span class="i">Package</span> <span class="i">FSharp</span><span class="o">.</span><span class="i">Interop</span><span class="o">.</span><span class="i">Compose</span>
+</code></pre></td>
+</tr>
+</table>
+<h2>Contribute</h2>
+<p>The <code>generate</code> target of the F# make file <a href="https://github.com/jbtule/FSharp.Interop.Compose/blob/master/tools/Make.fsx">Make.fsx</a> provides a mechansim to identify static base class libraries and alter their parameter order and write out the module on a per class basis.</p>
+<p>The <a href="https://github.com/jbtule/FSharp.Interop.Compose/blob/master/tools/Generate.fsx">tool/Generate.fsx</a> script provides the generalized api for generating those wrappers.</p>
+<p><em>Note: inline non-mutating instance method</em></p>
+<p>FSUnit xUnit tests can be added in <code>.fsx</code> files in the <a href="https://github.com/jbtule/FSharp.Interop.Compose/tree/master/test">test</a> directory.</p>
+<h2>Build</h2>
+<p>To build on Mono <a href="https://travis-ci.org/jbtule/FSharp.Interop.Compose"><img src="https://travis-ci.org/jbtule/FSharp.Interop.Compose.png?branch=master" alt="Build Status" /></a></p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="o">.</span><span class="o">/</span><span class="i">build</span><span class="o">.</span><span class="i">fsx</span>
+</code></pre></td>
+</tr>
+</table>
+<p>or on Windows <a href="https://ci.appveyor.com/project/jbtule/fsharp-interop-compose"><img src="https://ci.appveyor.com/api/projects/status/15onhtma28is6dr5?svg=true" alt="Build status" /></a></p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="i">fsi</span> <span class="o">--</span><span class="i">exec</span> <span class="i">build</span><span class="o">.</span><span class="i">fsx</span>
+</code></pre></td>
+</tr>
+</table>
+
+
+        </div>
+        <div class="span3">
+          <ul class="nav nav-list" id="menu">
+            <li class="nav-header">FSharp.Interop.Compose</li>
+            <li><a href="http://jbtule.github.io/FSharp.Interop.Compose/index.html">Home page</a></li>
+            <li class="divider"></li>
+            <li><a href="http://nuget.org/packages/FSharp.Interop.Compose">Get Library via NuGet</a></li>
+            <li><a href="https://github.com/jbtule/FSharp.Interop.Compose">Source Code on GitHub</a></li>
+            <li><a href="https://github.com/jbtule/FSharp.Interop.Compose/blob/master/LICENSE.txt">License</a></li>
+            <li><a href="https://github.com/jbtule/FSharp.Interop.Compose/releases">Release Notes</a></li>
+
+            <li class="nav-header">Getting started</li>
+            <li><a href="http://jbtule.github.io/FSharp.Interop.Compose/index.html">Home page</a></li>
+            <li><a href="http://jbtule.github.io/FSharp.Interop.Compose/why.html">Why Composable</a></li>
+
+            <li class="nav-header">Documentation</li>
+            <li><a href="http://jbtule.github.io/FSharp.Interop.Compose/reference/index.html">API Reference</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <a href="https://github.com/jbtule/FSharp.Interop.Compose"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a>
+  </body>
+  </html>

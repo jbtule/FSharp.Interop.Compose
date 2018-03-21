@@ -15,14 +15,11 @@
 
 [<AutoOpen>]
 module CompilerHelper
+open System
 
-#I "packages/FSharp.Compiler.Service/lib/net40/"
+#I "packages/FSharp.Compiler.Service/lib/net45/"
 #r "FSharp.Compiler.Service.dll"
-#I "packages/FAKE/tools"
-#r "FakeLib.dll"
 
-open Microsoft.FSharp.Compiler.SimpleSourceCodeServices
-open Fake.TraceHelper
 open System.IO
 open System.Reflection
 
@@ -32,8 +29,55 @@ type TargetFramework =
     | NET35
     | PORTABLE_47
     | PORTABLE_259
+    | NETSTD_2_0
 
-exception CompilerError of string
+let msbuildProp arg v = if String.IsNullOrWhiteSpace(v) then
+                             String.Empty
+                          else
+                             sprintf "/p:%s=%s" arg v
+
+let sysDotNetLibPath =
+        Assembly.GetAssembly(typeof<System.Object>).Location
+             |> Path.GetDirectoryName
+             |> (fun x -> Path.Combine(x, ".."))
+             |> Path.GetFullPath
+
+let msbuildPaths = [
+                    Path.Combine("Microsoft Visual Studio", "2017","Enterprise", "MSBuild", "15.0", "Bin" )
+                    Path.Combine("Microsoft Visual Studio", "2017","Professional", "MSBuild", "15.0", "Bin" )
+                    Path.Combine("Microsoft Visual Studio", "2017","Community", "MSBuild", "15.0", "Bin" )
+                    Path.Combine("MSBuild","15.0", "Bin" )
+                    Path.Combine("Microsoft Visual Studio", "2017","BuildTools", "MSBuild", "15.0", "Bin" )
+                   ] 
+                     |> List.map (fun x-> Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), x))
+                     |> List.append [
+                                      Path.Combine("/Library","Frameworks","Mono.framework","Versions","Current","Commands")
+                                      Path.Combine(sysDotNetLibPath,"msbuild", "15.0", "bin")
+                                      Path.Combine("/usr","bin")
+                                    ]
+
+let findMSBuild () =
+        msbuildPaths
+            |> Seq.map Path.GetFullPath
+            |> Seq.filter Directory.Exists
+            |> Seq.collect (fun p -> [Path.Combine(p, "msbuild"); Path.Combine(p, "msbuild.exe")])
+            |> Seq.tryFind File.Exists
+            |> Option.defaultValue "msbuild"
+
+let dotnetExePath = [
+                        Path.Combine(@"C:\Program Files", "dotnet")
+                        Path.Combine("/usr","local","share","dotnet")
+                        Path.Combine("/usr","share","dotnet")
+                    ]
+let findDotNet () =
+        dotnetExePath
+            |> Seq.map Path.GetFullPath
+            |> Seq.filter Directory.Exists
+            |> Seq.collect (fun p -> [Path.Combine(p, "dotnet"); Path.Combine(p, "dotnet.exe")])
+            |> Seq.tryFind File.Exists
+            |> Option.defaultValue "dotnet"
+
+
 
 let defaultSystemDlls (target:TargetFramework) =
     match target with
@@ -105,6 +149,10 @@ let defaultSystemDlls (target:TargetFramework) =
                 "System.Threading.Tasks.dll"
                 "System.Threading.Tasks.Parallel.dll"
             ]
+        | NETSTD_2_0 ->
+            [   
+                "netstandard.dll"
+            ]
 
 let systemTargetInfo (target:TargetFramework) =
     (defaultSystemDlls target, target)
@@ -115,15 +163,15 @@ let systemDllsResolver (systemDlls:string list,target:TargetFramework) =
     let fsharpSDK = Path.Combine (programFiles, "Reference Assemblies","Microsoft","FSharp");
     let fsharpSDK30 = Path.Combine (fsharpSDK,"3.0");
 
-    let sysDotNetLibPath =
-        Assembly.GetAssembly(typeof<System.Object>).Location
-             |> Path.GetDirectoryName
-             |> (fun x -> Path.Combine(x, ".."))
-             |> Path.GetFullPath
+
 
     let monoFSharpSDK = Path.Combine (sysDotNetLibPath, "Reference Assemblies","Microsoft","FSharp");
     let allStdPaths =
         match target with
+            | NETSTD_2_0 ->
+                [
+                    "./tools/std20/packages/NETStandard.Library/build/netstandard2.0/ref/"
+                ]
             | NET45 ->
                 [
                   Path.Combine(msSDK,".NETFramework", "v4.5.1", "Facades") 
@@ -163,6 +211,10 @@ let systemDllsResolver (systemDlls:string list,target:TargetFramework) =
 
     let fsharpPaths =
         match target with
+            | NETSTD_2_0 ->
+                [
+                   "./tools/std20/packages/FSharp.Core/lib/netstandard1.6/"
+                ]
             | PORTABLE_47 ->
                 [   Path.Combine(fsharpSDK, ".NETPortable", "2.3.5.1") //Windows F# 3.1
                     Path.Combine(monoFSharpSDK, ".NETPortable", "2.3.5.1") //Mono F# 3.1
@@ -204,13 +256,15 @@ let systemDllsResolver (systemDlls:string list,target:TargetFramework) =
 
     let searchPaths (paths:string list) =
         paths
-            |> Seq.map (fun p-> Path.GetFullPath p)
-            |> Seq.filter (fun p -> Directory.Exists p)
+            |> Seq.map Path.GetFullPath
+            |> Seq.filter Directory.Exists
 
     let fsharpCore =
         searchPaths fsharpPaths
             |> Seq.map (fun p -> Path.Combine(p, "FSharp.Core.dll"))
             |> Seq.find File.Exists
+
+    
 
     let dllPath dll =
         searchPaths allStdPaths
@@ -221,36 +275,3 @@ let systemDllsResolver (systemDlls:string list,target:TargetFramework) =
         |> List.choose dllPath
         |> List.append [fsharpCore]
 
-let private fscTargetingHelper (systemDlls:string list) (target:TargetFramework option)  (args:string list) =
-
-    let extraArgs (t:TargetFramework) =
-        ["--noframework"; sprintf "--define:%A" t]
-            @ match t with
-                | PORTABLE_259 -> ["--targetprofile:netcore"]
-                | __________ -> List.empty
-
-    let moreArgs =
-        match target with
-        | Some(t) -> systemDllsResolver (systemDlls, t)
-                                |> List.map (fun p-> sprintf "--reference:%s" p)
-                                |> List.append (extraArgs t)
-        | _______________ -> List.empty
-
-    let compilerOpts = ["fsc.exe"] @ moreArgs @ args
-    log (compilerOpts|> String.concat " ")
-    let scs = SimpleSourceCodeServices()
-    let errors,errorCode = scs.Compile(compilerOpts |> List.toArray)
-    for e in errors do
-        let errMsg = e.ToString()
-        match e.Severity with
-            | Microsoft.FSharp.Compiler.FSharpErrorSeverity.Warning -> traceImportant errMsg
-            | Microsoft.FSharp.Compiler.FSharpErrorSeverity.Error -> traceError errMsg
-    if errorCode = 0 then
-        trace "Compile Success"
-    else
-        raise (CompilerError "Compile Failed")
-    ()
-
-let fsc = fscTargetingHelper [] None
-let fscTargeting (systemDlls, target) = 
-    fscTargetingHelper systemDlls (Some(target))

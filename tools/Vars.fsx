@@ -1,19 +1,39 @@
 [<AutoOpen>]
 module Vars
 
+
+#r "System.Xml.Linq"
+
 open System.IO
+open System
+open System.Xml.Linq
+open System.Xml.XPath
 
 #load "CompilerHelper.fsx"
 
+let configuration = Environment.GetEnvironmentVariable("configuration")
+                    |> Option.ofObj
+                    |> Option.defaultValue "Debug"
 // Properties
-let buildDir = "build"
+let buildDir = Path.Combine("proj", "bin")
 let srcDir = "src"
-let docsDir = "docs"
-let docsBuildDir = Path.Combine(docsDir, "build")
+let docsDir = "docs-src"
+let docsBuildDir = "docs"
 let testDir = "test"
-let testBuildDir = Path.Combine(testDir, "build")
+let testBuildDir = Path.Combine(testDir, "bin")
 let nugetToolPath = Path.Combine("tools", "packages", "NuGet.CommandLine", "tools" , "NuGet.exe")
-let version = "1.14.0"
+let versionPrefix = "Version.props" 
+                        |> File.ReadAllText 
+                        |> XDocument.Parse
+                        |> (fun x -> x.XPathEvaluate("//VersionPrefix/text()"))
+                        |> (fun x-> x :?> seq<obj>)
+                        |> Seq.exactlyOne
+                        |> sprintf "%A"
+
+let versionSuffix = Environment.GetEnvironmentVariable("vsuffix")
+                    |> Option.ofObj
+                    |> Option.defaultValue ""
+
 let projectName = "FSharp.Interop.Compose"
 let projectUrl = "http://jbtule.github.io/FSharp.Interop.Compose"
 let gitHubProjectUrl = "https://github.com/jbtule/FSharp.Interop.Compose"
@@ -25,4 +45,4 @@ let description = "Inline composable fsharp functions around BCL static methods.
 let authors = ["Jay Tuley"]
 //let guid = "68ebe4ce-c63b-478d-a084-c5e36b3e8091"
 let root = System.Environment.CurrentDirectory
-let projectTargets = [ NET45; NET40; NET35; PORTABLE_47; PORTABLE_259 ]
+let projectTargets = [ NET45; NET40; NET35; PORTABLE_47; PORTABLE_259; NETSTD_2_0 ]

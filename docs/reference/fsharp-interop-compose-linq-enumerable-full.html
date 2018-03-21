@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Full - FSharp.Interop.Compose</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="Jay Tuley">
+
+    <script src="http://code.jquery.com/jquery-1.8.0.js"></script>
+    <script src="http://code.jquery.com/ui/1.8.23/jquery-ui.js"></script>
+    <script src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/css/bootstrap-combined.min.css" rel="stylesheet">
+
+    <link type="text/css" rel="stylesheet" href="http://jbtule.github.io/FSharp.Interop.Compose/content/style.css" />
+    <script type="text/javascript" src="http://jbtule.github.io/FSharp.Interop.Compose/content/tips.js"></script>
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="container">
+      <div class="masthead">
+        <ul class="nav nav-pills pull-right">
+          <li><a href="http://fsharp.org">fsharp.org</a></li>
+          <li><a href="https://github.com/jbtule/FSharp.Interop.Compose">github page</a></li>
+        </ul>
+        <h3 class="muted">FSharp.Interop.Compose</h3>
+      </div>
+      <hr />
+      <div class="row">
+        <div class="span9" id="main">
+          
+
+
+
+<h1>Full</h1>
+<div class="xmldoc">
+<p>Longer parameter versions of <code>System.Linq.Enumerable</code> methods</p>
+
+</div>
+
+<!-- Render nested types and modules, if there are any -->
+
+  <h3>Functions and values</h3>
+  <table class="table table-bordered member-list">
+    <thead>
+      <tr><td>Function or value</td><td>Description</td></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="member-name">
+
+          <code onmouseout="hideTip(event, '59', 59)" onmouseover="showTip(event, '59', 59)">
+            aggregate (...)
+          </code>
+          <div class="tip" id="59">
+            <strong>Signature:</strong> seed:&#39;TAccumulate -&gt; func:(&#39;TAccumulate -&gt; &#39;TSource -&gt; &#39;TAccumulate) -&gt; resultSelector:(&#39;TAccumulate -&gt; &#39;TResult) -&gt; source:(type) -&gt; &#39;TResult<br />
+                          <strong>Type parameters:</strong> 'TAccumulate, 'TSource, 'TResult          </div>
+        </td>
+        <td class="xmldoc">
+        <p>Calls <a href="https://docs.microsoft.com/en-us/dotnet/api/system.linq.enumerable.aggregate"><code>Aggregate(source, seed, System.Func&lt;'TAccumulate, 'TSource, 'TAccumulate&gt;(func), System.Func&lt;'TAccumulate, 'TResult&gt;(resultSelector))</code></a></p>
+
+
+            <a href="https://github.com/jbtule/FSharp.Interop.Compose/blob/stable/src/netstd_2_0/FSharp.Interop.Compose.Linq/Enumerable.fs#L149-149" class="github-link">Go to GitHub source</a>
+        </td>
+      </tr>
+      <tr>
+        <td class="member-name">
+
+          <code onmouseout="hideTip(event, '60', 60)" onmouseover="showTip(event, '60', 60)">
+            any predicate source
+          </code>
+          <div class="tip" id="60">
+            <strong>Signature:</strong> predicate:(&#39;TSource -&gt; (type)) -&gt; source:(type) -&gt; bool<br />
+                          <strong>Type parameters:</strong> 'TSource          </div>
+        </td>
+        <td class="xmldoc">
+        <p>Calls <a href="https://docs.microsoft.com/en-us/dotnet/api/system.linq.enumerable.any"><code>Any(source, System.Func&lt;'TSource, System.Boolean&gt;(predicate))</code></a></p>
+
+
+            <a href="https://github.com/jbtule/FSharp.Interop.Compose/blob/stable/src/netstd_2_0/FSharp.Interop.Compose.Linq/Enumerable.fs#L152-152" class="github-link">Go to GitHub source</a>
+        </td>
+      </tr>
+      <tr>
+        <td class="member-name">
+
+          <code onmouseout="hideTip(event, '61', 61)" onmouseover="showTip(event, '61', 61)">
+            contains value comparer source
+          </code>
+          <div class="tip" id="61">
+            <strong>Signature:</strong> value:&#39;?8194 -&gt; comparer:(type) -&gt; source:(type) -&gt; bool<br />
+                          <strong>Type parameters:</strong> '?8194          </div>
+        </td>
+        <td class="xmldoc">
+        <p>Calls <a href="https://docs.microsoft.com/en-us/dotnet/api/system.linq.enumerable.contains"><code>Contains(source, value, comparer)</code></a></p>
+
+
+            <a href="https://github.com/jbtule/FSharp.Interop.Compose/blob/stable/src/netstd_2_0/FSharp.Interop.Compose.Linq/Enumerable.fs#L155-155" class="github-link">Go to GitHub source</a>
+        </td>
+      </tr>
+      <tr>
+        <td class="member-name">
+
+          <code onmouseout="hideTip(event, '62', 62)" onmouseover="showTip(event, '62', 62)">
+            count predicate source
+          </code>
+          <div class="tip" id="62">
+            <strong>Signature:</strong> predicate:(&#39;TSource -&gt; (type)) -&gt; source:(type) -&gt; int<br />
+                          <strong>Type parameters:</strong> 'TSource          </div>
+        </td>
+        <td class="xmldoc">
+        <p>Calls <a href="https://docs.microsoft.com/en-us/dotnet/api/system.linq.enumerable.count"><code>Count(source, System.Func&lt;'TSource, System.Boolean&gt;(predicate))</code></a></p>
+
+
+            <a href="https://github.com/jbtule/FSharp.Interop.Compose/blob/stable/src/netstd_2_0/FSharp.Interop.Compose.Linq/Enumerable.fs#L158-158" class="github-link">Go to GitHub source</a>
+        </td>
+      </tr>
+      <tr>
+        <td class="member-name">
+
+          <code onmouseout="hideTip(event, '63', 63)" onmouseover="showTip(event, '63', 63)">
+            defaultIfEmpty defaultValue source
+          </code>
+          <div class="tip" id="63">
+            <strong>Signature:</strong> defaultValue:&#39;?8198 -&gt; source:(type) -&gt; (type)<br />
+                          <strong>Type parameters:</strong> '?8198          </div>
+        </td>
+        <td class="xmldoc">
+        <p>Calls <a href="https://docs.microsoft.com/en-us/dotnet/api/system.linq.enumerable.defaultifempty"><code>DefaultIfEmpty(source, defaultValue)</code></a></p>
+
+
+            <a href="https://github.com/jbtule/FSharp.Interop.Compose/blob/stable/src/netstd_2_0/FSharp.Interop.Compose.Linq/Enumerable.fs#L161-161" class="github-link">Go to GitHub source</a>
+        </td>
+      </tr>
+      <tr>
+        <td class="member-name">
+
+          <code onmouseout="hideTip(event, '64', 64)" onmouseover="showTip(event, '64', 64)">
+            distinct comparer source
+          </code>
+          <div class="tip" id="64">
+            <strong>Signature:</strong> comparer:(type) -&gt; source:(type) -&gt; (type)<br />
+                          <strong>Type parameters:</strong> '?8200          </div>
+        </td>
+        <td class="xmldoc">
+        <p>Calls <a href="https://docs.microsoft.com/en-us/dotnet/api/system.linq.enumerable.distinct"><code>Distinct(source, comparer)</code></a></p>
+
+
+            <a href="https://github.com/jbtule/FSharp.Interop.Compose/blob/stable/src/netstd_2_0/FSharp.Interop.Compose.Linq/Enumerable.fs#L164-164" class="github-link">Go to GitHub source</a>
+        </td>
+      </tr>
+      <tr>
+        <td class="member-name">
+
+          <code onmouseout="hideTip(event, '65', 65)" onmouseover="showTip(event, '65', 65)">
+            except second comparer first
+          </code>
+          <div class="tip" id="65">
+            <strong>Signature:</strong> second:(type) -&gt; comparer:(type) -&gt; first:(type) -&gt; (type)<br />
+                          <strong>Type parameters:</strong> '?8202          </div>
+        </td>
+        <td class="xmldoc">
+        <p>Calls <a href="https://docs.microsoft.com/en-us/dotnet/api/system.linq.enumerable.except"><code>Except(first, second, comparer)</code></a></p>
+
+
+            <a href="https://github.com/jbtule/FSharp.Interop.Compose/blob/stable/src/netstd_2_0/FSharp.Interop.Compose.Linq/Enumerable.fs#L167-167" class="github-link">Go to GitHub source</a>
+        </td>
+      </tr>
+      <tr>
+        <td class="member-name">
+
+          <code onmouseout="hideTip(event, '66', 66)" onmouseover="showTip(event, '66', 66)">
+            first predicate source
+          </code>
+          <div class="tip" id="66">
+            <strong>Signature:</strong> predicate:(&#39;TSource -&gt; (type)) -&gt; source:(type) -&gt; &#39;TSource<br />
+                          <strong>Type parameters:</strong> 'TSource          </div>
+        </td>
+        <td class="xmldoc">
+        <p>Calls <a href="https://docs.microsoft.com/en-us/dotnet/api/system.linq.enumerable.first"><code>First(source, System.Func&lt;'TSource, System.Boolean&gt;(predicate))</code></a></p>
+
+
+            <a href="https://github.com/jbtule/FSharp.Interop.Compose/blob/stable/src/netstd_2_0/FSharp.Interop.Compose.Linq/Enumerable.fs#L170-170" class="github-link">Go to GitHub source</a>
+        </td>
+      </tr>
+      <tr>
+        <td class="member-name">
+
+          <code onmouseout="hideTip(event, '67', 67)" onmouseover="showTip(event, '67', 67)">
+            firstOrDefault predicate source
+          </code>
+          <div class="tip" id="67">
+            <strong>Signature:</strong> predicate:(&#39;TSource -&gt; (type)) -&gt; source:(type) -&gt; &#39;TSource<br />
+                          <strong>Type parameters:</strong> 'TSource          </div>
+        </td>
+        <td class="xmldoc">
+        <p>Calls <a href="https://docs.microsoft.com/en-us/dotnet/api/system.linq.enumerable.firstordefault"><code>FirstOrDefault(source, System.Func&lt;'TSource, System.Boolean&gt;(predicate))</code></a></p>
+
+
+            <a href="https://github.com/jbtule/FSharp.Interop.Compose/blob/stable/src/netstd_2_0/FSharp.Interop.Compose.Linq/Enumerable.fs#L173-173" class="github-link">Go to GitHub source</a>
+        </td>
+      </tr>
+      <tr>
+        <td class="member-name">
+
+          <code onmouseout="hideTip(event, '68', 68)" onmouseover="showTip(event, '68', 68)">
+            groupBy (...)
+          </code>
+          <div class="tip" id="68">
+            <strong>Signature:</strong> keySelector:(&#39;TSource -&gt; &#39;TKey) -&gt; elementSelector:(&#39;TSource -&gt; &#39;TElement) -&gt; resultSelector:(&#39;TKey -&gt; (type) -&gt; &#39;TResult) -&gt; comparer:(type) -&gt; source:(type) -&gt; (type)<br />
+                          <strong>Type parameters:</strong> 'TSource, 'TKey, 'TElement, 'TResult          </div>
+        </td>
+        <td class="xmldoc">
+        <p>Calls <a href="https://docs.microsoft.com/en-us/dotnet/api/system.linq.enumerable.groupby"><code>GroupBy(source, System.Func&lt;'TSource, 'TKey&gt;(keySelector), System.Func&lt;'TSource, 'TElement&gt;(elementSelector), System.Func&lt;'TKey, System.Collections.Generic.IEnumerable&lt;'TElement&gt;, 'TResult&gt;(resultSelector), comparer)</code></a></p>
+
+
+            <a href="https://github.com/jbtule/FSharp.Interop.Compose/blob/stable/src/netstd_2_0/FSharp.Interop.Compose.Linq/Enumerable.fs#L176-176" class="github-link">Go to GitHub source</a>
+        </td>
+      </tr>
+      <tr>
+        <td class="member-name">
+
+          <code onmouseout="hideTip(event, '69', 69)" onmouseover="showTip(event, '69', 69)">
+            groupJoin (...)
+          </code>
+          <div class="tip" id="69">
+            <strong>Signature:</strong> outerKeySelector:(&#39;TOuter -&gt; &#39;TKey) -&gt; innerKeySelector:(&#39;TInner -&gt; &#39;TKey) -&gt; resultSelector:(&#39;TOuter -&gt; (type) -&gt; &#39;TResult) -&gt; comparer:(type) -&gt; outer:(type) -&gt; inner:(type) -&gt; (type)<br />
+                          <strong>Type parameters:</strong> 'TOuter, 'TKey, 'TInner, 'TResult          </div>
+        </td>
+        <td class="xmldoc">
+        <p>Calls <a href="https://docs.microsoft.com/en-us/dotnet/api/system.linq.enumerable.groupjoin"><code>GroupJoin(outer, inner, System.Func&lt;'TOuter, 'TKey&gt;(outerKeySelector), System.Func&lt;'TInner, 'TKey&gt;(innerKeySelector), System.Func&lt;'TOuter, System.Collections.Generic.IEnumerable&lt;'TInner&gt;, 'TResult&gt;(resultSelector), comparer)</code></a></p>
+
+
+            <a href="https://github.com/jbtule/FSharp.Interop.Compose/blob/stable/src/netstd_2_0/FSharp.Interop.Compose.Linq/Enumerable.fs#L179-179" class="github-link">Go to GitHub source</a>
+        </td>
+      </tr>
+      <tr>
+        <td class="member-name">
+
+          <code onmouseout="hideTip(event, '70', 70)" onmouseover="showTip(event, '70', 70)">
+            intersect comparer first second
+          </code>
+          <div class="tip" id="70">
+            <strong>Signature:</strong> comparer:(type) -&gt; first:(type) -&gt; second:(type) -&gt; (type)<br />
+                          <strong>Type parameters:</strong> '?8218          </div>
+        </td>
+        <td class="xmldoc">
+        <p>Calls <a href="https://docs.microsoft.com/en-us/dotnet/api/system.linq.enumerable.intersect"><code>Intersect(first, second, comparer)</code></a></p>
+
+
+            <a href="https://github.com/jbtule/FSharp.Interop.Compose/blob/stable/src/netstd_2_0/FSharp.Interop.Compose.Linq/Enumerable.fs#L182-182" class="github-link">Go to GitHub source</a>
+        </td>
+      </tr>
+      <tr>
+        <td class="member-name">
+
+          <code onmouseout="hideTip(event, '71', 71)" onmouseover="showTip(event, '71', 71)">
+            join (...)
+          </code>
+          <div class="tip" id="71">
+            <strong>Signature:</strong> outerKeySelector:(&#39;TOuter -&gt; &#39;TKey) -&gt; innerKeySelector:(&#39;TInner -&gt; &#39;TKey) -&gt; resultSelector:(&#39;TOuter -&gt; &#39;TInner -&gt; &#39;TResult) -&gt; comparer:(type) -&gt; outer:(type) -&gt; inner:(type) -&gt; (type)<br />
+                          <strong>Type parameters:</strong> 'TOuter, 'TKey, 'TInner, 'TResult          </div>
+        </td>
+        <td class="xmldoc">
+        <p>Calls <a href="https://docs.microsoft.com/en-us/dotnet/api/system.linq.enumerable.join"><code>Join(outer, inner, System.Func&lt;'TOuter, 'TKey&gt;(outerKeySelector), System.Func&lt;'TInner, 'TKey&gt;(innerKeySelector), System.Func&lt;'TOuter, 'TInner, 'TResult&gt;(resultSelector), comparer)</code></a></p>
+
+
+            <a href="https://github.com/jbtule/FSharp.Interop.Compose/blob/stable/src/netstd_2_0/FSharp.Interop.Compose.Linq/Enumerable.fs#L185-185" class="github-link">Go to GitHub source</a>
+        </td>
+      </tr>
+      <tr>
+        <td class="member-name">
+
+          <code onmouseout="hideTip(event, '72', 72)" onmouseover="showTip(event, '72', 72)">
+            last predicate source
+          </code>
+          <div class="tip" id="72">
+            <strong>Signature:</strong> predicate:(&#39;TSource -&gt; (type)) -&gt; source:(type) -&gt; &#39;TSource<br />
+                          <strong>Type parameters:</strong> 'TSource          </div>
+        </td>
+        <td class="xmldoc">
+        <p>Calls <a href="https://docs.microsoft.com/en-us/dotnet/api/system.linq.enumerable.last"><code>Last(source, System.Func&lt;'TSource, System.Boolean&gt;(predicate))</code></a></p>
+
+
+            <a href="https://github.com/jbtule/FSharp.Interop.Compose/blob/stable/src/netstd_2_0/FSharp.Interop.Compose.Linq/Enumerable.fs#L188-188" class="github-link">Go to GitHub source</a>
+        </td>
+      </tr>
+      <tr>
+        <td class="member-name">
+
+          <code onmouseout="hideTip(event, '73', 73)" onmouseover="showTip(event, '73', 73)">
+            lastOrDefault predicate source
+          </code>
+          <div class="tip" id="73">
+            <strong>Signature:</strong> predicate:(&#39;TSource -&gt; (type)) -&gt; source:(type) -&gt; &#39;TSource<br />
+                          <strong>Type parameters:</strong> 'TSource          </div>
+        </td>
+        <td class="xmldoc">
+        <p>Calls <a href="https://docs.microsoft.com/en-us/dotnet/api/system.linq.enumerable.lastordefault"><code>LastOrDefault(source, System.Func&lt;'TSource, System.Boolean&gt;(predicate))</code></a></p>
+
+
+            <a href="https://github.com/jbtule/FSharp.Interop.Compose/blob/stable/src/netstd_2_0/FSharp.Interop.Compose.Linq/Enumerable.fs#L191-191" class="github-link">Go to GitHub source</a>
+        </td>
+      </tr>
+      <tr>
+        <td class="member-name">
+
+          <code onmouseout="hideTip(event, '74', 74)" onmouseover="showTip(event, '74', 74)">
+            longCount predicate source
+          </code>
+          <div class="tip" id="74">
+            <strong>Signature:</strong> predicate:(&#39;TSource -&gt; (type)) -&gt; source:(type) -&gt; int64<br />
+                          <strong>Type parameters:</strong> 'TSource          </div>
+        </td>
+        <td class="xmldoc">
+        <p>Calls <a href="https://docs.microsoft.com/en-us/dotnet/api/system.linq.enumerable.longcount"><code>LongCount(source, System.Func&lt;'TSource, System.Boolean&gt;(predicate))</code></a></p>
+
+
+            <a href="https://github.com/jbtule/FSharp.Interop.Compose/blob/stable/src/netstd_2_0/FSharp.Interop.Compose.Linq/Enumerable.fs#L194-194" class="github-link">Go to GitHub source</a>
+        </td>
+      </tr>
+      <tr>
+        <td class="member-name">
+
+          <code onmouseout="hideTip(event, '75', 75)" onmouseover="showTip(event, '75', 75)">
+            orderBy keySelector comparer source
+          </code>
+          <div class="tip" id="75">
+            <strong>Signature:</strong> keySelector:(&#39;TSource -&gt; &#39;TKey) -&gt; comparer:(type) -&gt; source:(type) -&gt; (type)<br />
+                          <strong>Type parameters:</strong> 'TSource, 'TKey          </div>
+        </td>
+        <td class="xmldoc">
+        <p>Calls <a href="https://docs.microsoft.com/en-us/dotnet/api/system.linq.enumerable.orderby"><code>OrderBy(source, System.Func&lt;'TSource, 'TKey&gt;(keySelector), comparer)</code></a></p>
+
+
+            <a href="https://github.com/jbtule/FSharp.Interop.Compose/blob/stable/src/netstd_2_0/FSharp.Interop.Compose.Linq/Enumerable.fs#L197-197" class="github-link">Go to GitHub source</a>
+        </td>
+      </tr>
+      <tr>
+        <td class="member-name">
+
+          <code onmouseout="hideTip(event, '76', 76)" onmouseover="showTip(event, '76', 76)">
+            orderByDescending (...)
+          </code>
+          <div class="tip" id="76">
+            <strong>Signature:</strong> keySelector:(&#39;TSource -&gt; &#39;TKey) -&gt; comparer:(type) -&gt; source:(type) -&gt; (type)<br />
+                          <strong>Type parameters:</strong> 'TSource, 'TKey          </div>
+        </td>
+        <td class="xmldoc">
+        <p>Calls <a href="https://docs.microsoft.com/en-us/dotnet/api/system.linq.enumerable.orderbydescending"><code>OrderByDescending(source, System.Func&lt;'TSource, 'TKey&gt;(keySelector), comparer)</code></a></p>
+
+
+            <a href="https://github.com/jbtule/FSharp.Interop.Compose/blob/stable/src/netstd_2_0/FSharp.Interop.Compose.Linq/Enumerable.fs#L200-200" class="github-link">Go to GitHub source</a>
+        </td>
+      </tr>
+      <tr>
+        <td class="member-name">
+
+          <code onmouseout="hideTip(event, '77', 77)" onmouseover="showTip(event, '77', 77)">
+            select selector source
+          </code>
+          <div class="tip" id="77">
+            <strong>Signature:</strong> selector:(&#39;TSource -&gt; (type) -&gt; &#39;TResult) -&gt; source:(type) -&gt; (type)<br />
+                          <strong>Type parameters:</strong> 'TSource, 'TResult          </div>
+        </td>
+        <td class="xmldoc">
+        <p>Calls <a href="https://docs.microsoft.com/en-us/dotnet/api/system.linq.enumerable.select"><code>Select(source, System.Func&lt;'TSource, System.Int32, 'TResult&gt;(selector))</code></a></p>
+
+
+            <a href="https://github.com/jbtule/FSharp.Interop.Compose/blob/stable/src/netstd_2_0/FSharp.Interop.Compose.Linq/Enumerable.fs#L203-203" class="github-link">Go to GitHub source</a>
+        </td>
+      </tr>
+      <tr>
+        <td class="member-name">
+
+          <code onmouseout="hideTip(event, '78', 78)" onmouseover="showTip(event, '78', 78)">
+            selectMany (...)
+          </code>
+          <div class="tip" id="78">
+            <strong>Signature:</strong> collectionSelector:(&#39;TSource -&gt; (type) -&gt; (type)) -&gt; resultSelector:(&#39;TSource -&gt; &#39;TCollection -&gt; &#39;TResult) -&gt; source:(type) -&gt; (type)<br />
+                          <strong>Type parameters:</strong> 'TSource, 'TCollection, 'TResult          </div>
+        </td>
+        <td class="xmldoc">
+        <p>Calls <a href="https://docs.microsoft.com/en-us/dotnet/api/system.linq.enumerable.selectmany"><code>SelectMany(source, System.Func&lt;'TSource, System.Int32, System.Collections.Generic.IEnumerable&lt;'TCollection&gt;&gt;(collectionSelector), System.Func&lt;'TSource, 'TCollection, 'TResult&gt;(resultSelector))</code></a></p>
+
+
+            <a href="https://github.com/jbtule/FSharp.Interop.Compose/blob/stable/src/netstd_2_0/FSharp.Interop.Compose.Linq/Enumerable.fs#L206-206" class="github-link">Go to GitHub source</a>
+        </td>
+      </tr>
+      <tr>
+        <td class="member-name">
+
+          <code onmouseout="hideTip(event, '79', 79)" onmouseover="showTip(event, '79', 79)">
+            sequenceEqual comparer first second
+          </code>
+          <div class="tip" id="79">
+            <strong>Signature:</strong> comparer:(type) -&gt; first:(type) -&gt; second:(type) -&gt; bool<br />
+                          <strong>Type parameters:</strong> '?8244          </div>
+        </td>
+        <td class="xmldoc">
+        <p>Calls <a href="https://docs.microsoft.com/en-us/dotnet/api/system.linq.enumerable.sequenceequal"><code>SequenceEqual(first, second, comparer)</code></a></p>
+
+
+            <a href="https://github.com/jbtule/FSharp.Interop.Compose/blob/stable/src/netstd_2_0/FSharp.Interop.Compose.Linq/Enumerable.fs#L209-209" class="github-link">Go to GitHub source</a>
+        </td>
+      </tr>
+      <tr>
+        <td class="member-name">
+
+          <code onmouseout="hideTip(event, '80', 80)" onmouseover="showTip(event, '80', 80)">
+            single predicate source
+          </code>
+          <div class="tip" id="80">
+            <strong>Signature:</strong> predicate:(&#39;TSource -&gt; (type)) -&gt; source:(type) -&gt; &#39;TSource<br />
+                          <strong>Type parameters:</strong> 'TSource          </div>
+        </td>
+        <td class="xmldoc">
+        <p>Calls <a href="https://docs.microsoft.com/en-us/dotnet/api/system.linq.enumerable.single"><code>Single(source, System.Func&lt;'TSource, System.Boolean&gt;(predicate))</code></a></p>
+
+
+            <a href="https://github.com/jbtule/FSharp.Interop.Compose/blob/stable/src/netstd_2_0/FSharp.Interop.Compose.Linq/Enumerable.fs#L212-212" class="github-link">Go to GitHub source</a>
+        </td>
+      </tr>
+      <tr>
+        <td class="member-name">
+
+          <code onmouseout="hideTip(event, '81', 81)" onmouseover="showTip(event, '81', 81)">
+            singleOrDefault predicate source
+          </code>
+          <div class="tip" id="81">
+            <strong>Signature:</strong> predicate:(&#39;TSource -&gt; (type)) -&gt; source:(type) -&gt; &#39;TSource<br />
+                          <strong>Type parameters:</strong> 'TSource          </div>
+        </td>
+        <td class="xmldoc">
+        <p>Calls <a href="https://docs.microsoft.com/en-us/dotnet/api/system.linq.enumerable.singleordefault"><code>SingleOrDefault(source, System.Func&lt;'TSource, System.Boolean&gt;(predicate))</code></a></p>
+
+
+            <a href="https://github.com/jbtule/FSharp.Interop.Compose/blob/stable/src/netstd_2_0/FSharp.Interop.Compose.Linq/Enumerable.fs#L215-215" class="github-link">Go to GitHub source</a>
+        </td>
+      </tr>
+      <tr>
+        <td class="member-name">
+
+          <code onmouseout="hideTip(event, '82', 82)" onmouseover="showTip(event, '82', 82)">
+            skipWhile predicate source
+          </code>
+          <div class="tip" id="82">
+            <strong>Signature:</strong> predicate:(&#39;TSource -&gt; (type) -&gt; (type)) -&gt; source:(type) -&gt; (type)<br />
+                          <strong>Type parameters:</strong> 'TSource          </div>
+        </td>
+        <td class="xmldoc">
+        <p>Calls <a href="https://docs.microsoft.com/en-us/dotnet/api/system.linq.enumerable.skipwhile"><code>SkipWhile(source, System.Func&lt;'TSource, System.Int32, System.Boolean&gt;(predicate))</code></a></p>
+
+
+            <a href="https://github.com/jbtule/FSharp.Interop.Compose/blob/stable/src/netstd_2_0/FSharp.Interop.Compose.Linq/Enumerable.fs#L218-218" class="github-link">Go to GitHub source</a>
+        </td>
+      </tr>
+      <tr>
+        <td class="member-name">
+
+          <code onmouseout="hideTip(event, '83', 83)" onmouseover="showTip(event, '83', 83)">
+            takeWhile predicate source
+          </code>
+          <div class="tip" id="83">
+            <strong>Signature:</strong> predicate:(&#39;TSource -&gt; (type) -&gt; (type)) -&gt; source:(type) -&gt; (type)<br />
+                          <strong>Type parameters:</strong> 'TSource          </div>
+        </td>
+        <td class="xmldoc">
+        <p>Calls <a href="https://docs.microsoft.com/en-us/dotnet/api/system.linq.enumerable.takewhile"><code>TakeWhile(source, System.Func&lt;'TSource, System.Int32, System.Boolean&gt;(predicate))</code></a></p>
+
+
+            <a href="https://github.com/jbtule/FSharp.Interop.Compose/blob/stable/src/netstd_2_0/FSharp.Interop.Compose.Linq/Enumerable.fs#L221-221" class="github-link">Go to GitHub source</a>
+        </td>
+      </tr>
+      <tr>
+        <td class="member-name">
+
+          <code onmouseout="hideTip(event, '84', 84)" onmouseover="showTip(event, '84', 84)">
+            thenBy keySelector comparer source
+          </code>
+          <div class="tip" id="84">
+            <strong>Signature:</strong> keySelector:(&#39;TSource -&gt; &#39;TKey) -&gt; comparer:(type) -&gt; source:(type) -&gt; (type)<br />
+                          <strong>Type parameters:</strong> 'TSource, 'TKey          </div>
+        </td>
+        <td class="xmldoc">
+        <p>Calls <a href="https://docs.microsoft.com/en-us/dotnet/api/system.linq.enumerable.thenby"><code>ThenBy(source, System.Func&lt;'TSource, 'TKey&gt;(keySelector), comparer)</code></a></p>
+
+
+            <a href="https://github.com/jbtule/FSharp.Interop.Compose/blob/stable/src/netstd_2_0/FSharp.Interop.Compose.Linq/Enumerable.fs#L224-224" class="github-link">Go to GitHub source</a>
+        </td>
+      </tr>
+      <tr>
+        <td class="member-name">
+
+          <code onmouseout="hideTip(event, '85', 85)" onmouseover="showTip(event, '85', 85)">
+            thenByDescending (...)
+          </code>
+          <div class="tip" id="85">
+            <strong>Signature:</strong> keySelector:(&#39;TSource -&gt; &#39;TKey) -&gt; comparer:(type) -&gt; source:(type) -&gt; (type)<br />
+                          <strong>Type parameters:</strong> 'TSource, 'TKey          </div>
+        </td>
+        <td class="xmldoc">
+        <p>Calls <a href="https://docs.microsoft.com/en-us/dotnet/api/system.linq.enumerable.thenbydescending"><code>ThenByDescending(source, System.Func&lt;'TSource, 'TKey&gt;(keySelector), comparer)</code></a></p>
+
+
+            <a href="https://github.com/jbtule/FSharp.Interop.Compose/blob/stable/src/netstd_2_0/FSharp.Interop.Compose.Linq/Enumerable.fs#L227-227" class="github-link">Go to GitHub source</a>
+        </td>
+      </tr>
+      <tr>
+        <td class="member-name">
+
+          <code onmouseout="hideTip(event, '86', 86)" onmouseover="showTip(event, '86', 86)">
+            toDictionary (...)
+          </code>
+          <div class="tip" id="86">
+            <strong>Signature:</strong> keySelector:(&#39;TSource -&gt; &#39;TKey) -&gt; elementSelector:(&#39;TSource -&gt; &#39;TElement) -&gt; comparer:(type) -&gt; source:(type) -&gt; (type)<br />
+                          <strong>Type parameters:</strong> 'TSource, 'TKey, 'TElement          </div>
+        </td>
+        <td class="xmldoc">
+        <p>Calls <a href="https://docs.microsoft.com/en-us/dotnet/api/system.linq.enumerable.todictionary"><code>ToDictionary(source, System.Func&lt;'TSource, 'TKey&gt;(keySelector), System.Func&lt;'TSource, 'TElement&gt;(elementSelector), comparer)</code></a></p>
+
+
+            <a href="https://github.com/jbtule/FSharp.Interop.Compose/blob/stable/src/netstd_2_0/FSharp.Interop.Compose.Linq/Enumerable.fs#L230-230" class="github-link">Go to GitHub source</a>
+        </td>
+      </tr>
+      <tr>
+        <td class="member-name">
+
+          <code onmouseout="hideTip(event, '87', 87)" onmouseover="showTip(event, '87', 87)">
+            toLookup (...)
+          </code>
+          <div class="tip" id="87">
+            <strong>Signature:</strong> keySelector:(&#39;TSource -&gt; &#39;TKey) -&gt; elementSelector:(&#39;TSource -&gt; &#39;TElement) -&gt; comparer:(type) -&gt; source:(type) -&gt; (type)<br />
+                          <strong>Type parameters:</strong> 'TSource, 'TKey, 'TElement          </div>
+        </td>
+        <td class="xmldoc">
+        <p>Calls <a href="https://docs.microsoft.com/en-us/dotnet/api/system.linq.enumerable.tolookup"><code>ToLookup(source, System.Func&lt;'TSource, 'TKey&gt;(keySelector), System.Func&lt;'TSource, 'TElement&gt;(elementSelector), comparer)</code></a></p>
+
+
+            <a href="https://github.com/jbtule/FSharp.Interop.Compose/blob/stable/src/netstd_2_0/FSharp.Interop.Compose.Linq/Enumerable.fs#L233-233" class="github-link">Go to GitHub source</a>
+        </td>
+      </tr>
+      <tr>
+        <td class="member-name">
+
+          <code onmouseout="hideTip(event, '88', 88)" onmouseover="showTip(event, '88', 88)">
+            union comparer first second
+          </code>
+          <div class="tip" id="88">
+            <strong>Signature:</strong> comparer:(type) -&gt; first:(type) -&gt; second:(type) -&gt; (type)<br />
+                          <strong>Type parameters:</strong> '?8268          </div>
+        </td>
+        <td class="xmldoc">
+        <p>Calls <a href="https://docs.microsoft.com/en-us/dotnet/api/system.linq.enumerable.union"><code>Union(first, second, comparer)</code></a></p>
+
+
+            <a href="https://github.com/jbtule/FSharp.Interop.Compose/blob/stable/src/netstd_2_0/FSharp.Interop.Compose.Linq/Enumerable.fs#L236-236" class="github-link">Go to GitHub source</a>
+        </td>
+      </tr>
+      <tr>
+        <td class="member-name">
+
+          <code onmouseout="hideTip(event, '89', 89)" onmouseover="showTip(event, '89', 89)">
+            where predicate source
+          </code>
+          <div class="tip" id="89">
+            <strong>Signature:</strong> predicate:(&#39;TSource -&gt; (type) -&gt; (type)) -&gt; source:(type) -&gt; (type)<br />
+                          <strong>Type parameters:</strong> 'TSource          </div>
+        </td>
+        <td class="xmldoc">
+        <p>Calls <a href="https://docs.microsoft.com/en-us/dotnet/api/system.linq.enumerable.where"><code>Where(source, System.Func&lt;'TSource, System.Int32, System.Boolean&gt;(predicate))</code></a></p>
+
+
+            <a href="https://github.com/jbtule/FSharp.Interop.Compose/blob/stable/src/netstd_2_0/FSharp.Interop.Compose.Linq/Enumerable.fs#L239-239" class="github-link">Go to GitHub source</a>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+        </div>
+        <div class="span3">
+          <ul class="nav nav-list" id="menu">
+            <li class="nav-header">FSharp.Interop.Compose</li>
+            <li><a href="http://jbtule.github.io/FSharp.Interop.Compose/index.html">Home page</a></li>
+            <li class="divider"></li>
+            <li><a href="http://nuget.org/packages/FSharp.Interop.Compose">Get Library via NuGet</a></li>
+            <li><a href="https://github.com/jbtule/FSharp.Interop.Compose">Source Code on GitHub</a></li>
+            <li><a href="https://github.com/jbtule/FSharp.Interop.Compose/blob/master/LICENSE.txt">License</a></li>
+            <li><a href="https://github.com/jbtule/FSharp.Interop.Compose/releases">Release Notes</a></li>
+
+            <li class="nav-header">Getting started</li>
+            <li><a href="http://jbtule.github.io/FSharp.Interop.Compose/index.html">Home page</a></li>
+            <li><a href="http://jbtule.github.io/FSharp.Interop.Compose/why.html">Why Composable</a></li>
+
+            <li class="nav-header">Documentation</li>
+            <li><a href="http://jbtule.github.io/FSharp.Interop.Compose/reference/index.html">API Reference</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <a href="https://github.com/jbtule/FSharp.Interop.Compose"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a>
+  </body>
+  </html>

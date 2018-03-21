@@ -14,7 +14,7 @@
 
 module DocHelper
 
-#I "packages/FSharp.Compiler.Service/lib/net40/"
+#I "packages/FSharp.Compiler.Service/lib/net45/"
 #r "FSharp.Compiler.Service.dll"
 #I "packages/FSharpVSPowerTools.Core/lib/net45"
 #r "FSharpVSPowerTools.Core.dll"
@@ -31,8 +31,7 @@ open FSharp.Literate
 #load "Vars.fsx"
 
 let generateDocs () =
-  let testRoot = Path.Combine(root, "docs", "build", "output")
-
+  printfn "Generating Docs..."
   let projInfo =
     [ "project-author",  authors |> String.concat ", "
       "project-summary", description
@@ -41,9 +40,9 @@ let generateDocs () =
       "project-name", projectName
       "root" , projectUrl ]
 
-  let dll = Path.Combine(root, buildDir, "NET45", projectName + ".dll")
+  let dll = Path.Combine(root, buildDir, configuration, "netstandard2.0", projectName + ".dll")
 
-  let outputDir = Path.Combine(docsBuildDir, "output")
+  let outputDir = docsBuildDir
 
   Directory.CreateDirectory(outputDir) |> ignore
 
@@ -73,7 +72,7 @@ let generateDocs () =
       includeSource = true )
 
   Literate.ProcessMarkdown(
-      Path.Combine(root, "docs", "why.md"),
+      Path.Combine(root, docsDir, "why.md"),
       templateFile = template,
       output = Path.Combine(outputDir, "why.html"),
       replacements = projInfo,
@@ -93,4 +92,5 @@ let generateDocs () =
           parameters = projInfo,
           sourceRepo = githubSourceUrl,
           sourceFolder = root)
+  printfn "Finished Generating Docs."
   ()

@@ -1,4 +1,8 @@
-#!/usr/bin/env fsharpi --define:mono_posix --exec
+#!/bin/sh
+#if bin_sh
+  # Doing this because arguments can't be used with /usr/bin/env on linux, just mac
+  exec fsharpi --define:mono_posix --exec $0 $*
+#endif
 (*
  * CrossPlatform FSharp Makefile bootstraper - jay+code@tuley.name
  *
@@ -46,7 +50,6 @@ let execAt (workingDir:string) (exePath:string) (args:string seq) =
         exit exitCode
     ()
 
-let exec = execAt Environment.CurrentDirectory
 
 let downloadNugetTo path =
     let fullPath = path |> Path.GetFullPath;
@@ -54,10 +57,10 @@ let downloadNugetTo path =
         printf "Downloading NuGet..."
         use webClient = new System.Net.WebClient()
         fullPath |> Path.GetDirectoryName |> Directory.CreateDirectory |> ignore
-        webClient.DownloadFile("http://nuget.org/nuget.exe", path |> Path.GetFullPath)
+        webClient.DownloadFile("https://dist.nuget.org/win-x86-commandline/latest/nuget.exe", path |> Path.GetFullPath)
         printfn "Done."
 
-let passedArgs = fsi.CommandLineArgs.[1..] |> Array.toList
+let passedArg = fsi.CommandLineArgs.[1..] |> Array.tryHead
 
 (* execution script customize below *)
 
@@ -66,6 +69,67 @@ downloadNugetTo "tools/NuGet/NuGet.exe"
 execAt
     "tools/"
     "tools/NuGet/NuGet.exe"
-    ["install"; "packages.config"; "-OutputDirectory packages"; "-ExcludeVersion"]
+    ["install"; "-OutputDirectory packages"; "-ExcludeVersion"]
 
-exec "tools/packages/FAKE/tools/FAKE.exe" ("tools/Make.fsx"::passedArgs)
+execAt
+    "tools/std20"
+    "tools/NuGet/NuGet.exe"
+    ["install"; "-OutputDirectory packages"; "-ExcludeVersion"]
+
+#load "tools/SimpleMake.fsx"
+
+type actions = { gen:bool; docs:bool; build:bool; clean:bool; test:bool }
+
+let choice =
+    match passedArg with 
+        | Some(x) when x.Equals("Generate", StringComparison.InvariantCultureIgnoreCase) ->
+            printfn "Generate target";
+            { gen= true; docs=false; build =false; clean = true; test= false}
+        | Some(x) when x.Equals("Clean", StringComparison.InvariantCultureIgnoreCase) ->
+            printfn "Clean target";
+            { gen= false; docs=false; build =false; clean = true; test= false}
+        | _ -> 
+            printfn "Default target";
+            { gen= true; docs=true; build = true; clean = true; test= true}
+ 
+let msbuild = CompilerHelper.findMSBuild();
+
+if choice.clean then
+    SimpleMake.clean srcDir
+#if !mono_posix
+    SimpleMake.clean docsBuildDir
+#endif
+    SimpleMake.clean "proj/bin/"
+    SimpleMake.clean "proj/obj/"
+    SimpleMake.clean "test/bin/"
+    SimpleMake.clean "test/obj/"
+
+if choice.gen then
+    SimpleMake.generate ()
+
+if choice.build then
+    let msbuild = CompilerHelper.findMSBuild();
+    execAt "proj/" msbuild [
+                              "/t:restore" 
+                              msbuildProp "VersionSuffix" versionSuffix
+                           ]
+    execAt "proj/" msbuild [
+                              msbuildProp "VersionSuffix" versionSuffix
+                           ]
+
+if choice.test then
+    execAt "test/" msbuild ["/t:restore"]
+    execAt "test/" msbuild []
+    let xunitTools = Path.Combine("tools","packages", "xunit.runner.console","tools")
+    let dotnet = findDotNet ()
+    execAt "test/" dotnet   [
+                                Path.Combine("..", xunitTools, "netcoreapp2.0","xunit.console.dll")
+                                Path.Combine("bin", configuration, "netcoreapp2.0", "Test.dll" )
+                            ]
+    let xunitRunner =  Path.Combine(xunitTools, "net452","xunit.console.exe") |> Path.GetFullPath
+    execAt "test/" xunitRunner [  Path.Combine("bin", configuration, "net47", "Test.exe" ) ]
+
+#if !mono_posix
+if choice.docs then
+    DocHelper.generateDocs ()
+#endif
