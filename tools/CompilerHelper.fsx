@@ -53,9 +53,8 @@ let msbuildPaths = [
                      |> List.append [
                                       Path.Combine("/Library","Frameworks","Mono.framework","Versions","Current","Commands")
                                       Path.Combine(sysDotNetLibPath,"msbuild", "15.0", "bin")
+                                      Path.Combine("/usr","bin")
                                     ]
-
-printfn "%A" msbuildPaths
 
 let findMSBuild () =
         msbuildPaths
