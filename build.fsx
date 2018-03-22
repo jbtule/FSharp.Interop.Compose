@@ -109,13 +109,25 @@ if choice.gen then
 
 if choice.build then
     let msbuild = CompilerHelper.findMSBuild();
-    execAt "proj/" msbuild [
+
+    let props = [
+                    msbuildProp "VersionSuffix" versionSuffix
+                    msbuildProp "Description" description
+                    msbuildProp "Authors" (String.concat " " authors)
+                    msbuildProp "Copyright" copyright
+                    msbuildProp "PackageProjectUrl" projectUrl
+                    msbuildProp "PackageLicenseUrl" licenceUrl
+                    msbuildProp "PackageTags" (String.concat " " projectTags)
+                    msbuildProp "PackageRequireLicenseAcceptance" (requireLicence.ToString())
+                    msbuildProp "GeneratePackageOnBuild" "True"
+                    
+                ]
+
+
+    execAt "proj/" msbuild ([
                               "/t:restore" 
-                              msbuildProp "VersionSuffix" versionSuffix
-                           ]
-    execAt "proj/" msbuild [
-                              msbuildProp "VersionSuffix" versionSuffix
-                           ]
+                            ] @ props)
+    execAt "proj/" msbuild props
 
 if choice.test then
     execAt "test/" msbuild ["/t:restore"]

@@ -1,16 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
   <PropertyGroup>
     <TargetFrameworks>net35;net40;net45;portable-net45+sl5+win8;portable-net45+win8+wpa81+wp8;netstandard2.0</TargetFrameworks>
-    <Description>Inline composable fsharp functions around BCL static methods. Supports .net 3.5 through .net Standard</Description>
-    <Authors>Jay Tuley</Authors>
-    <Copyright>Copyright 2014-2018 Jay Tuley</Copyright>
-    <PackageProjectUrl>http://jbtule.github.io/FSharp.Interop.Compose</PackageProjectUrl>
-    <PackageLicenseUrl>http://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
-    <PackageTags>fsharp dynamic dlr</PackageTags>
     <GenerateDocumentationFile>true</GenerateDocumentationFile> 
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <DisableImplicitFSharpCoreReference>True</DisableImplicitFSharpCoreReference>
+    <DisableImplicitSystemValueTupleReference>true</DisableImplicitSystemValueTupleReference>
     <DebugSymbols>false</DebugSymbols>
     <DebugType>None</DebugType>
   </PropertyGroup>
@@ -34,7 +27,7 @@
 
   <ItemGroup Condition="'$(TargetFramework)'=='net45'">
     <Compile Include="../src/NET45/**/*.fs" />
-    <PackageReference Include="FSharp.Core" Version="4.*"  />
+    <PackageReference Include="FSharp.Core" Version="4.1.*"  />
   </ItemGroup>
  
   <ItemGroup Condition="'$(TargetFramework)'=='portable-net45+sl5+win8'">
