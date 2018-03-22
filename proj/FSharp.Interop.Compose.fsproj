@@ -10,6 +10,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile> 
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+    <DisableImplicitFSharpCoreReference>True</DisableImplicitFSharpCoreReference>
     <DebugSymbols>false</DebugSymbols>
     <DebugType>None</DebugType>
   </PropertyGroup>
@@ -22,33 +23,33 @@
 
  <ItemGroup Condition="'$(TargetFramework)'=='net35'">
     <Compile Include="../src/NET35/**/*.fs" />
-    <PackageReference Include="FSharp.Core" Version="4.1.*" PrivateAssets="all"  />
+    <PackageReference Include="FSharp.Core" Version="4.1.*" />
 
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)'=='net40'">
     <Compile Include="../src/NET40/**/*.fs" />
-    <PackageReference Include="FSharp.Core" Version="4.1.*" PrivateAssets="all"  />
+    <PackageReference Include="FSharp.Core" Version="4.1.*"  />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)'=='net45'">
     <Compile Include="../src/NET45/**/*.fs" />
-    <PackageReference Include="FSharp.Core" Version="4.*" PrivateAssets="all"  />
+    <PackageReference Include="FSharp.Core" Version="4.*"  />
   </ItemGroup>
  
   <ItemGroup Condition="'$(TargetFramework)'=='portable-net45+sl5+win8'">
     <Compile Include="../src/PORTABLE_47/**/*.fs" />
-    <PackageReference Include="FSharp.Core" Version="4.1.*" PrivateAssets="all"  />
+    <PackageReference Include="FSharp.Core" Version="4.1.*"   />
   </ItemGroup>
 
     <ItemGroup Condition="'$(TargetFramework)'=='portable-net45+win8+wpa81+wp8'">
     <Compile Include="../src/PORTABLE_259/**/*.fs" />
-    <PackageReference Include="FSharp.Core" Version="4.1.*" PrivateAssets="all"  />
+    <PackageReference Include="FSharp.Core" Version="4.1.*"  />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
     <Compile Include="../src/netstd_2_0/**/*.fs" />
-    <PackageReference Include="FSharp.Core" Version="4.*" PrivateAssets="all"  />
+    <PackageReference Include="FSharp.Core" Version="4.2.*"  />
   </ItemGroup>
  
   <ItemGroup>
