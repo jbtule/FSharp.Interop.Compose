@@ -111,7 +111,6 @@ if choice.build then
     let msbuild = CompilerHelper.findMSBuild();
 
     let props = [
-                    msbuildProp "VersionSuffix" versionSuffix
                     msbuildProp "Description" description
                     msbuildProp "Authors" (String.concat " " authors)
                     msbuildProp "Copyright" copyright
