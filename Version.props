@@ -1,6 +1,0 @@
-<Project>
-    <PropertyGroup>
-        <VersionPrefix>2.0.1</VersionPrefix>
-        <Version>$(VersionPrefix)$(VSUFFIX)</Version>
-    </PropertyGroup>
-</Project>
