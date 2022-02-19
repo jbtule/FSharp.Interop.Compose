@@ -1,8 +1,0 @@
-build/
-packages/
-tools/NuGet/
-.DS_Store
-.fake/
-bin/
-obj/
-.ionide/
